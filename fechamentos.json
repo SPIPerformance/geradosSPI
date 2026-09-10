@@ -1,0 +1,24 @@
+{
+  "2026-08": {
+    "fechadoEm": "2026-09-10",
+    "totalGerados": 445,
+    "porSpi": {
+      "SPI1": 104,
+      "SPI2": 47,
+      "SPI3": 65,
+      "SPI4": 73,
+      "SPI5": 58,
+      "SPI6": 80,
+      "Sensia": 18
+    },
+    "metas": {
+      "SPI1": 161,
+      "SPI2": 109,
+      "SPI3": 101,
+      "SPI4": 109,
+      "SPI5": 71,
+      "SPI6": 131,
+      "Sensia": 28
+    }
+  }
+}
