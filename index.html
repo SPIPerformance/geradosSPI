@@ -723,7 +723,21 @@ async function loadRelacaoGerentes(){
   try{
     const response = await fetch('relacao-gerentes-lojas.json?t=' + new Date().getTime());
     if(response.ok){
-      LOJA_GERENTE_MAP = await response.json();
+      const dataArray = await response.json();
+      const novoMapa = {};
+      
+      // Converte a lista em um dicionário usando o nome da loja normalizado como chave
+      dataArray.forEach(item => {
+        if(item.LOJA) {
+          const nomeLoja = normLoja(item.LOJA);
+          novoMapa[nomeLoja] = {
+            regional: item.REGIONAL,
+            gerente: item.GERENTE
+          };
+        }
+      });
+      
+      LOJA_GERENTE_MAP = novoMapa;
     }
   }catch(e){ /* mantem o mapeamento atual em caso de falha de rede */ }
 }
