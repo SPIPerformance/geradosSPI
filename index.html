@@ -443,6 +443,21 @@
                 <div class="n" id="statCanalTodos">0</div><div class="l">Todos</div>
               </div>
             </div>
+            <!-- Bloco adicionado de Share dos Canais -->
+            <div class="status-mini" style="margin-top:4px; border-top:1px dashed var(--line); padding-top:4px;">
+              <div id="statBoxShareHouse" onclick="selectedChannelFilter = (selectedChannelFilter === 'HOUSE') ? null : 'HOUSE'; render();" style="background: transparent;">
+                <div class="n" id="statShareHouse">0,0%</div><div class="l">Share House</div>
+              </div>
+              <div id="statBoxShareImob" onclick="selectedChannelFilter = (selectedChannelFilter === 'IMOB') ? null : 'IMOB'; render();" style="background: transparent;">
+                <div class="n" id="statShareImob">0,0%</div><div class="l">Share Imob</div>
+              </div>
+              <div id="statBoxShareAGS" onclick="selectedChannelFilter = (selectedChannelFilter === 'AGS') ? null : 'AGS'; render();" style="background: transparent;">
+                <div class="n" id="statShareAGS">0,0%</div><div class="l">Share AGS</div>
+              </div>
+              <div style="background: transparent; opacity: 0.6; cursor: default;">
+                <div class="n">100%</div><div class="l">Share Tot.</div>
+              </div>
+            </div>
           </div>
 
           <div class="card spi-card">
@@ -555,7 +570,7 @@
     <div id="teamSectionsWrap">
       <div class="card team-section" style="border-left:4px solid var(--green);">
         <h4 style="margin:0 0 8px;font-size:12px;color:var(--green-dark);display:flex;align-items:center;gap:6px;">🧑‍💼 Gerentes &amp; Supervisores (AGS / House / Imob) <span id="teamGerentesCount" class="team-count-badge"></span></h4>
-        <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">No canal Imob, o supervisor aparece dentro do gerente dele — as vendas não somam 2x no Total Geral. Selecionando várias semanas, os números são somados.</p>
+        <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">No canal Imob, the supervisor aparece dentro do gerente dele — as vendas não somam 2x no Total Geral. Selecionando várias semanas, os números são somados.</p>
         <div class="team-tree-root" id="teamGerentesTree"></div>
       </div>
     </div>
@@ -922,9 +937,6 @@ function renderHistoricoGerados(){
   });
 }
 
-// Carrega o historico de fechamentos mensais (arquivo fixo e leve, uma entrada
-// por mês). A chave de cada entrada é sempre "AAAA-MM" — fechar um mês que já
-// existe SOBRESCREVE aquela chave, nunca cria uma segunda entrada pro mesmo mês.
 async function loadHistorico(){
   try{
     const response = await fetch('historico/fechamentos.json?t=' + new Date().getTime());
@@ -948,7 +960,6 @@ function fecharMesAtual(){
   const porSpi = {}; const metasOut = {};
   SPI_KEYS.forEach(k=>{ porSpi[k] = perSpiTotal[k]||0; metasOut[k] = Number(metasDoMes[k])||0; });
 
-  // Se a chave do mês já existe, avisa e SUBSTITUI (nunca duplica) ao confirmar.
   if(historicoFechamentos[mKey]){
     const jaTinha = historicoFechamentos[mKey];
     const confirmMsg = `Já existe um fechamento salvo para ${mKey} `+
@@ -1127,9 +1138,6 @@ function renderGerenteComSupervisoresNode(name, count, supervisoresHtml){
   return `<details class="team-lvl-pessoa${semGerenteCls}"><summary><span class="team-lvl-label">${label}</span><span class="team-lvl-total">${count}</span></summary>${supervisoresHtml}</details>`;
 }
 
-// Renderiza a árvore Regional -> Canal -> Gerente -> Supervisor somando os
-// dados de UMA OU MAIS semanas selecionadas ao mesmo tempo (weekIndices é
-// sempre um array; se vier um único número, é normalizado pra array de 1).
 function renderTeamTree(containerId, countId, records, year, month, lastDay, weekIndices){
   const container = document.getElementById(containerId);
   const countBadge = document.getElementById(countId);
@@ -1205,8 +1213,6 @@ function renderTeamTree(containerId, countId, records, year, month, lastDay, wee
   container.innerHTML = html;
 }
 
-// Popula o <select multiple> de semanas preservando as semanas já marcadas
-// pelo usuário (se ainda existirem no novo mês); senão cai na semana padrão.
 function populateTeamWeekSelect(numWeeks, defaultWeekIdx){
   const sel = document.getElementById('teamWeekSelect');
   const prevSelected = Array.from(sel.selectedOptions).map(o => o.value);
@@ -1222,7 +1228,6 @@ function populateTeamWeekSelect(numWeeks, defaultWeekIdx){
   Array.from(sel.options).forEach(o => { o.selected = toSelect.includes(o.value); });
 }
 
-// Texto "dias X a Y" pra uma ou mais semanas selecionadas.
 function getWeeksRangeLabel(year, month, weekIndices, lastDay){
   const sorted = [...new Set(weekIndices)].sort((a,b)=>a-b);
   const parts = sorted.map(w=>{
@@ -1410,10 +1415,6 @@ function updateFileStatus(){
   }
 }
 
-// Calcula um hash simples do conteúdo do XML, pra saber se o arquivo do
-// GitHub realmente mudou desde a última vez que o painel checou. Usa
-// SHA-256 quando disponível (crypto.subtle); cai num fallback por tamanho
-// se o navegador não suportar (ex: contexto não seguro).
 async function hashText(text){
   try{
     const enc = new TextEncoder().encode(text);
@@ -1424,9 +1425,6 @@ async function hashText(text){
   }
 }
 
-// "Atualizado em" só avança quando o conteúdo do XML do GitHub muda de fato.
-// Guarda o hash e a hora da última mudança real no localStorage; se o XML
-// baixado agora tem o mesmo hash de antes, mantém a hora antiga.
 async function updateFileStatusFromRemote(xmlText){
   const hash = await hashText(xmlText);
   const storedHash = localStorage.getItem('spi-xml-hash');
@@ -1445,8 +1443,6 @@ async function updateFileStatusFromRemote(xmlText){
 async function handleFile(file){
   const text = await file.text();
   await loadFromText(text);
-  // Upload manual: aqui faz sentido mostrar "agora", e também atualiza o
-  // hash/hora de referência pra não conflitar com o próximo fetch do GitHub.
   const hash = await hashText(text);
   const nowIso = new Date().toISOString();
   localStorage.setItem('spi-xml-hash', hash);
@@ -1662,7 +1658,7 @@ async function resetSimulations(){
     localStorage.setItem('spi-pdv-pcts-map', JSON.stringify(allPdvPctsByMonth));
     localStorage.setItem('spi-metas-map', JSON.stringify(allMetasByMonth));
     
-    await loadPlanejamento(); // Recarrega os dados do planejamento.json
+    await loadPlanejamento();
     loadMonthSettings();
     
     buildSimMetaBar();
@@ -1773,10 +1769,26 @@ function render(){
   document.getElementById('statBoxImob').style.background = (selectedChannelFilter === 'IMOB') ? '#d1e7dd' : 'transparent';
   document.getElementById('statBoxAGS').style.background = (selectedChannelFilter === 'AGS') ? '#d1e7dd' : 'transparent';
   document.getElementById('statBoxCanalTodos').style.background = (!selectedChannelFilter) ? '#d1e7dd' : 'transparent';
+
+  // Destacando também o filtro de share/canal correspondente
+  document.getElementById('statBoxShareHouse').style.background = (selectedChannelFilter === 'HOUSE') ? '#d1e7dd' : 'transparent';
+  document.getElementById('statBoxShareImob').style.background = (selectedChannelFilter === 'IMOB') ? '#d1e7dd' : 'transparent';
+  document.getElementById('statBoxShareAGS').style.background = (selectedChannelFilter === 'AGS') ? '#d1e7dd' : 'transparent';
+
   document.getElementById('statHouse').textContent = channelCount.HOUSE;
   document.getElementById('statImob').textContent = channelCount.IMOB;
   document.getElementById('statAGS').textContent = channelCount.AGS;
   document.getElementById('statCanalTodos').textContent = monthRecords.length;
+
+  // Cálculo e exibição do Share de cada canal em relação ao total do mês
+  const totalMesCount = monthRecords.length;
+  const shareHouse = totalMesCount > 0 ? (channelCount.HOUSE / totalMesCount) * 100 : 0;
+  const shareImob = totalMesCount > 0 ? (channelCount.IMOB / totalMesCount) * 100 : 0;
+  const shareAGS = totalMesCount > 0 ? (channelCount.AGS / totalMesCount) * 100 : 0;
+
+  document.getElementById('statShareHouse').textContent = shareHouse.toFixed(1).replace('.', ',') + '%';
+  document.getElementById('statShareImob').textContent = shareImob.toFixed(1).replace('.', ',') + '%';
+  document.getElementById('statShareAGS').textContent = shareAGS.toFixed(1).replace('.', ',') + '%';
 
   const isFiltered = selectedSpiFilter !== null;
   const keysToRender = isFiltered ? [selectedSpiFilter] : SPI_KEYS;
