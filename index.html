@@ -237,6 +237,10 @@
   .status-mini div{text-align:center;flex:1;cursor:pointer;padding:2px 3px;border-radius:4px;transition:background .15s;}
   .status-mini .n{font-size:12px;font-weight:800;color:var(--green-dark);}
   .status-mini .l{font-size:9px;color:var(--muted);font-weight:600;}
+  
+  /* Estilo customizado para os textos/números menores de share na mesma barra */
+  .status-mini .n.share-val { font-size: 10px; font-weight: 700; color: var(--muted); }
+  .status-mini .l.share-lbl { font-size: 8px; color: var(--muted); }
 
   .empty-state{
     text-align:center;padding:40px 20px;color:var(--muted);
@@ -431,31 +435,16 @@
             </div>
             <div class="status-mini" style="margin-top:4px;">
               <div id="statBoxHouse" onclick="selectedChannelFilter = (selectedChannelFilter === 'HOUSE') ? null : 'HOUSE'; render();" style="background: transparent;">
-                <div class="n" id="statHouse">0</div><div class="l">House</div>
+                <div class="n" id="statHouse">0</div><div class="l">House <span id="statShareHouse" class="share-val" style="display:block;">(0,0%)</span></div>
               </div>
               <div id="statBoxImob" onclick="selectedChannelFilter = (selectedChannelFilter === 'IMOB') ? null : 'IMOB'; render();" style="background: transparent;">
-                <div class="n" id="statImob">0</div><div class="l">Imob</div>
+                <div class="n" id="statImob">0</div><div class="l">Imob <span id="statShareImob" class="share-val" style="display:block;">(0,0%)</span></div>
               </div>
               <div id="statBoxAGS" onclick="selectedChannelFilter = (selectedChannelFilter === 'AGS') ? null : 'AGS'; render();" style="background: transparent;">
-                <div class="n" id="statAGS">0</div><div class="l">AGS</div>
+                <div class="n" id="statAGS">0</div><div class="l">AGS <span id="statShareAGS" class="share-val" style="display:block;">(0,0%)</span></div>
               </div>
               <div id="statBoxCanalTodos" onclick="selectedChannelFilter = null; render();" style="background: rgb(209, 231, 221);">
-                <div class="n" id="statCanalTodos">0</div><div class="l">Todos</div>
-              </div>
-            </div>
-            <!-- Bloco adicionado de Share dos Canais -->
-            <div class="status-mini" style="margin-top:4px; border-top:1px dashed var(--line); padding-top:4px;">
-              <div id="statBoxShareHouse" onclick="selectedChannelFilter = (selectedChannelFilter === 'HOUSE') ? null : 'HOUSE'; render();" style="background: transparent;">
-                <div class="n" id="statShareHouse">0,0%</div><div class="l">Share House</div>
-              </div>
-              <div id="statBoxShareImob" onclick="selectedChannelFilter = (selectedChannelFilter === 'IMOB') ? null : 'IMOB'; render();" style="background: transparent;">
-                <div class="n" id="statShareImob">0,0%</div><div class="l">Share Imob</div>
-              </div>
-              <div id="statBoxShareAGS" onclick="selectedChannelFilter = (selectedChannelFilter === 'AGS') ? null : 'AGS'; render();" style="background: transparent;">
-                <div class="n" id="statShareAGS">0,0%</div><div class="l">Share AGS</div>
-              </div>
-              <div style="background: transparent; opacity: 0.6; cursor: default;">
-                <div class="n">100%</div><div class="l">Share Tot.</div>
+                <div class="n" id="statCanalTodos">0</div><div class="l">Todos <span class="share-val" style="display:block; visibility:hidden;">(100%)</span></div>
               </div>
             </div>
           </div>
@@ -570,7 +559,7 @@
     <div id="teamSectionsWrap">
       <div class="card team-section" style="border-left:4px solid var(--green);">
         <h4 style="margin:0 0 8px;font-size:12px;color:var(--green-dark);display:flex;align-items:center;gap:6px;">🧑‍💼 Gerentes &amp; Supervisores (AGS / House / Imob) <span id="teamGerentesCount" class="team-count-badge"></span></h4>
-        <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">No canal Imob, the supervisor aparece dentro do gerente dele — as vendas não somam 2x no Total Geral. Selecionando várias semanas, os números são somados.</p>
+        <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">No canal Imob, o supervisor aparece dentro do gerente dele — as vendas não somam 2x no Total Geral. Selecionando várias semanas, os números são somados.</p>
         <div class="team-tree-root" id="teamGerentesTree"></div>
       </div>
     </div>
@@ -1769,26 +1758,20 @@ function render(){
   document.getElementById('statBoxImob').style.background = (selectedChannelFilter === 'IMOB') ? '#d1e7dd' : 'transparent';
   document.getElementById('statBoxAGS').style.background = (selectedChannelFilter === 'AGS') ? '#d1e7dd' : 'transparent';
   document.getElementById('statBoxCanalTodos').style.background = (!selectedChannelFilter) ? '#d1e7dd' : 'transparent';
-
-  // Destacando também o filtro de share/canal correspondente
-  document.getElementById('statBoxShareHouse').style.background = (selectedChannelFilter === 'HOUSE') ? '#d1e7dd' : 'transparent';
-  document.getElementById('statBoxShareImob').style.background = (selectedChannelFilter === 'IMOB') ? '#d1e7dd' : 'transparent';
-  document.getElementById('statBoxShareAGS').style.background = (selectedChannelFilter === 'AGS') ? '#d1e7dd' : 'transparent';
-
   document.getElementById('statHouse').textContent = channelCount.HOUSE;
   document.getElementById('statImob').textContent = channelCount.IMOB;
   document.getElementById('statAGS').textContent = channelCount.AGS;
   document.getElementById('statCanalTodos').textContent = monthRecords.length;
 
-  // Cálculo e exibição do Share de cada canal em relação ao total do mês
+  // Cálculo e exibição do Share de cada canal em relação ao total do mês integrado diretamente nos blocos
   const totalMesCount = monthRecords.length;
   const shareHouse = totalMesCount > 0 ? (channelCount.HOUSE / totalMesCount) * 100 : 0;
   const shareImob = totalMesCount > 0 ? (channelCount.IMOB / totalMesCount) * 100 : 0;
   const shareAGS = totalMesCount > 0 ? (channelCount.AGS / totalMesCount) * 100 : 0;
 
-  document.getElementById('statShareHouse').textContent = shareHouse.toFixed(1).replace('.', ',') + '%';
-  document.getElementById('statShareImob').textContent = shareImob.toFixed(1).replace('.', ',') + '%';
-  document.getElementById('statShareAGS').textContent = shareAGS.toFixed(1).replace('.', ',') + '%';
+  document.getElementById('statShareHouse').textContent = '(' + shareHouse.toFixed(1).replace('.', ',') + '%)';
+  document.getElementById('statShareImob').textContent = '(' + shareImob.toFixed(1).replace('.', ',') + '%)';
+  document.getElementById('statShareAGS').textContent = '(' + shareAGS.toFixed(1).replace('.', ',') + '%)';
 
   const isFiltered = selectedSpiFilter !== null;
   const keysToRender = isFiltered ? [selectedSpiFilter] : SPI_KEYS;
