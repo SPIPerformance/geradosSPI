@@ -404,6 +404,7 @@
     </div>
 
     <div class="actions">
+      <button class="btn secondary" id="analystLockBtn" type="button" title="Destravar aba de Simulação" style="padding:0 8px;">🔒</button>
       <button class="btn secondary" id="settingsBtn" type="button">⚙ Config.</button>
       <button class="btn secondary" id="exportXmlBtn" type="button">⬇ Baixar XML</button>
       <div class="upload-group">
@@ -416,7 +417,7 @@
 
   <div class="tabs">
     <button class="tab-btn active" id="tabDashBtn" onclick="switchTab('dash')">📊 Painel Executivo</button>
-    <button class="tab-btn" id="tabSimBtn" onclick="switchTab('sim')">📋 Simulação Plano de Voo</button>
+    <button class="tab-btn" id="tabSimBtn" onclick="switchTab('sim')" style="display:none;">📋 Simulação Plano de Voo</button>
     <button class="tab-btn" id="tabHistBtn" onclick="switchTab('hist')">🗓 Histórico</button>
     <button class="tab-btn" id="tabTeamBtn" onclick="switchTab('team')">👥 Gerentes & Supervisores</button>
   </div>
@@ -1486,7 +1487,66 @@ async function handleFile(file){
   updateFileStatus();
 }
 
+// ---- Modo analista: trava a aba "Simulação Plano de Voo" por senha. ----
+// Isso NÃO é segurança de verdade (o app é um arquivo estático, qualquer um
+// com acesso ao código-fonte consegue contornar) — é só pra a aba não aparecer
+// no dia a dia de quem não é analista de performance. Guarda só o hash
+// SHA-256 da senha (não a senha em texto puro) e lembra o destravo no
+// localStorage deste navegador, então não precisa digitar de novo.
+const ANALYST_PASS_HASH = '4a1898716ef67796fcc80c7426c4f876d398de27da5c73a3accf425e42a7f412';
+let analystUnlocked = false;
+
+async function sha256Hex(text){
+  try{
+    const enc = new TextEncoder().encode(text);
+    const buf = await crypto.subtle.digest('SHA-256', enc);
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  }catch(e){ return null; }
+}
+
+function applyAnalystLockUI(){
+  const tabBtn = document.getElementById('tabSimBtn');
+  const lockBtn = document.getElementById('analystLockBtn');
+  if(analystUnlocked){
+    tabBtn.style.display = '';
+    if(lockBtn){ lockBtn.textContent = '🔓'; lockBtn.title = 'Modo analista ativo — clique para travar de novo'; }
+  } else {
+    tabBtn.style.display = 'none';
+    if(lockBtn){ lockBtn.textContent = '🔒'; lockBtn.title = 'Destravar aba de Simulação'; }
+    if(document.getElementById('tabSimContent').style.display === 'block'){
+      switchTab('dash');
+    }
+  }
+}
+
+function initAnalystLock(){
+  analystUnlocked = localStorage.getItem('spi-analyst-unlocked') === 'true';
+  applyAnalystLockUI();
+  const lockBtn = document.getElementById('analystLockBtn');
+  if(lockBtn) lockBtn.addEventListener('click', toggleAnalystLock);
+}
+
+async function toggleAnalystLock(){
+  if(analystUnlocked){
+    analystUnlocked = false;
+    localStorage.removeItem('spi-analyst-unlocked');
+    applyAnalystLockUI();
+    return;
+  }
+  const pass = prompt('Senha de analista:');
+  if(pass === null) return;
+  const hash = await sha256Hex(pass);
+  if(hash === ANALYST_PASS_HASH){
+    analystUnlocked = true;
+    localStorage.setItem('spi-analyst-unlocked', 'true');
+    applyAnalystLockUI();
+  } else {
+    alert('Senha incorreta.');
+  }
+}
+
 function switchTab(tab){
+  if(tab==='sim' && !analystUnlocked){ tab = 'dash'; }
   document.getElementById('tabDashBtn').className = tab==='dash' ? 'tab-btn active' : 'tab-btn';
   document.getElementById('tabSimBtn').className = tab==='sim' ? 'tab-btn active' : 'tab-btn';
   document.getElementById('tabHistBtn').className = tab==='hist' ? 'tab-btn active' : 'tab-btn';
@@ -2152,6 +2212,7 @@ function exportXml() {
 document.getElementById('exportXmlBtn').addEventListener('click', exportXml);
 
 (async function init(){
+  initAnalystLock();
   await loadSettings();
   await loadPlanejamento();
   await loadMapping();
