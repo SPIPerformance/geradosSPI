@@ -241,7 +241,6 @@
   .status-mini .n.share-val { font-size: 10px; font-weight: 700; color: var(--muted); }
   .status-mini .l.share-lbl { font-size: 8px; color: var(--muted); }
 
-  /* Estilos para o grupo de checkboxes das semanas */
   .team-weeks-container {
     display: flex;
     flex-wrap: wrap;
@@ -416,7 +415,8 @@
 
   <div class="tabs">
     <button class="tab-btn active" id="tabDashBtn" onclick="switchTab('dash')">📊 Painel Executivo</button>
-    <button class="tab-btn" id="tabSimBtn" onclick="switchTab('sim')">📋 Simulação Plano de Voo</button>
+    <!-- Botão de simulação oculto para usuários comuns. Aparece apenas para você se usar ?admin=1 na URL ou apertar F2 -->
+    <button class="tab-btn" id="tabSimBtn" onclick="switchTab('sim')" style="display:none;">📋 Simulação Plano de Voo</button>
     <button class="tab-btn" id="tabHistBtn" onclick="switchTab('hist')">🗓 Histórico</button>
     <button class="tab-btn" id="tabTeamBtn" onclick="switchTab('team')">👥 Gerentes & Supervisores</button>
   </div>
@@ -576,7 +576,6 @@
       <h3 style="margin:0 0 4px;font-size:12px;color:var(--green-dark);">👥 Vendas por semana — Gerentes e Supervisores</h3>
       <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
         <label style="font-size:11px;font-weight:700;color:var(--green-dark);">📅 Semana(s):</label>
-        <!-- Substituído select múltiplo por container de checkboxes customizadas -->
         <div id="teamWeeksCheckboxes" class="team-weeks-container"></div>
         <span id="teamWeekRange" style="font-size:10px;color:var(--muted);margin-left:auto;"></span>
         <button class="btn secondary" id="teamPrintBtn" type="button" onclick="window.print()">🖨 Imprimir esta aba</button>
@@ -1234,7 +1233,6 @@ function renderTeamTree(containerId, countId, records, year, month, lastDay, wee
   container.innerHTML = html;
 }
 
-// Renderiza as checkboxes das semanas de forma elegante mantendo as seleções anteriores
 function populateTeamWeeksCheckboxes(numWeeks, defaultWeekIdx){
   const container = document.getElementById('teamWeeksCheckboxes');
   const prevChecked = Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
@@ -1285,7 +1283,6 @@ function renderTeamTab(){
   const numWeeks = getNumWeeks(year, month, lastDay);
   const defaultWeekIdx = getWeekIndexForDay(year, month, dataLastDay);
 
-  // Inicializa as caixas de marcação se ainda não existirem ou mudou o mês
   const container = document.getElementById('teamWeeksCheckboxes');
   if(container.children.length !== numWeeks){
     populateTeamWeeksCheckboxes(numWeeks, defaultWeekIdx);
@@ -1488,9 +1485,13 @@ async function handleFile(file){
 
 function switchTab(tab){
   document.getElementById('tabDashBtn').className = tab==='dash' ? 'tab-btn active' : 'tab-btn';
-  document.getElementById('tabSimBtn').className = tab==='sim' ? 'tab-btn active' : 'tab-btn';
+  const simBtn = document.getElementById('tabSimBtn');
+  if(simBtn.style.display !== 'none') {
+    simBtn.className = tab==='sim' ? 'tab-btn active' : 'tab-btn';
+  }
   document.getElementById('tabHistBtn').className = tab==='hist' ? 'tab-btn active' : 'tab-btn';
   document.getElementById('tabTeamBtn').className = tab==='team' ? 'tab-btn active' : 'tab-btn';
+  
   document.getElementById('tabDashContent').style.display = tab==='dash' ? 'block' : 'none';
   document.getElementById('tabSimContent').style.display = tab==='sim' ? 'block' : 'none';
   document.getElementById('tabHistContent').style.display = tab==='hist' ? 'block' : 'none';
@@ -1508,6 +1509,36 @@ function switchTab(tab){
   }
 }
 
+// Verifica se o modo Admin está ativado via URL (?admin=1)
+function checkAdminMode(){
+  const urlParams = new URLSearchParams(window.location.search);
+  if(urlParams.get('admin') === '1' || localStorage.getItem('spi-admin-mode') === '1'){
+    enableAdminMode();
+  }
+}
+
+function enableAdminMode(){
+  localStorage.setItem('spi-admin-mode', '1');
+  const simBtn = document.getElementById('tabSimBtn');
+  if(simBtn) simBtn.style.display = 'inline-block';
+}
+
+// Atalho secreto no teclado: Apertar F2 exibe ou oculta a aba de simulação
+window.addEventListener('keydown', (e) => {
+  if(e.key === 'F2') {
+    const simBtn = document.getElementById('tabSimBtn');
+    if(simBtn.style.display === 'none'){
+      enableAdminMode();
+      alert('Modo Admin (Simulação) ativado com sucesso!');
+    } else {
+      simBtn.style.display = 'none';
+      localStorage.removeItem('spi-admin-mode');
+      switchTab('dash');
+      alert('Modo Admin desativado.');
+    }
+  }
+});
+
 function initRegionalFilter(){
   const sel = document.getElementById('simRegionalFilter');
   sel.innerHTML = '<option value="ALL">Todas as Regionais (SPIs)</option>';
@@ -1519,7 +1550,7 @@ function initRegionalFilter(){
 function buildSimMetaBar(){
   const bar = document.getElementById('simMetaBar');
   if(!bar) return;
-  const filterVal = document.getElementById('simRegionalFilter') ? document.getElementById('simRegionalFilter').value : 'ALL';
+  const filterVal = document.getElementById('simRegionalFilter') ? document.getElementById('simRegionalFilter'].value : 'ALL';
   const activeIdx = filterVal === 'ALL' ? SPI_KEYS.map((_,i)=>i) : [SPI_KEYS.indexOf(filterVal)];
 
   let html = '<div class="sim-meta-title">🎯 Meta mensal por SPI — edite aqui e a tabela recalcula (%, Norm, Ass/Dia e Acum) na hora</div>';
@@ -2149,9 +2180,12 @@ function exportXml() {
   URL.revokeObjectURL(url);
 }
 
+document.getElementById('exportXmlBtn').exportXml = exportXml;
 document.getElementById('exportXmlBtn').addEventListener('click', exportXml);
 
 (async function init(){
+  checkAdminMode(); // Ativa a aba caso esteja autenticado como admin
+
   await loadSettings();
   await loadPlanejamento();
   await loadMapping();
