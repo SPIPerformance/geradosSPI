@@ -238,9 +238,41 @@
   .status-mini .n{font-size:12px;font-weight:800;color:var(--green-dark);}
   .status-mini .l{font-size:9px;color:var(--muted);font-weight:600;}
   
-  /* Estilo customizado para os textos/números menores de share na mesma barra */
   .status-mini .n.share-val { font-size: 10px; font-weight: 700; color: var(--muted); }
   .status-mini .l.share-lbl { font-size: 8px; color: var(--muted); }
+
+  /* Estilos para o grupo de checkboxes das semanas */
+  .team-weeks-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+  }
+  .week-checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #fff;
+    border: 1.5px solid var(--line);
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .week-checkbox-label:hover {
+    border-color: var(--green);
+    background: var(--green-light);
+  }
+  .week-checkbox-label input[type="checkbox"] {
+    accent-color: var(--green);
+    width: 13px;
+    height: 13px;
+    cursor: pointer;
+    margin: 0;
+  }
 
   .empty-state{
     text-align:center;padding:40px 20px;color:var(--muted);
@@ -542,12 +574,12 @@
   <div id="tabTeamContent" style="display:none;">
     <div class="card" style="margin-bottom:10px;">
       <h3 style="margin:0 0 4px;font-size:12px;color:var(--green-dark);">👥 Vendas por semana — Gerentes e Supervisores</h3>
-      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
         <label style="font-size:11px;font-weight:700;color:var(--green-dark);">📅 Semana(s):</label>
-        <select id="teamWeekSelect" multiple size="4" onchange="renderTeamTab()" style="padding:4px 8px;border:1.5px solid var(--line);border-radius:6px;font-size:11px;font-weight:600;color:var(--ink);min-width:120px;"></select>
-        <span style="font-size:9.5px;color:var(--muted);">(Ctrl/Cmd + clique para somar várias semanas)</span>
-        <span id="teamWeekRange" style="font-size:10px;color:var(--muted);"></span>
-        <button class="btn secondary" id="teamPrintBtn" type="button" onclick="window.print()" style="margin-left:auto;">🖨 Imprimir esta aba</button>
+        <!-- Substituído select múltiplo por container de checkboxes customizadas -->
+        <div id="teamWeeksCheckboxes" class="team-weeks-container"></div>
+        <span id="teamWeekRange" style="font-size:10px;color:var(--muted);margin-left:auto;"></span>
+        <button class="btn secondary" id="teamPrintBtn" type="button" onclick="window.print()">🖨 Imprimir esta aba</button>
       </div>
     </div>
 
@@ -1202,19 +1234,24 @@ function renderTeamTree(containerId, countId, records, year, month, lastDay, wee
   container.innerHTML = html;
 }
 
-function populateTeamWeekSelect(numWeeks, defaultWeekIdx){
-  const sel = document.getElementById('teamWeekSelect');
-  const prevSelected = Array.from(sel.selectedOptions).map(o => o.value);
-  sel.innerHTML = '';
+// Renderiza as checkboxes das semanas de forma elegante mantendo as seleções anteriores
+function populateTeamWeeksCheckboxes(numWeeks, defaultWeekIdx){
+  const container = document.getElementById('teamWeeksCheckboxes');
+  const prevChecked = Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+  
+  container.innerHTML = '';
   for(let w=0; w<numWeeks; w++){
-    const opt = document.createElement('option');
-    opt.value = w;
-    opt.textContent = `Semana ${w+1}`;
-    sel.appendChild(opt);
+    const isChecked = prevChecked.length > 0 ? prevChecked.includes(String(w)) : (w === defaultWeekIdx);
+    const label = document.createElement('label');
+    label.className = 'week-checkbox-label';
+    label.innerHTML = `<input type="checkbox" value="${w}" ${isChecked ? 'checked' : ''} onchange="renderTeamTab()"> Semana ${w+1}`;
+    container.appendChild(label);
   }
-  let toSelect = prevSelected.filter(v => Number(v) < numWeeks);
-  if(toSelect.length === 0) toSelect = [String(defaultWeekIdx)];
-  Array.from(sel.options).forEach(o => { o.selected = toSelect.includes(o.value); });
+}
+
+function getSelectedTeamWeeks() {
+  const checkboxes = document.querySelectorAll('#teamWeeksCheckboxes input[type="checkbox"]:checked');
+  return Array.from(checkboxes).map(cb => Number(cb.value));
 }
 
 function getWeeksRangeLabel(year, month, weekIndices, lastDay){
@@ -1248,9 +1285,18 @@ function renderTeamTab(){
   const numWeeks = getNumWeeks(year, month, lastDay);
   const defaultWeekIdx = getWeekIndexForDay(year, month, dataLastDay);
 
-  populateTeamWeekSelect(numWeeks, defaultWeekIdx);
-  let weekIndices = Array.from(document.getElementById('teamWeekSelect').selectedOptions).map(o => Number(o.value));
-  if(weekIndices.length === 0) weekIndices = [defaultWeekIdx];
+  // Inicializa as caixas de marcação se ainda não existirem ou mudou o mês
+  const container = document.getElementById('teamWeeksCheckboxes');
+  if(container.children.length !== numWeeks){
+    populateTeamWeeksCheckboxes(numWeeks, defaultWeekIdx);
+  }
+
+  let weekIndices = getSelectedTeamWeeks();
+  if(weekIndices.length === 0){
+    weekIndices = [defaultWeekIdx];
+    const firstCb = container.querySelector(`input[type="checkbox"][value="${defaultWeekIdx}"]`);
+    if(firstCb) firstCb.checked = true;
+  }
 
   document.getElementById('teamWeekRange').textContent = getWeeksRangeLabel(year, month, weekIndices, lastDay);
 
@@ -1763,7 +1809,6 @@ function render(){
   document.getElementById('statAGS').textContent = channelCount.AGS;
   document.getElementById('statCanalTodos').textContent = monthRecords.length;
 
-  // Cálculo e exibição do Share de cada canal em relação ao total do mês integrado diretamente nos blocos
   const totalMesCount = monthRecords.length;
   const shareHouse = totalMesCount > 0 ? (channelCount.HOUSE / totalMesCount) * 100 : 0;
   const shareImob = totalMesCount > 0 ? (channelCount.IMOB / totalMesCount) * 100 : 0;
