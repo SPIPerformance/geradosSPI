@@ -226,6 +226,8 @@
   .team-tree-list{margin:2px 0 4px 16px;padding:0 0 0 10px;list-style:none;border-left:2px solid var(--green-light);}
   .team-tree-list li{font-size:9.5px;font-weight:500;color:var(--muted);padding:2px 0;line-height:1.35;}
   .team-tree-loja{color:#2554a8;font-weight:600;}
+  .emp-emcash-yes{display:inline-block;background:var(--green-light);color:var(--green-dark);font-weight:700;font-size:9px;padding:1px 7px;border-radius:8px;margin-left:6px;vertical-align:middle;}
+  .emp-emcash-no{display:inline-block;color:var(--muted);font-size:9px;margin-left:6px;vertical-align:middle;}
 
   .team-grand-total{margin-top:8px;padding:6px 8px;background:var(--green-light);border-radius:5px;font-weight:800;color:var(--green-dark);text-align:right;font-size:11px;}
   .team-empty-msg{color:var(--muted);font-size:11px;padding:10px 4px;}
@@ -420,6 +422,7 @@
     <button class="tab-btn" id="tabSimBtn" onclick="switchTab('sim')" style="display:none;">📋 Simulação Plano de Voo</button>
     <button class="tab-btn" id="tabHistBtn" onclick="switchTab('hist')">🗓 Histórico</button>
     <button class="tab-btn" id="tabTeamBtn" onclick="switchTab('team')">👥 Gerentes & Supervisores</button>
+    <button class="tab-btn" id="tabEmpBtn" onclick="switchTab('emp')">🏢 Empreendimentos</button>
   </div>
 
   <div class="warn-banner" id="unmappedWarning" style="display: none;"></div>
@@ -595,6 +598,46 @@
         <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">No canal Imob, o supervisor aparece dentro do gerente dele — as vendas não somam 2x no Total Geral. Selecionando várias semanas, os números são somados.</p>
         <div class="team-tree-root" id="teamGerentesTree"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- ---- ABA 5: EMPREENDIMENTOS ---- -->
+  <div id="tabEmpContent" style="display:none;">
+    <div class="card" style="margin-bottom:10px; padding:10px 14px;">
+      <h3 style="margin:0 0 8px;font-size:12px;color:var(--green-dark);">💰 Preço médio das propostas × Meta</h3>
+      <div style="display:flex; gap:22px; flex-wrap:wrap; align-items:center;">
+        <div>
+          <div style="font-size:9.5px;color:var(--muted);font-weight:700;">Média do mês</div>
+          <div id="empKpiMedia" style="font-size:18px;font-weight:800;color:var(--green-dark);">—</div>
+        </div>
+        <div>
+          <div style="font-size:9.5px;color:var(--muted);font-weight:700;">Meta</div>
+          <div id="empKpiMeta" style="font-size:18px;font-weight:800;color:var(--ink);">—</div>
+        </div>
+        <div>
+          <div style="font-size:9.5px;color:var(--muted);font-weight:700;">Atingimento</div>
+          <span id="empKpiGap" class="gap-cell" style="font-size:12px;padding:3px 9px;">—</span>
+        </div>
+        <div style="font-size:9.5px;color:var(--muted);">
+          <div>Unidades no mês</div>
+          <div id="empKpiCount" style="font-size:14px;font-weight:800;color:var(--ink);">—</div>
+        </div>
+        <div style="font-size:9.5px;color:var(--muted);">
+          <div>Vendas EmCash</div>
+          <div id="empKpiEmCash" style="font-size:14px;font-weight:800;color:var(--ink);">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="empEmptyMsg" class="card empty-state" style="display:none;">
+      <h2>Nenhum dado carregado ainda</h2>
+      <p>Carregue o XML do mês para ver os empreendimentos vendidos.</p>
+    </div>
+
+    <div class="card" id="empTreeWrap" style="padding:10px 14px;">
+      <h3 style="margin:0 0 8px;font-size:12px;color:var(--green-dark);">🏢 Empreendimentos vendidos — Regional › Cidade › Empreendimento › UH</h3>
+      <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">Dentro de cada empreendimento, as unidades vendidas aparecem ordenadas por preço.</p>
+      <div class="team-tree-root" id="empTree"></div>
     </div>
   </div>
 
@@ -1335,7 +1378,13 @@ function parseXML(text){
       status: el.getAttribute('STATUS_DO_CONTRATO') || '',
       canal: resolveCanal(el.getAttribute('TIPO_CANAL') || '', el.getAttribute('LOJA') || ''),
       corretor: (el.getAttribute('CORRETOR') || '').trim(),
-      superior: (el.getAttribute('Superior_Direto_do_Corretor') || '').trim()
+      superior: (el.getAttribute('Superior_Direto_do_Corretor') || '').trim(),
+      regional: (el.getAttribute('REGIONAL') || '').trim(),
+      cidade: (el.getAttribute('CIDADE1') || el.getAttribute('CIDADE') || '').trim(),
+      descricaoProduto: (el.getAttribute('DESCRICAO_PRODUTO') || '').trim(),
+      valorProposta: parseFloat(el.getAttribute('VALOR_DA_PROPOSTA')) || 0,
+      valorDesconto: parseFloat(el.getAttribute('VALOR_TOTAL_PARCELA_DESCONTO')) || 0,
+      isEmCash: (el.getAttribute('Textbox137') || '').trim().toUpperCase() === 'EMCASH'
     });
   }
   return records;
@@ -1551,10 +1600,12 @@ function switchTab(tab){
   document.getElementById('tabSimBtn').className = tab==='sim' ? 'tab-btn active' : 'tab-btn';
   document.getElementById('tabHistBtn').className = tab==='hist' ? 'tab-btn active' : 'tab-btn';
   document.getElementById('tabTeamBtn').className = tab==='team' ? 'tab-btn active' : 'tab-btn';
+  document.getElementById('tabEmpBtn').className = tab==='emp' ? 'tab-btn active' : 'tab-btn';
   document.getElementById('tabDashContent').style.display = tab==='dash' ? 'block' : 'none';
   document.getElementById('tabSimContent').style.display = tab==='sim' ? 'block' : 'none';
   document.getElementById('tabHistContent').style.display = tab==='hist' ? 'block' : 'none';
   document.getElementById('tabTeamContent').style.display = tab==='team' ? 'block' : 'none';
+  document.getElementById('tabEmpContent').style.display = tab==='emp' ? 'block' : 'none';
 
   if(tab==='dash'){
     if(currentRecords.length>0) render();
@@ -1565,7 +1616,133 @@ function switchTab(tab){
     renderHistorico();
   } else if(tab==='team'){
     renderTeamTab();
+  } else if(tab==='emp'){
+    renderEmpreendimentosTab();
   }
+}
+
+// Formata número como moeda brasileira (R$).
+function fmtBRL(v){
+  return (v||0).toLocaleString('pt-BR', {style:'currency', currency:'BRL', minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+const META_PRECO_PROPOSTA = 276170;
+
+// Aba Empreendimentos: KPI de preço médio x meta, e árvore
+// Regional -> Cidade -> Empreendimento -> UH (ordenada por preço).
+// Usa os registros do mês "de referência" (mesma lógica de mês majoritário
+// usada no resto do painel), sem filtro de status/canal — é o mesmo universo
+// de "gerados" que aparece nos outros KPIs do painel.
+function renderEmpreendimentosTab(){
+  const emptyMsg = document.getElementById('empEmptyMsg');
+  const treeWrap = document.getElementById('empTreeWrap');
+
+  if(currentRecords.length === 0){
+    emptyMsg.style.display = 'block';
+    treeWrap.style.display = 'none';
+    document.getElementById('empKpiMedia').textContent = '—';
+    document.getElementById('empKpiMeta').textContent = fmtBRL(META_PRECO_PROPOSTA);
+    document.getElementById('empKpiGap').textContent = '—';
+    document.getElementById('empKpiCount').textContent = '—';
+    document.getElementById('empKpiEmCash').textContent = '—';
+    return;
+  }
+  emptyMsg.style.display = 'none';
+  treeWrap.style.display = 'block';
+
+  const { year, month } = getMajorityYearMonth(currentRecords);
+  const monthRecords = currentRecords.filter(r=>{
+    const d = getEffectiveGeracaoDate(parseDateBR(r.geracao), year, month);
+    return d && d.getFullYear()===year && d.getMonth()===month;
+  });
+
+  // Preço = (VALOR_DA_PROPOSTA - VALOR_TOTAL_PARCELA_DESCONTO) somado de todas
+  // as vendas, dividido pelo número TOTAL de vendas do mês (não só as com preço).
+  const somaLiquida = monthRecords.reduce((s,r)=> s + (r.valorProposta - r.valorDesconto), 0);
+  const mediaLiquida = monthRecords.length ? somaLiquida / monthRecords.length : 0;
+  const pctMeta = META_PRECO_PROPOSTA>0 ? (mediaLiquida/META_PRECO_PROPOSTA*100) : 0;
+
+  const countEmCash = monthRecords.filter(r=>r.isEmCash).length;
+  const pctEmCash = monthRecords.length ? (countEmCash/monthRecords.length*100) : 0;
+
+  document.getElementById('empKpiMedia').textContent = fmtBRL(mediaLiquida);
+  document.getElementById('empKpiMeta').textContent = fmtBRL(META_PRECO_PROPOSTA);
+  document.getElementById('empKpiCount').textContent = monthRecords.length.toLocaleString('pt-BR');
+  document.getElementById('empKpiEmCash').textContent = `${countEmCash} (${pctEmCash.toFixed(1).replace('.',',')}%)`;
+  const gapEl = document.getElementById('empKpiGap');
+  gapEl.textContent = pctMeta.toFixed(1).replace('.',',') + '%';
+  gapEl.style.background = pctMeta>=100 ? 'var(--good-green)'
+    : pctMeta>=90 ? 'var(--light-green)'
+    : pctMeta>=80 ? 'var(--yellow)'
+    : pctMeta>=70 ? 'var(--amber)'
+    : 'var(--red)';
+
+  // Regional = SPI resolvido pelo de-para de mapeamento-regionais.json
+  // (mesmo mapeamento Empreendimento -> SPI usado no resto do painel), não o
+  // atributo REGIONAL do XML.
+  const tree = {};
+  monthRecords.forEach(r=>{
+    const spiKey = resolveSpi(r.empreendimento);
+    const reg = spiKey ? SPI_GROUPS[SPI_KEYS.indexOf(spiKey)] : '(Sem SPI mapeado)';
+    const cid = r.cidade || '(Sem cidade)';
+    const emp = r.empreendimento || '(Sem empreendimento)';
+    tree[reg] = tree[reg] || {};
+    tree[reg][cid] = tree[reg][cid] || {};
+    tree[reg][cid][emp] = tree[reg][cid][emp] || { items: [] };
+    tree[reg][cid][emp].items.push({
+      desc: r.descricaoProduto || '(sem descrição)',
+      precoLiquido: (r.valorProposta || 0) - (r.valorDesconto || 0),
+      emCash: !!r.isEmCash
+    });
+  });
+
+  const regOrder = SPI_GROUPS.slice();
+  const regionais = Object.keys(tree).sort((a,b)=>{
+    const ia = regOrder.indexOf(a), ib = regOrder.indexOf(b);
+    if(ia===-1 && ib===-1) return a.localeCompare(b,'pt-BR');
+    if(ia===-1) return 1;
+    if(ib===-1) return -1;
+    return ia-ib;
+  });
+  let html = '';
+
+  regionais.forEach(reg=>{
+    const cidadesObj = tree[reg];
+    const cidades = Object.keys(cidadesObj).sort((a,b)=>a.localeCompare(b,'pt-BR'));
+    let regHtml = '';
+    let regCount = 0, regSoma = 0;
+
+    cidades.forEach(cid=>{
+      const empsObj = cidadesObj[cid];
+      const emps = Object.keys(empsObj).sort((a,b)=>a.localeCompare(b,'pt-BR'));
+      let cidHtml = '';
+      let cidCount = 0, cidSoma = 0;
+
+      emps.forEach(emp=>{
+        const data = empsObj[emp];
+        const itemsSorted = [...data.items].sort((a,b)=>a.precoLiquido-b.precoLiquido);
+        const count = itemsSorted.length;
+        const soma = itemsSorted.reduce((s,it)=>s+it.precoLiquido, 0);
+        const media = count ? soma/count : 0;
+        regCount += count; regSoma += soma;
+        cidCount += count; cidSoma += soma;
+
+        const itemsHtml = itemsSorted.map(it=>
+          `<li>${it.desc} <span class="team-tree-loja">— ${fmtBRL(it.precoLiquido)}</span> ${it.emCash ? '<span class="emp-emcash-yes">EmCash</span>' : '<span class="emp-emcash-no">Não EmCash</span>'}</li>`
+        ).join('');
+
+        cidHtml += `<details class="team-lvl-pessoa"><summary><span class="team-lvl-label">${emp}</span><span class="team-lvl-total">${count} uds · méd. ${fmtBRL(media)}</span></summary><ul class="team-tree-list">${itemsHtml}</ul></details>`;
+      });
+
+      const cidMedia = cidCount ? cidSoma/cidCount : 0;
+      regHtml += `<details class="team-lvl-canal"><summary><span class="team-lvl-label">${cid}</span><span class="team-lvl-total">${cidCount} uds · méd. ${fmtBRL(cidMedia)}</span></summary>${cidHtml}</details>`;
+    });
+
+    const regMedia = regCount ? regSoma/regCount : 0;
+    html += `<details class="team-lvl-regional"><summary><span class="team-lvl-label">${reg}</span><span class="team-lvl-total">${regCount} uds · méd. ${fmtBRL(regMedia)}</span></summary>${regHtml}</details>`;
+  });
+
+  document.getElementById('empTree').innerHTML = html || '<div class="team-empty-msg">Nenhuma venda encontrada neste mês.</div>';
 }
 
 function initRegionalFilter(){
