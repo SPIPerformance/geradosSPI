@@ -184,12 +184,6 @@
 
   .team-count-badge{background:var(--green-light);color:var(--green-dark);font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:10px;}
   .team-section{margin-bottom:0 !important;}
-  table.team-table{table-layout:auto !important;width:100%;border-collapse:collapse;font-size:11px;}
-  table.team-table th{background:var(--green);color:#fff;padding:5px 8px !important;font-weight:700;font-size:10px;text-align:center;white-space:nowrap;width:auto !important;min-width:0 !important;max-width:none !important;}
-  table.team-table th:first-child{text-align:left;width:auto !important;min-width:120px !important;max-width:none !important;padding-left:10px !important;}
-  table.team-table td{padding:5px 8px;text-align:center;border-bottom:1px solid var(--line);color:var(--ink);font-size:11px;width:auto !important;min-width:0 !important;max-width:none !important;white-space:nowrap;}
-  table.team-table td:first-child{text-align:left;font-weight:700;color:var(--ink);padding-left:10px !important;white-space:normal;}
-  table.team-table tr:hover td{background:#f0f5f1;}
 
   .team-tree-root{font-size:11px;}
   .team-tree-root details{margin:0;}
@@ -203,44 +197,86 @@
   details.team-lvl-regional:first-child{margin-top:0;}
   details.team-lvl-regional > summary{padding:6px 6px;background:#eef4f0;border-radius:4px;}
   details.team-lvl-regional > summary .team-lvl-label{font-weight:800;font-size:10.5px;text-transform:uppercase;letter-spacing:.02em;color:var(--green-dark);}
-  details.team-lvl-regional > summary .emp-summary-right{color:var(--green-dark);}
 
   details.team-lvl-canal{margin:3px 0 3px 16px;}
   details.team-lvl-canal > summary{padding:4px 6px;background:#f2f6fb;border-radius:4px;}
   details.team-lvl-canal > summary .team-lvl-label{font-weight:700;font-size:10.5px;color:#2554a8;}
-  details.team-lvl-canal > summary .emp-summary-right{color:#2554a8;}
 
   details.team-lvl-pessoa{margin:2px 0 2px 16px;}
   details.team-lvl-pessoa > summary{padding:3px 6px;}
   details.team-lvl-pessoa > summary .team-lvl-label{font-weight:600;font-size:10.5px;color:var(--ink);}
-  details.team-lvl-pessoa > summary:hover .team-lvl-label{color:var(--green-dark);}
-  details.team-lvl-pessoa.team-sem-gerente > summary .team-lvl-label{color:#c2410c;}
 
-  details.team-lvl-supervisor{margin:2px 0 2px 16px;}
-  details.team-lvl-supervisor > summary{padding:3px 6px;}
-  details.team-lvl-supervisor > summary .team-lvl-label{font-weight:600;font-size:10px;color:#7e22ce;}
-  details.team-lvl-supervisor > summary:hover .team-lvl-label{color:#5b1a91;}
+  /* NOVO SISTEMA DE GRELHA UNIFICADA PARA A ABA DE EMPREENDIMENTOS */
+  .emp-grid-row {
+    display: grid;
+    grid-template-columns: 1fr 90px 180px 80px;
+    align-items: center;
+    width: 100%;
+    font-size: 10.5px;
+  }
 
-  .team-tree-list{margin:2px 0 4px 16px;padding:0 0 0 10px;list-style:none;border-left:2px solid var(--green-light);}
-  .team-tree-loja{color:#2554a8;font-weight:600;}
-  
-  /* Layout perfeitamente alinhado em grade flexível com tamanhos de fonte uniformes */
-  .emp-header-row { background: var(--green); color: #fff; display: flex; padding: 5px 8px; font-weight: 700; font-size: 10.5px; align-items: center; border-radius: 4px 4px 0 0; }
-  .emp-header-col { flex: 1; text-align: center; font-size: 10.5px; }
-  .emp-header-col:first-child { text-align: left; flex: 3.5; }
-  
-  .team-tree-root details > summary { display: flex; align-items: center; justify-content: space-between; width: 100%; }
-  .emp-summary-right { display: flex; width: 55%; align-items: center; font-size: 10.5px; font-weight: 800; color: var(--muted); }
-  .emp-col-vendas { flex: 1; text-align: center; font-size: 10.5px; font-weight: 800; }
-  .emp-col-preco { flex: 1; text-align: center; font-size: 10.5px; font-weight: 800; }
-  .emp-col-emcash { flex: 1; text-align: center; font-size: 10.5px; font-weight: 800; }
+  .emp-header-row {
+    background: var(--green);
+    color: #fff;
+    padding: 5px 8px;
+    font-weight: 700;
+    font-size: 10.5px;
+    border-radius: 4px 4px 0 0;
+  }
+  .emp-header-row .emp-col-nome { text-align: left; }
+  .emp-header-row .emp-col-vendas,
+  .emp-header-row .emp-col-preco,
+  .emp-header-row .emp-col-emcash { text-align: center; }
 
-  .emp-item-row { display: flex; align-items: center; padding: 4px 8px 4px 20px; font-size: 10.5px; font-weight: 500; color: var(--ink); border-bottom: 1px solid var(--line); background: #fff; }
-  .emp-item-row:hover { background: #f0f5f1; }
-  .emp-item-desc { flex: 3.5; text-align: left; font-weight: 600; color: var(--ink); }
-  .emp-item-vendas { flex: 1; text-align: center; color: var(--muted); font-size: 10.5px; font-weight: 600; }
-  .emp-item-val { flex: 1; text-align: center; font-weight: 600; color: var(--green-dark); font-size: 10.5px; }
-  .emp-item-emcash { flex: 1; text-align: center; font-size: 10.5px; }
+  .team-tree-root details.emp-node > summary {
+    display: grid;
+    grid-template-columns: 1fr 90px 180px 80px;
+    align-items: center;
+    width: 100%;
+    padding: 3px 6px;
+  }
+
+  details.team-lvl-regional.emp-reg > summary {
+    padding: 6px 6px;
+    background: #eef4f0;
+    border-radius: 4px;
+    font-weight: 800;
+    color: var(--green-dark);
+  }
+  details.team-lvl-canal.emp-cid > summary {
+    padding: 4px 6px;
+    background: #f2f6fb;
+    border-radius: 4px;
+    font-weight: 700;
+    color: #2554a8;
+    margin-left: 12px;
+  }
+  details.team-lvl-pessoa.emp-item > summary {
+    margin-left: 24px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .emp-col-vendas { text-align: center; font-weight: 700; }
+  .emp-col-preco { text-align: center; font-weight: 700; }
+  .emp-col-emcash { text-align: center; font-weight: 700; }
+
+  .emp-unit-row {
+    display: grid;
+    grid-template-columns: 1fr 90px 180px 80px;
+    align-items: center;
+    padding: 4px 6px 4px 36px;
+    font-size: 10.5px;
+    font-weight: 500;
+    color: var(--ink);
+    border-bottom: 1px solid var(--line);
+    background: #fff;
+  }
+  .emp-unit-row:hover { background: #f0f5f1; }
+  .emp-unit-desc { text-align: left; font-weight: 600; color: var(--ink); }
+  .emp-unit-vendas { text-align: center; color: var(--muted); font-weight: 600; }
+  .emp-unit-val { text-align: center; font-weight: 600; color: var(--green-dark); }
+  .emp-unit-emcash { text-align: center; }
 
   .emp-emcash-dot { display: inline-block; width: 10px; height: 10px; background-color: var(--good-green); border-radius: 50%; box-shadow: 0 0 3px rgba(0,0,0,0.2); }
   .emp-emcash-empty { display: inline-block; width: 10px; height: 10px; }
@@ -614,12 +650,12 @@
       <h3 style="margin:0 0 8px;font-size:12px;color:var(--green-dark);">🏢 Empreendimentos vendidos — Regional › Cidade › Empreendimento › UH</h3>
       <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">Dentro de cada empreendimento, as unidades vendidas aparecem ordenadas por preço.</p>
       
-      <!-- Cabeçalho perfeitamente alinhado -->
-      <div class="emp-header-row" style="margin-bottom: 4px;">
-        <div class="emp-header-col">Unidade / Empreendimento</div>
-        <div class="emp-header-col">Vendas</div>
-        <div class="emp-header-col">Méd. Preço Vendido</div>
-        <div class="emp-header-col">Emcash</div>
+      <!-- Cabeçalho perfeitamente alinhado por Grid -->
+      <div class="emp-grid-row emp-header-row" style="margin-bottom: 4px;">
+        <div class="emp-col-nome">Unidade / Empreendimento</div>
+        <div class="emp-col-vendas">Vendas</div>
+        <div class="emp-col-preco">Méd. Preço Vendido</div>
+        <div class="emp-col-emcash">Emcash</div>
       </div>
       
       <div class="team-tree-root" id="empTree"></div>
@@ -1719,23 +1755,23 @@ function renderEmpreendimentosTab(){
         cidCount += count; cidEmCashCount += emCashCount; cidSoma += soma;
 
         const itemsHtml = itemsSorted.map(it=>
-          `<div class="emp-item-row">
-             <div class="emp-item-desc">${it.desc}</div>
-             <div class="emp-item-vendas">1</div>
-             <div class="emp-item-val">${fmtBRL(it.precoLiquido)}</div>
-             <div class="emp-item-emcash">${it.emCash ? '<span class="emp-emcash-dot" title="EmCash"></span>' : '<span class="emp-emcash-empty"></span>'}</div>
+          `<div class="emp-unit-row">
+             <div class="emp-unit-desc">${it.desc}</div>
+             <div class="emp-unit-vendas">1</div>
+             <div class="emp-unit-val">${fmtBRL(it.precoLiquido)}</div>
+             <div class="emp-unit-emcash">${it.emCash ? '<span class="emp-emcash-dot" title="EmCash"></span>' : '<span class="emp-emcash-empty"></span>'}</div>
            </div>`
         ).join('');
 
-        cidHtml += `<details class="team-lvl-pessoa"><summary><span class="team-lvl-label">${emp}</span><div class="emp-summary-right"><span class="emp-col-vendas">${count}</span><span class="emp-col-preco">${fmtBRL(media)}</span><span class="emp-col-emcash">${emCashCount}</span></div></summary><div>${itemsHtml}</div></details>`;
+        cidHtml += `<details class="team-lvl-pessoa emp-node emp-item"><summary><span class="team-lvl-label">${emp}</span><span class="emp-col-vendas">${count}</span><span class="emp-col-preco">${fmtBRL(media)}</span><span class="emp-col-emcash">${emCashCount}</span></summary><div>${itemsHtml}</div></details>`;
       });
 
       const cidMedia = cidCount ? cidSoma/cidCount : 0;
-      regHtml += `<details class="team-lvl-canal"><summary><span class="team-lvl-label">${cid}</span><div class="emp-summary-right"><span class="emp-col-vendas">${cidCount}</span><span class="emp-col-preco">${fmtBRL(cidMedia)}</span><span class="emp-col-emcash">${cidEmCashCount}</span></div></summary>${cidHtml}</details>`;
+      regHtml += `<details class="team-lvl-canal emp-node emp-cid"><summary><span class="team-lvl-label">${cid}</span><span class="emp-col-vendas">${cidCount}</span><span class="emp-col-preco">${fmtBRL(cidMedia)}</span><span class="emp-col-emcash">${cidEmCashCount}</span></summary>${cidHtml}</details>`;
     });
 
     const regMedia = regCount ? regSoma/regCount : 0;
-    html += `<details class="team-lvl-regional"><summary><span class="team-lvl-label">${reg}</span><div class="emp-summary-right"><span class="emp-col-vendas">${regCount}</span><span class="emp-col-preco">${fmtBRL(regMedia)}</span><span class="emp-col-emcash">${regEmCashCount}</span></div></summary>${regHtml}</details>`;
+    html += `<details class="team-lvl-regional emp-node emp-reg"><summary><span class="team-lvl-label">${reg}</span><span class="emp-col-vendas">${regCount}</span><span class="emp-col-preco">${fmtBRL(regMedia)}</span><span class="emp-col-emcash">${regEmCashCount}</span></summary>${regHtml}</details>`;
   });
 
   document.getElementById('empTree').innerHTML = html || '<div class="team-empty-msg">Nenhuma venda encontrada neste mês.</div>';
