@@ -182,8 +182,8 @@
   table.week td:first-child{text-align:left;font-weight:700;color:var(--green-dark);padding-left:6px;}
   table.week tr.total-row td{background:var(--green-light);font-weight:800;border-top:2px solid var(--green);}
 
-  /* ESTILOS DA ÁRVORE DE EMPREENDIMENTOS E GERENTES - PROPORCIONAL E HARMONIOSO */
-  .emp-tree-root, .team-tree-root { font-size: 11px; max-width: 900px; }
+  /* ESTILOS DA ÁRVORE DE EMPREENDIMENTOS E GERENTES - PROPORCIONAL E AMPLIADO */
+  .emp-tree-root, .team-tree-root { font-size: 11.5px; width: 100%; }
   .emp-tree-root details, .team-tree-root details { margin: 0; }
   .emp-tree-root summary, .team-tree-root summary {
     display: flex;
@@ -215,20 +215,20 @@
     justify-content: space-between;
     background: var(--green);
     color: #fff;
-    padding: 6px 14px;
+    padding: 7px 16px;
     font-weight: 700;
-    font-size: 10.5px;
+    font-size: 11px;
     border-radius: 4px;
     margin-bottom: 6px;
-    max-width: 900px;
+    width: 100%;
   }
   .emp-header-metrics {
     display: flex;
-    gap: 15px;
+    gap: 20px;
     text-align: right;
-    width: 280px;
+    width: 340px;
     justify-content: flex-end;
-    padding-right: 10px;
+    padding-right: 14px;
   }
 
   details.emp-lvl-reg {
@@ -238,44 +238,44 @@
   }
   details.emp-lvl-reg:first-child { margin-top: 0; }
   details.emp-lvl-reg > summary {
-    padding: 6px 10px;
+    padding: 7px 12px;
     background: #eef4f0;
     border-radius: 4px;
   }
   details.emp-lvl-reg > summary .emp-tree-label {
     font-weight: 800;
-    font-size: 11px;
+    font-size: 11.5px;
     text-transform: uppercase;
     color: var(--green-dark);
   }
 
-  details.emp-lvl-cid { margin: 3px 0 3px 12px; }
+  details.emp-lvl-cid { margin: 3px 0 3px 14px; }
   details.emp-lvl-cid > summary {
-    padding: 4px 8px;
+    padding: 5px 10px;
     background: #f2f6fb;
     border-radius: 4px;
   }
   details.emp-lvl-cid > summary .emp-tree-label {
     font-weight: 700;
-    font-size: 11px;
+    font-size: 11.5px;
     color: #2554a8;
   }
 
-  details.emp-lvl-emp { margin: 2px 0 2px 12px; }
+  details.emp-lvl-emp { margin: 2px 0 2px 14px; }
   details.emp-lvl-emp > summary {
-    padding: 3px 8px;
+    padding: 4px 10px;
     background: #fafcfb;
     border-radius: 3px;
   }
   details.emp-lvl-emp > summary:hover { background: #f0f5f1; }
   details.emp-lvl-emp > summary .emp-tree-label {
     font-weight: 700;
-    font-size: 11px;
+    font-size: 11.5px;
     color: var(--ink);
   }
 
   .emp-units-list {
-    margin: 2px 0 4px 20px;
+    margin: 2px 0 4px 22px;
     list-style: none;
     padding: 0;
   }
@@ -283,9 +283,9 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 3px 8px;
+    padding: 4px 10px;
     border-bottom: 1px solid var(--line);
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 600;
     color: var(--ink);
     background: #fff;
@@ -293,26 +293,26 @@
   .emp-unit-item:hover { background: #f7faf8; }
   .emp-unit-info {
     display: flex;
-    gap: 15px;
+    gap: 20px;
     align-items: center;
-    width: 280px;
+    width: 340px;
     justify-content: flex-end;
-    padding-right: 10px;
+    padding-right: 14px;
     flex-shrink: 0;
   }
   
   .emp-metric-group {
     display: flex;
-    gap: 15px;
+    gap: 20px;
     align-items: center;
-    width: 280px;
+    width: 340px;
     justify-content: flex-end;
-    padding-right: 10px;
+    padding-right: 14px;
     flex-shrink: 0;
   }
-  .emp-col-vendas { width: 50px; text-align: center; font-weight: 700; font-size: 11px; color: var(--ink); }
-  .emp-col-preco { width: 120px; text-align: right; font-weight: 700; color: inherit; font-size: 11px; }
-  .emp-col-emcash { width: 45px; text-align: center; font-weight: 700; font-size: 11px; }
+  .emp-col-vendas { width: 60px; text-align: center; font-weight: 700; font-size: 11.5px; color: var(--ink); }
+  .emp-col-preco { width: 140px; text-align: right; font-weight: 700; color: inherit; font-size: 11.5px; }
+  .emp-col-emcash { width: 50px; text-align: center; font-weight: 700; font-size: 11.5px; }
 
   .emp-emcash-dot { display: inline-block; width: 9px; height: 9px; background-color: var(--good-green); border-radius: 50%; box-shadow: 0 0 3px rgba(0,0,0,0.2); }
   .emp-emcash-empty { display: inline-block; width: 9px; height: 9px; }
@@ -320,7 +320,6 @@
   .team-count-badge{background:var(--green-light);color:var(--green-dark);font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:10px;}
   .team-section{margin-bottom:0 !important;}
 
-  /* Gerentes & Supervisores Tree Fixes */
   details.team-lvl-regional {
     border-top: 1.5px solid var(--green);
     margin-top: 6px;
@@ -410,7 +409,7 @@
     color:var(--green-dark);
     text-align:right;
     font-size:11px;
-    max-width: 900px;
+    width: 100%;
   }
   .team-empty-msg{color:var(--muted);font-size:11px;padding:10px 4px;}
 
@@ -785,9 +784,9 @@
       <div class="emp-header-bar">
         <span>Unidade / Empreendimento</span>
         <div class="emp-header-metrics">
-          <span style="width:50px; text-align:center;">Vendas</span>
-          <span style="width:120px; text-align:right;">Méd. Preço</span>
-          <span style="width:45px; text-align:center;">Emcash</span>
+          <span style="width:60px; text-align:center;">Vendas</span>
+          <span style="width:140px; text-align:right;">Méd. Preço</span>
+          <span style="width:50px; text-align:center;">Emcash</span>
         </div>
       </div>
       
