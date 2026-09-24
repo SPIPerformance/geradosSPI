@@ -32,7 +32,6 @@
     padding:8px 16px;
     overflow-x: hidden;
   }
-  /* Ajustado para preencher monitores grandes de forma fluida, mantendo margens seguras */
   .wrap{width:100%; max-width:98vw; margin:0 auto;}
 
   .topbar{
@@ -184,244 +183,115 @@
   table.week td:first-child{text-align:left;font-weight:700;color:var(--green-dark);padding-left:8px;}
   table.week tr.total-row td{background:var(--green-light);font-weight:800;border-top:2px solid var(--green);}
 
-  /* ESTILOS DA ÁRVORE DE EMPREENDIMENTOS E GERENTES - ALINHAMENTO PERFEITO */
-  .emp-tree-root, .team-tree-root { font-size: 12px; width: 100%; }
-  .emp-tree-root details, .team-tree-root details { margin: 0; width: 100%; }
-  .emp-tree-root summary, .team-tree-root summary {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    cursor: pointer;
-    list-style: none;
-    outline: none;
-    width: 100%;
+  /* ESTILOS DA ÁRVORE DE EMPREENDIMENTOS */
+  .emp-tree-root{font-size:12px;width:100%;}
+  .emp-tree-root details{margin:0;width:100%;}
+  .emp-tree-root summary{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    cursor:pointer;list-style:none;outline:none;width:100%;
   }
-  .emp-tree-root summary::-webkit-details-marker, .team-tree-root summary::-webkit-details-marker { display: none; }
+  .emp-tree-root summary::-webkit-details-marker{display:none;}
+  .emp-tree-label::before{
+    content:'▸';display:inline-block;margin-right:6px;font-size:10px;color:var(--muted);transition:transform .15s;
+  }
+  .emp-tree-root details[open]>summary .emp-tree-label::before{transform:rotate(90deg);}
+
+  .emp-header-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--green); color: #fff; padding: 8px 16px; font-weight: 700; font-size: 11.5px;
+    border-radius: 4px; margin-bottom: 6px; width: 100%;
+  }
+  .emp-header-metrics { display: flex; gap: 20px; text-align: right; width: 340px; justify-content: flex-end; padding-right: 14px; }
+
+  details.emp-lvl-reg { border-top: 1.5px solid var(--green); margin-top: 6px; padding-top: 2px; }
+  details.emp-lvl-reg:first-child { margin-top: 0; }
+  details.emp-lvl-reg > summary { padding: 7px 12px; background: #eef4f0; border-radius: 4px; }
+  details.emp-lvl-reg > summary .emp-tree-label { font-weight: 800; font-size: 12px; text-transform: uppercase; color: var(--green-dark); }
+
+  details.emp-lvl-cid { margin: 3px 0 3px 14px; width: calc(100% - 14px); }
+  details.emp-lvl-cid > summary { padding: 5px 10px; background: #f2f6fb; border-radius: 4px; }
+  details.emp-lvl-cid > summary .emp-tree-label { font-weight: 700; font-size: 12px; color: #2554a8; }
+
+  details.emp-lvl-emp { margin: 2px 0 2px 14px; width: calc(100% - 14px); }
+  details.emp-lvl-emp > summary { padding: 4px 10px; background: #fafcfb; border-radius: 3px; }
+  details.emp-lvl-emp > summary:hover { background: #f0f5f1; }
+  details.emp-lvl-emp > summary .emp-tree-label { font-weight: 700; font-size: 12px; color: var(--ink); }
+
+  .emp-units-list { margin: 2px 0 4px 22px; list-style: none; padding: 0; width: calc(100% - 22px); }
+  .emp-unit-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 5px 10px; border-bottom: 1px solid var(--line); font-size: 12px; font-weight: 600; color: var(--ink); background: #fff; width: 100%;
+  }
+  .emp-unit-item:hover { background: #f7faf8; }
+  .emp-unit-info { display: flex; gap: 20px; align-items: center; width: 340px; justify-content: flex-end; padding-right: 14px; flex-shrink: 0; }
+  .emp-metric-group { display: flex; gap: 20px; align-items: center; width: 340px; justify-content: flex-end; padding-right: 14px; flex-shrink: 0; }
+  .emp-col-vendas { width: 60px; text-align: center; font-weight: 700; font-size: 12px; color: var(--ink); }
+  .emp-col-preco { width: 140px; text-align: right; font-weight: 700; color: inherit; font-size: 12px; }
+  .emp-col-emcash { width: 50px; text-align: center; font-weight: 700; font-size: 12px; }
+  .emp-emcash-dot { display: inline-block; width: 9px; height: 9px; background-color: var(--good-green); border-radius: 50%; box-shadow: 0 0 3px rgba(0,0,0,0.2); }
+  .emp-emcash-empty { display: inline-block; width: 9px; height: 9px; }
+
+
+  /* =========================================================
+     ESTILOS DA ABA GERENTES & SUPERVISORES (FONTES AUMENTADAS)
+     ========================================================= */
+  .team-tree-root { font-size: 13px; width: 100%; }
+  .team-tree-root details { margin: 0; width: 100%; }
+  .team-tree-root summary {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    cursor: pointer; list-style: none; outline: none; width: 100%;
+  }
+  .team-tree-root summary::-webkit-details-marker { display: none; }
   
-  .emp-tree-label::before, .team-lvl-label::before {
-    content: '▸';
-    display: inline-block;
-    margin-right: 6px;
-    font-size: 10px;
-    color: var(--muted);
-    transition: transform .15s;
+  .team-lvl-label::before {
+    content: '▸'; display: inline-block; margin-right: 8px; font-size: 11px; color: var(--muted); transition: transform .15s;
   }
-  .emp-tree-root details[open] > summary .emp-tree-label::before,
   .team-tree-root details[open] > summary .team-lvl-label::before {
     transform: rotate(90deg);
   }
 
-  .emp-header-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--green);
-    color: #fff;
-    padding: 8px 16px;
-    font-weight: 700;
-    font-size: 11.5px;
-    border-radius: 4px;
-    margin-bottom: 6px;
-    width: 100%;
-  }
-  .emp-header-metrics {
-    display: flex;
-    gap: 20px;
-    text-align: right;
-    width: 340px;
-    justify-content: flex-end;
-    padding-right: 14px;
-  }
+  .team-count-badge { background: var(--green-light); color: var(--green-dark); font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 12px; }
 
-  details.emp-lvl-reg {
-    border-top: 1.5px solid var(--green);
-    margin-top: 6px;
-    padding-top: 2px;
-  }
-  details.emp-lvl-reg:first-child { margin-top: 0; }
-  details.emp-lvl-reg > summary {
-    padding: 7px 12px;
-    background: #eef4f0;
-    border-radius: 4px;
-  }
-  details.emp-lvl-reg > summary .emp-tree-label {
-    font-weight: 800;
-    font-size: 12px;
-    text-transform: uppercase;
-    color: var(--green-dark);
-  }
-
-  details.emp-lvl-cid { margin: 3px 0 3px 14px; width: calc(100% - 14px); }
-  details.emp-lvl-cid > summary {
-    padding: 5px 10px;
-    background: #f2f6fb;
-    border-radius: 4px;
-  }
-  details.emp-lvl-cid > summary .emp-tree-label {
-    font-weight: 700;
-    font-size: 12px;
-    color: #2554a8;
-  }
-
-  details.emp-lvl-emp { margin: 2px 0 2px 14px; width: calc(100% - 14px); }
-  details.emp-lvl-emp > summary {
-    padding: 4px 10px;
-    background: #fafcfb;
-    border-radius: 3px;
-  }
-  details.emp-lvl-emp > summary:hover { background: #f0f5f1; }
-  details.emp-lvl-emp > summary .emp-tree-label {
-    font-weight: 700;
-    font-size: 12px;
-    color: var(--ink);
-  }
-
-  .emp-units-list {
-    margin: 2px 0 4px 22px;
-    list-style: none;
-    padding: 0;
-    width: calc(100% - 22px);
-  }
-  .emp-unit-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 5px 10px;
-    border-bottom: 1px solid var(--line);
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--ink);
-    background: #fff;
-    width: 100%;
-  }
-  .emp-unit-item:hover { background: #f7faf8; }
-  .emp-unit-info {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    width: 340px;
-    justify-content: flex-end;
-    padding-right: 14px;
-    flex-shrink: 0;
-  }
-  
-  .emp-metric-group {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    width: 340px;
-    justify-content: flex-end;
-    padding-right: 14px;
-    flex-shrink: 0;
-  }
-  .emp-col-vendas { width: 60px; text-align: center; font-weight: 700; font-size: 12px; color: var(--ink); }
-  .emp-col-preco { width: 140px; text-align: right; font-weight: 700; color: inherit; font-size: 12px; }
-  .emp-col-emcash { width: 50px; text-align: center; font-weight: 700; font-size: 12px; }
-
-  .emp-emcash-dot { display: inline-block; width: 9px; height: 9px; background-color: var(--good-green); border-radius: 50%; box-shadow: 0 0 3px rgba(0,0,0,0.2); }
-  .emp-emcash-empty { display: inline-block; width: 9px; height: 9px; }
-
-  .team-count-badge{background:var(--green-light);color:var(--green-dark);font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;}
-  .team-section{margin-bottom:0 !important;}
-
-  details.team-lvl-regional {
-    border-top: 1.5px solid var(--green);
-    margin-top: 6px;
-    padding-top: 2px;
-  }
+  details.team-lvl-regional { border-top: 2px solid var(--green); margin-top: 8px; padding-top: 3px; }
   details.team-lvl-regional:first-child { margin-top: 0; }
-  details.team-lvl-regional > summary {
-    padding: 6px 14px;
-    background: #eef4f0;
-    border-radius: 4px;
-  }
+  details.team-lvl-regional > summary { padding: 8px 16px; background: #eef4f0; border-radius: 5px; }
   details.team-lvl-regional > summary .team-lvl-label {
-    font-weight: 800;
-    font-size: 11.5px;
-    text-transform: uppercase;
-    letter-spacing: .02em;
-    color: var(--green-dark);
+    font-weight: 800; font-size: 13.5px; text-transform: uppercase; letter-spacing: .02em; color: var(--green-dark);
   }
 
-  details.team-lvl-canal { margin: 3px 0 3px 12px; width: calc(100% - 12px); }
-  details.team-lvl-canal > summary {
-    padding: 4px 14px;
-    background: #f2f6fb;
-    border-radius: 4px;
-  }
+  details.team-lvl-canal { margin: 4px 0 4px 14px; width: calc(100% - 14px); }
+  details.team-lvl-canal > summary { padding: 6px 16px; background: #f2f6fb; border-radius: 5px; }
   details.team-lvl-canal > summary .team-lvl-label {
-    font-weight: 700;
-    font-size: 11.5px;
-    color: #2554a8;
+    font-weight: 700; font-size: 13px; color: #2554a8;
   }
 
-  details.team-lvl-pessoa, details.team-lvl-supervisor { margin: 2px 0 2px 12px; width: calc(100% - 12px); }
-  details.team-lvl-pessoa > summary, details.team-lvl-supervisor > summary {
-    padding: 3px 14px;
-    background: #fafcfb;
-    border-radius: 3px;
-  }
+  details.team-lvl-pessoa, details.team-lvl-supervisor { margin: 3px 0 3px 14px; width: calc(100% - 14px); }
+  details.team-lvl-pessoa > summary, details.team-lvl-supervisor > summary { padding: 5px 16px; background: #fafcfb; border-radius: 4px; }
   details.team-lvl-pessoa > summary:hover, details.team-lvl-supervisor > summary:hover { background: #f0f5f1; }
   details.team-lvl-pessoa > summary .team-lvl-label, details.team-lvl-supervisor > summary .team-lvl-label {
-    font-weight: 700;
-    font-size: 11.5px;
-    color: var(--ink);
+    font-weight: 700; font-size: 12.5px; color: var(--ink);
   }
 
-  .team-tree-list {
-    margin: 2px 0 4px 20px;
-    list-style: none;
-    padding: 0;
-    width: calc(100% - 20px);
-  }
+  .team-tree-list { margin: 3px 0 6px 24px; list-style: none; padding: 0; width: calc(100% - 24px); }
   .team-tree-list li {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 4px 14px;
-    border-bottom: 1px solid var(--line);
-    font-size: 11.5px;
-    font-weight: 600;
-    color: var(--ink);
-    background: #fff;
-    width: 100%;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 16px; border-bottom: 1px solid var(--line); font-size: 12.5px; font-weight: 600; color: var(--ink); background: #fff; width: 100%;
   }
   .team-tree-list li:hover { background: #f7faf8; }
-  .team-tree-loja { color: var(--muted); font-weight: normal; }
+  .team-tree-loja { color: var(--muted); font-weight: normal; font-size: 12px; }
 
-  /* PADRONIZAÇÃO EXATA DA COLUNA DE VENDAS DA ÁRVORE DE GERENTES */
   .team-metric-box {
-    width: 70px;
-    text-align: center;
-    font-weight: 700;
-    font-size: 11.5px;
-    color: var(--ink);
-    flex-shrink: 0;
-    padding-right: 14px;
+    width: 75px; text-align: center; font-weight: 700; font-size: 12.5px; color: var(--ink); flex-shrink: 0; padding-right: 14px;
   }
   .team-leaf-meta {
-    width: 70px;
-    text-align: center;
-    font-weight: 700;
-    font-size: 11.5px;
-    color: var(--ink);
-    flex-shrink: 0;
-    padding-right: 14px;
+    width: 75px; text-align: center; font-weight: 700; font-size: 12.5px; color: var(--ink); flex-shrink: 0; padding-right: 14px;
   }
 
-  .team-grand-total{
-    margin-top:8px;
-    padding:8px 14px;
-    background:var(--green-light);
-    border-radius:5px;
-    font-weight:800;
-    color:var(--green-dark);
-    text-align:right;
-    font-size:11.5px;
-    width: 100%;
+  .team-grand-total {
+    margin-top: 10px; padding: 10px 16px; background: var(--green-light); border-radius: 6px;
+    font-weight: 800; color: var(--green-dark); text-align: right; font-size: 13px; width: 100%;
   }
-  .team-empty-msg{color:var(--muted);font-size:11.5px;padding:10px 4px;}
+  .team-empty-msg { color: var(--muted); font-size: 12.5px; padding: 12px 6px; }
 
   .status-mini{display:flex;gap:6px;margin-top:6px;padding-top:6px;border-top:1px solid var(--line);}
   .status-mini div{text-align:center;flex:1;cursor:pointer;padding:3px 4px;border-radius:4px;transition:background .15s;}
@@ -440,12 +310,12 @@
   .week-checkbox-label {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
     background: #fff;
     border: 1.5px solid var(--line);
-    padding: 4px 10px;
+    padding: 5px 12px;
     border-radius: 5px;
-    font-size: 11.5px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--ink);
     cursor: pointer;
@@ -457,8 +327,8 @@
   }
   .week-checkbox-label input[type="checkbox"] {
     accent-color: var(--green);
-    width: 14px;
-    height: 14px;
+    width: 15px;
+    height: 15px;
     cursor: pointer;
     margin: 0;
   }
@@ -730,11 +600,11 @@
   <!-- ---- ABA 3: GERENTES & SUPERVISORES ---- -->
   <div id="tabTeamContent" style="display:none;">
     <div class="card" style="margin-bottom:10px; padding:12px 16px;">
-      <h3 style="margin:0 0 8px;font-size:12.5px;color:var(--green-dark);">👥 Vendas por semana — Gerentes e Supervisores</h3>
+      <h3 style="margin:0 0 8px;font-size:14px;color:var(--green-dark);">👥 Vendas por semana — Gerentes e Supervisores</h3>
       <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-        <label style="font-size:11.5px;font-weight:700;color:var(--green-dark);">📅 Semana(s):</label>
+        <label style="font-size:12.5px;font-weight:700;color:var(--green-dark);">📅 Semana(s):</label>
         <div id="teamWeeksCheckboxes" class="team-weeks-container"></div>
-        <span id="teamWeekRange" style="font-size:10.5px;color:var(--muted);margin-left:auto;"></span>
+        <span id="teamWeekRange" style="font-size:11.5px;color:var(--muted);margin-left:auto;"></span>
         <button class="btn secondary" id="teamPrintBtn" type="button" onclick="window.print()">🖨 Imprimir esta aba</button>
       </div>
     </div>
@@ -746,13 +616,13 @@
 
     <div class="card" id="teamSectionsWrap" style="padding:12px 16px;">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
-        <h4 style="margin:0;font-size:12.5px;color:var(--green-dark);display:flex;align-items:center;gap:6px;">🧑‍💼 Gerentes &amp; Supervisores (AGS / House / Imob) <span id="teamGerentesCount" class="team-count-badge"></span></h4>
+        <h4 style="margin:0;font-size:14px;color:var(--green-dark);display:flex;align-items:center;gap:6px;">🧑‍💼 Gerentes &amp; Supervisores (AGS / House / Imob) <span id="teamGerentesCount" class="team-count-badge"></span></h4>
       </div>
-      <p style="font-size:10.5px;color:var(--muted);margin:0 0 8px;">No canal Imob, o supervisor aparece dentro do gerente dele — as vendas não somam 2x no Total Geral. Selecionando várias semanas, os números são somados.</p>
+      <p style="font-size:11.5px;color:var(--muted);margin:0 0 10px;">No canal Imob, o supervisor aparece dentro do gerente dele — as vendas não somam 2x no Total Geral. Selecionando várias semanas, os números são somados.</p>
       
-      <div class="emp-header-bar">
+      <div class="emp-header-bar" style="font-size: 12.5px; padding: 10px 16px;">
         <span>Equipe / Unidade / Loja</span>
-        <div style="width: 70px; text-align: center; font-weight: 700; font-size: 11px; padding-right: 14px;">Vendas</div>
+        <div style="width: 75px; text-align: center; font-weight: 700; font-size: 12px; padding-right: 14px;">Vendas</div>
       </div>
 
       <div class="team-tree-root" id="teamGerentesTree"></div>
