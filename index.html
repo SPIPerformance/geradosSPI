@@ -227,8 +227,7 @@
   .team-tree-list li{font-size:9.5px;font-weight:500;color:var(--muted);padding:2px 0;line-height:1.35;display:flex;align-items:center;justify-content:space-between;}
   .team-tree-loja{color:#2554a8;font-weight:600;}
   
-  /* Novos estilos para tabela estilo árvore na aba Empreendimentos */
-  .emp-table-wrapper { width: 100%; border-collapse: collapse; font-size: 11px; }
+  /* Estilos estruturados para a tabela em árvore da aba Empreendimentos */
   .emp-header-row { background: var(--green); color: #fff; display: flex; padding: 5px 8px; font-weight: 700; font-size: 10px; align-items: center; border-radius: 4px 4px 0 0; }
   .emp-header-col { flex: 1; text-align: center; }
   .emp-header-col:first-child { text-align: left; flex: 2; }
@@ -239,14 +238,17 @@
   .emp-item-val { flex: 1; text-align: center; font-weight: 600; color: var(--green-dark); }
   .emp-item-emcash { flex: 1; text-align: center; }
 
+  /* Ajustes para alinhar as colunas nas linhas de sumário (summary) das árvore details */
+  .team-tree-root details > summary { display: flex; align-items: center; justify-content: space-between; }
+  .team-tree-root details > summary .emp-summary-right { display: flex; gap: 20px; align-items: center; font-size: 10px; font-weight: 800; color: var(--muted); }
+  .team-tree-root details.team-lvl-regional > summary .emp-summary-right { color: var(--green-dark); }
+  .team-tree-root details.team-lvl-canal > summary .emp-summary-right { color: #2554a8; }
+
   .emp-emcash-dot { display: inline-block; width: 10px; height: 10px; background-color: var(--good-green); border-radius: 50%; box-shadow: 0 0 3px rgba(0,0,0,0.2); }
   .emp-emcash-empty { display: inline-block; width: 10px; height: 10px; }
 
   .team-grand-total{margin-top:8px;padding:6px 8px;background:var(--green-light);border-radius:5px;font-weight:800;color:var(--green-dark);text-align:right;font-size:11px;}
   .team-empty-msg{color:var(--muted);font-size:11px;padding:10px 4px;}
-  .team-leaf-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:3px 6px 3px 20px;font-size:10.5px;font-weight:600;color:var(--ink);border-bottom:1px solid var(--line);}
-  .team-leaf-row:last-child{border-bottom:none;}
-  .team-leaf-row .team-lvl-total{font-size:10px;font-weight:800;color:var(--muted);}
 
   .status-mini{display:flex;gap:6px;margin-top:4px;padding-top:4px;border-top:1px solid var(--line);}
   .status-mini div{text-align:center;flex:1;cursor:pointer;padding:2px 3px;border-radius:4px;transition:background .15s;}
@@ -256,7 +258,6 @@
   .status-mini .n.share-val { font-size: 10px; font-weight: 700; color: var(--muted); }
   .status-mini .l.share-lbl { font-size: 8px; color: var(--muted); }
 
-  /* Estilos para o grupo de checkboxes das semanas */
   .team-weeks-container {
     display: flex;
     flex-wrap: wrap;
@@ -619,10 +620,11 @@
       <h3 style="margin:0 0 8px;font-size:12px;color:var(--green-dark);">🏢 Empreendimentos vendidos — Regional › Cidade › Empreendimento › UH</h3>
       <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">Dentro de cada empreendimento, as unidades vendidas aparecem ordenadas por preço.</p>
       
-      <!-- Cabeçalho de colunas idêntico ao design de referência -->
+      <!-- Cabeçalho idêntico à referência solicitada -->
       <div class="emp-header-row" style="margin-bottom: 4px;">
         <div class="emp-header-col">Unidade / Empreendimento</div>
-        <div class="emp-header-col">Preço Vendido</div>
+        <div class="emp-header-col">Vendas</div>
+        <div class="emp-header-col">Méd. Preço Vendido</div>
         <div class="emp-header-col">Emcash</div>
       </div>
       
@@ -644,7 +646,7 @@
 
     <div class="card">
       <h3 style="margin:0 0 6px;font-size:12px;color:var(--green-dark);">Histórico de fechamentos mensais</h3>
-      <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">Dados carregados de <code>historico/fechamentos.json</code> no GitHub. Cada mês fechado é uma chave (ano-mês) nesse arquivo — fechar um mês que já existe SUBSTITUI o registro daquele mês, nunca duplica.</p>
+      <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">Dados carregados de <code>historico/fechamentos.json</code> no GitHub. Cada mês fechado é uma chave (ano-mês) nesse arquivo — fechar um mês que já existe SUBSTITUI el registro daquele mês, nunca duplica.</p>
       <div style="margin-bottom:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <button class="btn" type="button" onclick="fecharMesAtual()">📌 Fechar mês atual (usa o XML carregado)</button>
         <span style="font-size:10px;color:var(--muted);">Pega o total já calculado por SPI e as metas da aba Simulação, e baixa o fechamentos.json atualizado.</span>
@@ -1732,20 +1734,21 @@ function renderEmpreendimentosTab(){
         const itemsHtml = itemsSorted.map(it=>
           `<div class="emp-item-row">
              <div class="emp-item-desc">${it.desc}</div>
+             <div class="emp-item-val" style="color:var(--muted); font-size:10px;">—</div>
              <div class="emp-item-val">${fmtBRL(it.precoLiquido)}</div>
              <div class="emp-item-emcash">${it.emCash ? '<span class="emp-emcash-dot" title="EmCash"></span>' : '<span class="emp-emcash-empty"></span>'}</div>
            </div>`
         ).join('');
 
-        cidHtml += `<details class="team-lvl-pessoa"><summary><span class="team-lvl-label">${emp}</span><span class="team-lvl-total">${count} uds · méd. ${fmtBRL(media)}</span></summary><div>${itemsHtml}</div></details>`;
+        cidHtml += `<details class="team-lvl-pessoa"><summary><span class="team-lvl-label">${emp}</span><div class="emp-summary-right"><span>${count}</span><span>${fmtBRL(media)}</span></div></summary><div>${itemsHtml}</div></details>`;
       });
 
       const cidMedia = cidCount ? cidSoma/cidCount : 0;
-      regHtml += `<details class="team-lvl-canal"><summary><span class="team-lvl-label">${cid}</span><span class="team-lvl-total">${cidCount} uds · méd. ${fmtBRL(cidMedia)}</span></summary>${cidHtml}</details>`;
+      regHtml += `<details class="team-lvl-canal"><summary><span class="team-lvl-label">${cid}</span><div class="emp-summary-right"><span>${cidCount}</span><span>${fmtBRL(cidMedia)}</span></div></summary>${cidHtml}</details>`;
     });
 
     const regMedia = regCount ? regSoma/regCount : 0;
-    html += `<details class="team-lvl-regional"><summary><span class="team-lvl-label">${reg}</span><span class="team-lvl-total">${regCount} uds · méd. ${fmtBRL(regMedia)}</span></summary>${regHtml}</details>`;
+    html += `<details class="team-lvl-regional"><summary><span class="team-lvl-label">${reg}</span><div class="emp-summary-right"><span>${regCount}</span><span>${fmtBRL(regMedia)}</span></div></summary>${regHtml}</details>`;
   });
 
   document.getElementById('empTree').innerHTML = html || '<div class="team-empty-msg">Nenhuma venda encontrada neste mês.</div>';
