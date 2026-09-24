@@ -321,7 +321,7 @@
   .team-count-badge{background:var(--green-light);color:var(--green-dark);font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:10px;}
   .team-section{margin-bottom:0 !important;}
 
-  /* Níveis da Árvore Gerentes & Supervisores com alinhamento e fontes rigorosos */
+  /* Níveis da Árvore Gerentes & Supervisores com alinhamento centralizado perfeito e fixo */
   details.team-lvl-regional {
     border-top: 1.5px solid var(--green);
     margin-top: 6px;
@@ -385,21 +385,24 @@
   .team-tree-list li:hover { background: #f7faf8; }
   .team-tree-loja { color: var(--muted); font-weight: normal; }
 
+  /* Ajuste exato e centralizado para a coluna de vendas dos gerentes/supervisores alinhada ao cabeçalho Vendas */
   .team-metric-box {
-    width: 65px;
+    width: 100px;
     text-align: center;
     font-weight: 700;
     font-size: 11px;
     color: var(--ink);
     flex-shrink: 0;
+    padding-right: 15px;
   }
   .team-leaf-meta {
-    width: 65px;
+    width: 100px;
     text-align: center;
     font-weight: 700;
     font-size: 11px;
     color: var(--ink);
     flex-shrink: 0;
+    padding-right: 15px;
   }
 
   .team-grand-total{margin-top:8px;padding:6px 8px;background:var(--green-light);border-radius:5px;font-weight:800;color:var(--green-dark);text-align:right;font-size:11px;}
@@ -733,11 +736,11 @@
       </div>
       <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">No canal Imob, o supervisor aparece dentro do gerente dele — as vendas não somam 2x no Total Geral. Selecionando várias semanas, os números são somados.</p>
       
-      <!-- Cabeçalho exato com a coluna de vendas perfeitamente centralizada -->
+      <!-- Cabeçalho exato com alinhamento centralizado perfeito -->
       <div class="emp-header-bar">
         <span>Equipe / Unidade / Loja</span>
         <div class="emp-header-metrics">
-          <span style="width:65px; text-align:center;">Vendas</span>
+          <span style="width:100px; text-align:center; padding-right:15px;">Vendas</span>
           <span style="width:140px; text-align:right; visibility:hidden;">—</span>
           <span style="width:55px; text-align:center; visibility:hidden;">—</span>
         </div>
@@ -766,7 +769,7 @@
         </div>
         <div>
           <div style="font-size:9.5px;color:var(--muted);font-weight:700;">Vendas EmCash</div>
-          <div id="empKpiEmCash" style="font-size:14px;font-weight:800;color:var(--ink);">—</div>
+          <div id="empKpiEmCash" style="font-size:18px;font-weight:800;color:var(--ink);">—</div>
         </div>
       </div>
     </div>
