@@ -185,6 +185,130 @@
   .team-count-badge{background:var(--green-light);color:var(--green-dark);font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:10px;}
   .team-section{margin-bottom:0 !important;}
 
+  /* ESTILOS DA ÁRVORE DE EMPREENDIMENTOS (IDÊNTICO À ABA DE GERENTES) */
+  .emp-tree-root { font-size: 11px; }
+  .emp-tree-root details { margin: 0; }
+  .emp-tree-root summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    cursor: pointer;
+    list-style: none;
+    outline: none;
+  }
+  .emp-tree-root summary::-webkit-details-marker { display: none; }
+  .emp-tree-label::before {
+    content: '▸';
+    display: inline-block;
+    margin-right: 6px;
+    font-size: 9px;
+    color: var(--muted);
+    transition: transform .15s;
+  }
+  .emp-tree-root details[open] > summary .emp-tree-label::before {
+    transform: rotate(90deg);
+  }
+
+  /* Cabeçalho Fixo do Empreendimento */
+  .emp-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--green);
+    color: #fff;
+    padding: 6px 10px;
+    font-weight: 700;
+    font-size: 11px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+  }
+  .emp-header-metrics {
+    display: flex;
+    gap: 35px;
+    text-align: right;
+  }
+
+  /* Níveis da Árvore */
+  details.emp-lvl-reg {
+    border-top: 1.5px solid var(--green);
+    margin-top: 6px;
+    padding-top: 2px;
+  }
+  details.emp-lvl-reg:first-child { margin-top: 0; }
+  details.emp-lvl-reg > summary {
+    padding: 6px 6px;
+    background: #eef4f0;
+    border-radius: 4px;
+  }
+  details.emp-lvl-reg > summary .emp-tree-label {
+    font-weight: 800;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    color: var(--green-dark);
+  }
+
+  details.emp-lvl-cid { margin: 3px 0 3px 16px; }
+  details.emp-lvl-cid > summary {
+    padding: 4px 6px;
+    background: #f2f6fb;
+    border-radius: 4px;
+  }
+  details.emp-lvl-cid > summary .emp-tree-label {
+    font-weight: 700;
+    font-size: 10.5px;
+    color: #2554a8;
+  }
+
+  details.emp-lvl-emp { margin: 2px 0 2px 16px; }
+  details.emp-lvl-emp > summary {
+    padding: 3px 6px;
+    background: #fafcfb;
+    border-radius: 3px;
+  }
+  details.emp-lvl-emp > summary:hover { background: #f0f5f1; }
+  details.emp-lvl-emp > summary .emp-tree-label {
+    font-weight: 700;
+    font-size: 10.5px;
+    color: var(--ink);
+  }
+
+  /* Linhas das Unidades (Folhas) */
+  .emp-units-list {
+    margin: 2px 0 4px 28px;
+    list-style: none;
+    padding: 0;
+  }
+  .emp-unit-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3px 6px;
+    border-bottom: 1px solid var(--line);
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--ink);
+    background: #fff;
+  }
+  .emp-unit-item:hover { background: #f7faf8; }
+  .emp-unit-info { display: flex; gap: 20px; align-items: center; margin-left: auto; }
+  
+  .emp-metric-group {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .emp-col-vendas { width: 45px; text-align: center; font-weight: 700; }
+  .emp-col-preco { width: 130px; text-align: right; font-weight: 700; color: var(--green-dark); }
+  .emp-col-emcash { width: 45px; text-align: center; font-weight: 700; }
+
+  .emp-emcash-dot { display: inline-block; width: 9px; height: 9px; background-color: var(--good-green); border-radius: 50%; box-shadow: 0 0 3px rgba(0,0,0,0.2); }
+  .emp-emcash-empty { display: inline-block; width: 9px; height: 9px; }
+
+  .team-count-badge{background:var(--green-light);color:var(--green-dark);font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:10px;}
+  .team-section{margin-bottom:0 !important;}
+
   .team-tree-root{font-size:11px;}
   .team-tree-root details{margin:0;}
   .team-tree-root summary{display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;list-style:none;outline:none;}
@@ -205,73 +329,6 @@
   details.team-lvl-pessoa{margin:2px 0 2px 16px;}
   details.team-lvl-pessoa > summary{padding:3px 6px;}
   details.team-lvl-pessoa > summary .team-lvl-label{font-weight:600;font-size:10.5px;color:var(--ink);}
-
-  /* TABELA NATIVA ESTILO TABELA DINÂMICA (PIVOT TABLE) */
-  table.pivot-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 10.5px;
-    background: #fff;
-  }
-  table.pivot-table th {
-    background: var(--green);
-    color: #fff;
-    padding: 6px 8px;
-    font-weight: 700;
-    font-size: 10.5px;
-    text-align: left;
-  }
-  table.pivot-table th.col-num, table.pivot-table td.col-num {
-    text-align: center;
-    width: 90px;
-  }
-  table.pivot-table th.col-preco, table.pivot-table td.col-preco {
-    text-align: center;
-    width: 170px;
-  }
-  table.pivot-table th.col-emcash, table.pivot-table td.col-emcash {
-    text-align: center;
-    width: 75px;
-  }
-
-  table.pivot-table tr.row-regiao td {
-    background: #eef4f0;
-    font-weight: 800;
-    color: var(--green-dark);
-    padding: 6px 8px;
-    border-top: 1.5px solid var(--green);
-    text-transform: uppercase;
-  }
-  table.pivot-table tr.row-cidade td {
-    background: #f2f6fb;
-    font-weight: 700;
-    color: #2554a8;
-    padding: 5px 8px 5px 22px;
-  }
-  table.pivot-table tr.row-emp td {
-    background: #fafcfb;
-    font-weight: 700;
-    color: var(--ink);
-    padding: 4px 8px 4px 38px;
-    cursor: pointer;
-  }
-  table.pivot-table tr.row-emp:hover td {
-    background: #f0f5f1;
-  }
-  table.pivot-table tr.row-unidade td {
-    background: #ffffff;
-    font-weight: 500;
-    color: var(--ink);
-    padding: 4px 8px 4px 54px;
-    border-bottom: 1px solid var(--line);
-    font-size: 10px;
-  }
-  table.pivot-table tr.row-unidade:hover td {
-    background: #f7faf8;
-  }
-
-  .emp-emcash-dot { display: inline-block; width: 10px; height: 10px; background-color: var(--good-green); border-radius: 50%; box-shadow: 0 0 3px rgba(0,0,0,0.2); }
-  .emp-emcash-empty { display: inline-block; width: 10px; height: 10px; }
 
   .team-grand-total{margin-top:8px;padding:6px 8px;background:var(--green-light);border-radius:5px;font-weight:800;color:var(--green-dark);text-align:right;font-size:11px;}
   .team-empty-msg{color:var(--muted);font-size:11px;padding:10px 4px;}
@@ -607,7 +664,7 @@
     </div>
   </div>
 
-  <!-- ---- ABA 4: EMPREENDIMENTOS (Tabela Dinâmica Nativa) ---- -->
+  <!-- ---- ABA 4: EMPREENDIMENTOS (Árvore Nativa Retorcida com Métricas Alinhadas) ---- -->
   <div id="tabEmpContent" style="display:none;">
     <div class="card" style="margin-bottom:10px; padding:10px 14px;">
       <h3 style="margin:0 0 8px;font-size:12px;color:var(--green-dark);">💰 Preço médio das propostas</h3>
@@ -636,21 +693,21 @@
       <p>Carregue o XML do mês para ver os empreendimentos vendidos.</p>
     </div>
 
-    <div class="card" id="empTreeWrap" style="padding:10px 14px; overflow-x:auto;">
+    <div class="card" id="empTreeWrap" style="padding:10px 14px;">
       <h3 style="margin:0 0 8px;font-size:12px;color:var(--green-dark);">🏢 Empreendimentos vendidos — Regional › Cidade › Empreendimento › UH</h3>
-      <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">Estrutura em tabela dinâmica com expansão por cliques.</p>
+      <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">Estrutura em árvore expansível com colunas perfeitamente alinhadas.</p>
       
-      <table class="pivot-table">
-        <thead>
-          <tr>
-            <th>Unidade / Empreendimento</th>
-            <th class="col-num">Vendas</th>
-            <th class="col-preco">Méd. Preço Vendido</th>
-            <th class="col-emcash">Emcash</th>
-          </tr>
-        </thead>
-        <tbody id="pivotTableBody"></tbody>
-      </table>
+      <!-- Cabeçalho de Métricas correspondente -->
+      <div class="emp-header-bar">
+        <span>Unidade / Empreendimento</span>
+        <div class="emp-header-metrics">
+          <span style="width:45px; text-align:center;">Vendas</span>
+          <span style="width:130px; text-align:right;">Méd. Preço Vendido</span>
+          <span style="width:45px; text-align:center;">Emcash</span>
+        </div>
+      </div>
+      
+      <div class="emp-tree-root" id="empTree"></div>
     </div>
   </div>
 
@@ -737,8 +794,6 @@ let historicoFechamentos = {};
 
 const WEEKDAY_WEIGHTS = {0:0.145, 1:0.155, 2:0.165, 3:0.150, 4:0.170, 5:0.175, 6:0.040};
 const QUARTER_WEIGHTS = {1:0.15, 2:0.25, 3:0.25, 4:0.35};
-
-let pivotExpanded = {};
 
 function resolveSpi(empreendimento){
   const norm = (empreendimento||'').trim().toUpperCase();
@@ -1664,11 +1719,6 @@ function fmtBRL(v){
 
 const META_PRECO_PROPOSTA = 276170;
 
-function togglePivotExpand(key){
-  pivotExpanded[key] = !pivotExpanded[key];
-  renderEmpreendimentosTab();
-}
-
 function renderEmpreendimentosTab(){
   const emptyMsg = document.getElementById('empEmptyMsg');
   const treeWrap = document.getElementById('empTreeWrap');
@@ -1727,21 +1777,19 @@ function renderEmpreendimentosTab(){
     return ia-ib;
   });
 
-  let rowsHtml = '';
+  let html = '';
 
   regionais.forEach(reg=>{
     const cidadesObj = tree[reg];
     const cidades = Object.keys(cidadesObj).sort((a,b)=>a.localeCompare(b,'pt-BR'));
-    
+    let regHtml = '';
     let regCount = 0, regEmCashCount = 0, regSoma = 0;
-    const regCidadesData = [];
 
     cidades.forEach(cid=>{
       const empsObj = cidadesObj[cid];
       const emps = Object.keys(empsObj).sort((a,b)=>a.localeCompare(b,'pt-BR'));
-      
+      let cidHtml = '';
       let cidCount = 0, cidEmCashCount = 0, cidSoma = 0;
-      const cidEmpsData = [];
 
       emps.forEach(emp=>{
         const data = empsObj[emp];
@@ -1754,60 +1802,29 @@ function renderEmpreendimentosTab(){
         regCount += count; regEmCashCount += emCashCount; regSoma += soma;
         cidCount += count; cidEmCashCount += emCashCount; cidSoma += soma;
 
-        cidEmpsData.push({ emp, count, media, emCashCount, items: itemsSorted });
+        const itemsHtml = itemsSorted.map(it=>
+          `<li class="emp-unit-item">
+             <span>${it.desc}</span>
+             <div class="emp-unit-info">
+               <span class="emp-col-vendas">1</span>
+               <span class="emp-col-preco">${fmtBRL(it.precoLiquido)}</span>
+               <span class="emp-col-emcash">${it.emCash ? '<span class="emp-emcash-dot" title="EmCash"></span>' : '<span class="emp-emcash-empty"></span>'}</span>
+             </div>
+           </li>`
+        ).join('');
+
+        cidHtml += `<details class="emp-lvl-emp"><summary><span class="emp-tree-label">${emp}</span><div class="emp-metric-group"><span class="emp-col-vendas">${count}</span><span class="emp-col-preco">${fmtBRL(media)}</span><span class="emp-col-emcash">${emCashCount}</span></div></summary><ul class="emp-units-list">${itemsHtml}</ul></details>`;
       });
 
       const cidMedia = cidCount ? cidSoma/cidCount : 0;
-      regCidadesData.push({ cid, cidCount, cidMedia, cidEmCashCount, emps: cidEmpsData });
+      regHtml += `<details class="emp-lvl-cid"><summary><span class="emp-tree-label">${cid}</span><div class="emp-metric-group"><span class="emp-col-vendas">${cidCount}</span><span class="emp-col-preco">${fmtBRL(cidMedia)}</span><span class="emp-col-emcash">${cidEmCashCount}</span></div></summary>${cidHtml}</details>`;
     });
 
     const regMedia = regCount ? regSoma/regCount : 0;
-
-    // Linha Regional
-    rowsHtml += `<tr class="row-regiao">
-      <td>▸ ${reg}</td>
-      <td class="col-num">${regCount}</td>
-      <td class="col-preco">${fmtBRL(regMedia)}</td>
-      <td class="col-emcash">${regEmCashCount}</td>
-    </tr>`;
-
-    regCidadesData.forEach(c => {
-      // Linha Cidade
-      rowsHtml += `<tr class="row-cidade">
-        <td>▸ ${c.cid}</td>
-        <td class="col-num">${c.cidCount}</td>
-        <td class="col-preco">${fmtBRL(c.cidMedia)}</td>
-        <td class="col-emcash">${c.cidEmCashCount}</td>
-      </tr>`;
-
-      c.emps.forEach(e => {
-        const empKey = `${reg}___${c.cid}___${e.emp}`;
-        const isExp = !!pivotExpanded[empKey];
-        const arrow = isExp ? '▾' : '▸';
-
-        // Linha Empreendimento
-        rowsHtml += `<tr class="row-emp" onclick="togglePivotExpand('${empKey}')">
-          <td>${arrow} ${e.emp}</td>
-          <td class="col-num">${e.count}</td>
-          <td class="col-preco">${fmtBRL(e.media)}</td>
-          <td class="col-emcash">${e.emCashCount}</td>
-        </tr>`;
-
-        if(isExp){
-          e.items.forEach(it => {
-            rowsHtml += `<tr class="row-unidade">
-              <td>${it.desc}</td>
-              <td class="col-num">1</td>
-              <td class="col-preco">${fmtBRL(it.precoLiquido)}</td>
-              <td class="col-emcash">${it.emCash ? '<span class="emp-emcash-dot" title="EmCash"></span>' : '<span class="emp-emcash-empty"></span>'}</td>
-            </tr>`;
-          });
-        }
-      });
-    });
+    html += `<details class="emp-lvl-reg"><summary><span class="emp-tree-label">${reg}</span><div class="emp-metric-group"><span class="emp-col-vendas">${regCount}</span><span class="emp-col-preco">${fmtBRL(regMedia)}</span><span class="emp-col-emcash">${regEmCashCount}</span></div></summary>${regHtml}</details>`;
   });
 
-  document.getElementById('pivotTableBody').innerHTML = rowsHtml || '<tr><td colspan="4" class="team-empty-msg">Nenhuma venda encontrada neste mês.</td></tr>';
+  document.getElementById('empTree').innerHTML = html || '<div class="team-empty-msg">Nenhuma venda encontrada neste mês.</div>';
 }
 
 function initRegionalFilter(){
