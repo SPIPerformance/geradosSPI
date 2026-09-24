@@ -371,7 +371,7 @@
   .team-tree-list {
     margin: 2px 0 4px 20px;
     list-style: none;
-    padding: 0 14px 0 0;
+    padding: 0;
     width: calc(100% - 20px);
   }
   .team-tree-list li {
@@ -389,6 +389,7 @@
   .team-tree-list li:hover { background: #f7faf8; }
   .team-tree-loja { color: var(--muted); font-weight: normal; }
 
+  /* PADRONIZAÇÃO EXATA DA COLUNA DE VENDAS DA ÁRVORE DE GERENTES */
   .team-metric-box {
     width: 70px;
     text-align: center;
@@ -396,6 +397,7 @@
     font-size: 11px;
     color: var(--ink);
     flex-shrink: 0;
+    padding-right: 14px;
   }
   .team-leaf-meta {
     width: 70px;
@@ -404,6 +406,7 @@
     font-size: 11px;
     color: var(--ink);
     flex-shrink: 0;
+    padding-right: 14px;
   }
 
   .team-grand-total{
@@ -748,7 +751,7 @@
       
       <div class="emp-header-bar">
         <span>Equipe / Unidade / Loja</span>
-        <div style="width: 70px; text-align: center; font-weight: 700; font-size: 10.5px;">Vendas</div>
+        <div style="width: 70px; text-align: center; font-weight: 700; font-size: 10.5px; padding-right: 14px;">Vendas</div>
       </div>
 
       <div class="team-tree-root" id="teamGerentesTree"></div>
