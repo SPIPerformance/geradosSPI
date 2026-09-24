@@ -216,7 +216,7 @@
     justify-content: space-between;
     background: var(--green);
     color: #fff;
-    padding: 6px 10px;
+    padding: 6px 14px;
     font-weight: 700;
     font-size: 10.5px;
     border-radius: 4px;
@@ -321,7 +321,7 @@
   .team-count-badge{background:var(--green-light);color:var(--green-dark);font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:10px;}
   .team-section{margin-bottom:0 !important;}
 
-  /* Níveis da Árvore Gerentes & Supervisores com alinhamento centralizado perfeito e fixo */
+  /* Níveis da Árvore Gerentes & Supervisores com alinhamento rigoroso e idêntico ao cabeçalho */
   details.team-lvl-regional {
     border-top: 1.5px solid var(--green);
     margin-top: 6px;
@@ -329,7 +329,7 @@
   }
   details.team-lvl-regional:first-child { margin-top: 0; }
   details.team-lvl-regional > summary {
-    padding: 6px 6px;
+    padding: 6px 14px;
     background: #eef4f0;
     border-radius: 4px;
   }
@@ -343,7 +343,7 @@
 
   details.team-lvl-canal { margin: 3px 0 3px 16px; }
   details.team-lvl-canal > summary {
-    padding: 4px 6px;
+    padding: 4px 14px;
     background: #f2f6fb;
     border-radius: 4px;
   }
@@ -355,7 +355,7 @@
 
   details.team-lvl-pessoa, details.team-lvl-supervisor { margin: 2px 0 2px 16px; }
   details.team-lvl-pessoa > summary, details.team-lvl-supervisor > summary {
-    padding: 3px 6px;
+    padding: 3px 14px;
     background: #fafcfb;
     border-radius: 3px;
   }
@@ -369,13 +369,13 @@
   .team-tree-list {
     margin: 2px 0 4px 28px;
     list-style: none;
-    padding: 0;
+    padding: 0 14px 0 0;
   }
   .team-tree-list li {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 3px 6px;
+    padding: 3px 14px;
     border-bottom: 1px solid var(--line);
     font-size: 11px;
     font-weight: 600;
@@ -385,27 +385,25 @@
   .team-tree-list li:hover { background: #f7faf8; }
   .team-tree-loja { color: var(--muted); font-weight: normal; }
 
-  /* Ajuste exato e centralizado para a coluna de vendas dos gerentes/supervisores alinhada ao cabeçalho Vendas */
+  /* Caixa de métrica com largura fixa e alinhada perfeitamente ao centro da coluna Vendas */
   .team-metric-box {
-    width: 100px;
+    width: 70px;
     text-align: center;
     font-weight: 700;
     font-size: 11px;
     color: var(--ink);
     flex-shrink: 0;
-    padding-right: 15px;
   }
   .team-leaf-meta {
-    width: 100px;
+    width: 70px;
     text-align: center;
     font-weight: 700;
     font-size: 11px;
     color: var(--ink);
     flex-shrink: 0;
-    padding-right: 15px;
   }
 
-  .team-grand-total{margin-top:8px;padding:6px 8px;background:var(--green-light);border-radius:5px;font-weight:800;color:var(--green-dark);text-align:right;font-size:11px;}
+  .team-grand-total{margin-top:8px;padding:6px 14px;background:var(--green-light);border-radius:5px;font-weight:800;color:var(--green-dark);text-align:right;font-size:11px;}
   .team-empty-msg{color:var(--muted);font-size:11px;padding:10px 4px;}
 
   .status-mini{display:flex;gap:6px;margin-top:4px;padding-top:4px;border-top:1px solid var(--line);}
@@ -736,14 +734,10 @@
       </div>
       <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">No canal Imob, o supervisor aparece dentro do gerente dele — as vendas não somam 2x no Total Geral. Selecionando várias semanas, os números são somados.</p>
       
-      <!-- Cabeçalho exato com alinhamento centralizado perfeito -->
+      <!-- Cabeçalho exato alinhado ao centro -->
       <div class="emp-header-bar">
         <span>Equipe / Unidade / Loja</span>
-        <div class="emp-header-metrics">
-          <span style="width:100px; text-align:center; padding-right:15px;">Vendas</span>
-          <span style="width:140px; text-align:right; visibility:hidden;">—</span>
-          <span style="width:55px; text-align:center; visibility:hidden;">—</span>
-        </div>
+        <div style="width: 70px; text-align: center; font-weight: 700; font-size: 10.5px;">Vendas</div>
       </div>
 
       <div class="team-tree-root" id="teamGerentesTree"></div>
@@ -1798,7 +1792,7 @@ function switchTab(tab){
 }
 
 function fmtBRL(v){
-  return (v||0).toLocaleString('pt-BR', {style:'currency', currency:'BRL', minimumFractionDigits:2, maximumFractionDigits:2});
+  return (v||0).toLocaleString('pt-BR', {style:'currency', currency:'BRL', minimumFractionDigits:0, maximumFractionDigits:0});
 }
 
 const META_PRECO_PROPOSTA = 276170;
