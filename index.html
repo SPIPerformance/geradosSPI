@@ -224,10 +224,23 @@
   details.team-lvl-supervisor.team-sem-gerente > summary .team-lvl-total{color:#c2410c;}
 
   .team-tree-list{margin:2px 0 4px 16px;padding:0 0 0 10px;list-style:none;border-left:2px solid var(--green-light);}
-  .team-tree-list li{font-size:9.5px;font-weight:500;color:var(--muted);padding:2px 0;line-height:1.35;}
+  .team-tree-list li{font-size:9.5px;font-weight:500;color:var(--muted);padding:2px 0;line-height:1.35;display:flex;align-items:center;justify-content:space-between;}
   .team-tree-loja{color:#2554a8;font-weight:600;}
-  .emp-emcash-yes{display:inline-block;background:var(--green-light);color:var(--green-dark);font-weight:700;font-size:9px;padding:1px 7px;border-radius:8px;margin-left:6px;vertical-align:middle;}
-  .emp-emcash-no{display:inline-block;color:var(--muted);font-size:9px;margin-left:6px;vertical-align:middle;}
+  
+  /* Novos estilos para tabela estilo árvore na aba Empreendimentos */
+  .emp-table-wrapper { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .emp-header-row { background: var(--green); color: #fff; display: flex; padding: 5px 8px; font-weight: 700; font-size: 10px; align-items: center; border-radius: 4px 4px 0 0; }
+  .emp-header-col { flex: 1; text-align: center; }
+  .emp-header-col:first-child { text-align: left; flex: 2; }
+  
+  .emp-item-row { display: flex; align-items: center; justify-content: space-between; padding: 4px 8px 4px 20px; font-size: 10.5px; font-weight: 500; color: var(--ink); border-bottom: 1px solid var(--line); background: #fff; }
+  .emp-item-row:hover { background: #f0f5f1; }
+  .emp-item-desc { flex: 2; text-align: left; font-weight: 600; color: var(--ink); }
+  .emp-item-val { flex: 1; text-align: center; font-weight: 600; color: var(--green-dark); }
+  .emp-item-emcash { flex: 1; text-align: center; }
+
+  .emp-emcash-dot { display: inline-block; width: 10px; height: 10px; background-color: var(--good-green); border-radius: 50%; box-shadow: 0 0 3px rgba(0,0,0,0.2); }
+  .emp-emcash-empty { display: inline-block; width: 10px; height: 10px; }
 
   .team-grand-total{margin-top:8px;padding:6px 8px;background:var(--green-light);border-radius:5px;font-weight:800;color:var(--green-dark);text-align:right;font-size:11px;}
   .team-empty-msg{color:var(--muted);font-size:11px;padding:10px 4px;}
@@ -420,9 +433,9 @@
   <div class="tabs">
     <button class="tab-btn active" id="tabDashBtn" onclick="switchTab('dash')">📊 Painel Executivo</button>
     <button class="tab-btn" id="tabSimBtn" onclick="switchTab('sim')" style="display:none;">📋 Simulação Plano de Voo</button>
-    <button class="tab-btn" id="tabHistBtn" onclick="switchTab('hist')">🗓 Histórico</button>
     <button class="tab-btn" id="tabTeamBtn" onclick="switchTab('team')">👥 Gerentes & Supervisores</button>
     <button class="tab-btn" id="tabEmpBtn" onclick="switchTab('emp')">🏢 Empreendimentos</button>
+    <button class="tab-btn" id="tabHistBtn" onclick="switchTab('hist')">🗓 Histórico</button>
   </div>
 
   <div class="warn-banner" id="unmappedWarning" style="display: none;"></div>
@@ -543,7 +556,81 @@
     </div>
   </div>
 
-  <!-- ---- ABA 3: HISTORICO ---- -->
+  <!-- ---- ABA 3: GERENTES & SUPERVISORES ---- -->
+  <div id="tabTeamContent" style="display:none;">
+    <div class="card" style="margin-bottom:10px;">
+      <h3 style="margin:0 0 4px;font-size:12px;color:var(--green-dark);">👥 Vendas por semana — Gerentes e Supervisores</h3>
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <label style="font-size:11px;font-weight:700;color:var(--green-dark);">📅 Semana(s):</label>
+        <div id="teamWeeksCheckboxes" class="team-weeks-container"></div>
+        <span id="teamWeekRange" style="font-size:10px;color:var(--muted);margin-left:auto;"></span>
+        <button class="btn secondary" id="teamPrintBtn" type="button" onclick="window.print()">🖨 Imprimir esta aba</button>
+      </div>
+    </div>
+
+    <div id="teamEmptyMsg" class="card empty-state" style="display:none;">
+      <h2>Nenhum dado carregado ainda</h2>
+      <p>Carregue o XML do mês para ver os números por gerente/supervisor.</p>
+    </div>
+
+    <div id="teamSectionsWrap">
+      <div class="card team-section" style="border-left:4px solid var(--green);">
+        <h4 style="margin:0 0 8px;font-size:12px;color:var(--green-dark);display:flex;align-items:center;gap:6px;">🧑‍💼 Gerentes &amp; Supervisores (AGS / House / Imob) <span id="teamGerentesCount" class="team-count-badge"></span></h4>
+        <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">No canal Imob, o supervisor aparece dentro do gerente dele — as vendas não somam 2x no Total Geral. Selecionando várias semanas, os números são somados.</p>
+        <div class="team-tree-root" id="teamGerentesTree"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---- ABA 4: EMPREENDIMENTOS ---- -->
+  <div id="tabEmpContent" style="display:none;">
+    <div class="card" style="margin-bottom:10px; padding:10px 14px;">
+      <h3 style="margin:0 0 8px;font-size:12px;color:var(--green-dark);">💰 Preço médio das propostas × Meta</h3>
+      <div style="display:flex; gap:22px; flex-wrap:wrap; align-items:center;">
+        <div>
+          <div style="font-size:9.5px;color:var(--muted);font-weight:700;">Média do mês</div>
+          <div id="empKpiMedia" style="font-size:18px;font-weight:800;color:var(--green-dark);">—</div>
+        </div>
+        <div>
+          <div style="font-size:9.5px;color:var(--muted);font-weight:700;">Meta</div>
+          <div id="empKpiMeta" style="font-size:18px;font-weight:800;color:var(--ink);">—</div>
+        </div>
+        <div>
+          <div style="font-size:9.5px;color:var(--muted);font-weight:700;">Atingimento</div>
+          <span id="empKpiGap" class="gap-cell" style="font-size:12px;padding:3px 9px;">—</span>
+        </div>
+        <div style="font-size:9.5px;color:var(--muted);">
+          <div>Vendas</div>
+          <div id="empKpiCount" style="font-size:14px;font-weight:800;color:var(--ink);">—</div>
+        </div>
+        <div style="font-size:9.5px;color:var(--muted);">
+          <div>Vendas EmCash</div>
+          <div id="empKpiEmCash" style="font-size:14px;font-weight:800;color:var(--ink);">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="empEmptyMsg" class="card empty-state" style="display:none;">
+      <h2>Nenhum dado carregado ainda</h2>
+      <p>Carregue o XML do mês para ver os empreendimentos vendidos.</p>
+    </div>
+
+    <div class="card" id="empTreeWrap" style="padding:10px 14px;">
+      <h3 style="margin:0 0 8px;font-size:12px;color:var(--green-dark);">🏢 Empreendimentos vendidos — Regional › Cidade › Empreendimento › UH</h3>
+      <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">Dentro de cada empreendimento, as unidades vendidas aparecem ordenadas por preço.</p>
+      
+      <!-- Cabeçalho de colunas idêntico ao design de referência -->
+      <div class="emp-header-row" style="margin-bottom: 4px;">
+        <div class="emp-header-col">Unidade / Empreendimento</div>
+        <div class="emp-header-col">Preço Vendido</div>
+        <div class="emp-header-col">Emcash</div>
+      </div>
+      
+      <div class="team-tree-root" id="empTree"></div>
+    </div>
+  </div>
+
+  <!-- ---- ABA 5: HISTORICO ---- -->
   <div id="tabHistContent" style="display:none;">
     <div class="card" style="margin-bottom:8px;">
       <h3 style="margin:0 0 4px;font-size:12px;color:var(--green-dark);">📈 Projeção de fechamento (plano de voo)</h3>
@@ -571,73 +658,6 @@
         <table class="matrix" id="histTable"></table>
       </div>
       <div id="histForecast" style="font-size:11px;color:var(--ink);margin-top:8px;font-weight:600;"></div>
-    </div>
-  </div>
-
-  <!-- ---- ABA 4: GERENTES & SUPERVISORES ---- -->
-  <div id="tabTeamContent" style="display:none;">
-    <div class="card" style="margin-bottom:10px;">
-      <h3 style="margin:0 0 4px;font-size:12px;color:var(--green-dark);">👥 Vendas por semana — Gerentes e Supervisores</h3>
-      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-        <label style="font-size:11px;font-weight:700;color:var(--green-dark);">📅 Semana(s):</label>
-        <!-- Substituído select múltiplo por container de checkboxes customizadas -->
-        <div id="teamWeeksCheckboxes" class="team-weeks-container"></div>
-        <span id="teamWeekRange" style="font-size:10px;color:var(--muted);margin-left:auto;"></span>
-        <button class="btn secondary" id="teamPrintBtn" type="button" onclick="window.print()">🖨 Imprimir esta aba</button>
-      </div>
-    </div>
-
-    <div id="teamEmptyMsg" class="card empty-state" style="display:none;">
-      <h2>Nenhum dado carregado ainda</h2>
-      <p>Carregue o XML do mês para ver os números por gerente/supervisor.</p>
-    </div>
-
-    <div id="teamSectionsWrap">
-      <div class="card team-section" style="border-left:4px solid var(--green);">
-        <h4 style="margin:0 0 8px;font-size:12px;color:var(--green-dark);display:flex;align-items:center;gap:6px;">🧑‍💼 Gerentes &amp; Supervisores (AGS / House / Imob) <span id="teamGerentesCount" class="team-count-badge"></span></h4>
-        <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">No canal Imob, o supervisor aparece dentro do gerente dele — as vendas não somam 2x no Total Geral. Selecionando várias semanas, os números são somados.</p>
-        <div class="team-tree-root" id="teamGerentesTree"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ---- ABA 5: EMPREENDIMENTOS ---- -->
-  <div id="tabEmpContent" style="display:none;">
-    <div class="card" style="margin-bottom:10px; padding:10px 14px;">
-      <h3 style="margin:0 0 8px;font-size:12px;color:var(--green-dark);">💰 Preço médio das propostas × Meta</h3>
-      <div style="display:flex; gap:22px; flex-wrap:wrap; align-items:center;">
-        <div>
-          <div style="font-size:9.5px;color:var(--muted);font-weight:700;">Média do mês</div>
-          <div id="empKpiMedia" style="font-size:18px;font-weight:800;color:var(--green-dark);">—</div>
-        </div>
-        <div>
-          <div style="font-size:9.5px;color:var(--muted);font-weight:700;">Meta</div>
-          <div id="empKpiMeta" style="font-size:18px;font-weight:800;color:var(--ink);">—</div>
-        </div>
-        <div>
-          <div style="font-size:9.5px;color:var(--muted);font-weight:700;">Atingimento</div>
-          <span id="empKpiGap" class="gap-cell" style="font-size:12px;padding:3px 9px;">—</span>
-        </div>
-        <div style="font-size:9.5px;color:var(--muted);">
-          <div>Unidades no mês</div>
-          <div id="empKpiCount" style="font-size:14px;font-weight:800;color:var(--ink);">—</div>
-        </div>
-        <div style="font-size:9.5px;color:var(--muted);">
-          <div>Vendas EmCash</div>
-          <div id="empKpiEmCash" style="font-size:14px;font-weight:800;color:var(--ink);">—</div>
-        </div>
-      </div>
-    </div>
-
-    <div id="empEmptyMsg" class="card empty-state" style="display:none;">
-      <h2>Nenhum dado carregado ainda</h2>
-      <p>Carregue o XML do mês para ver os empreendimentos vendidos.</p>
-    </div>
-
-    <div class="card" id="empTreeWrap" style="padding:10px 14px;">
-      <h3 style="margin:0 0 8px;font-size:12px;color:var(--green-dark);">🏢 Empreendimentos vendidos — Regional › Cidade › Empreendimento › UH</h3>
-      <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">Dentro de cada empreendimento, as unidades vendidas aparecem ordenadas por preço.</p>
-      <div class="team-tree-root" id="empTree"></div>
     </div>
   </div>
 
@@ -1189,7 +1209,7 @@ function renderPessoaNode(name, count, items, levelClass){
   });
   const leaves = Object.values(agg).sort((a,b)=> b.count - a.count);
   const leavesHtml = leaves.map(l =>
-    `<li>${l.empreendimento} <span class="team-tree-loja">— ${l.loja}</span>${l.count>1 ? ` <b>(${l.count})</b>` : ''}</li>`
+    `<li><span>${l.empreendimento} <span class="team-tree-loja">— ${l.loja}</span></span>${l.count>1 ? ` <b>(${l.count})</b>` : ''}</li>`
   ).join('');
   const semGerenteCls = name === 'SEM GERENTE' ? ' team-sem-gerente' : '';
   const label = name === 'SEM GERENTE' ? '⚠️ SEM GERENTE' : name;
@@ -1278,7 +1298,6 @@ function renderTeamTree(containerId, countId, records, year, month, lastDay, wee
   container.innerHTML = html;
 }
 
-// Renderiza as checkboxes das semanas de forma elegante mantendo as seleções anteriores
 function populateTeamWeeksCheckboxes(numWeeks, defaultWeekIdx){
   const container = document.getElementById('teamWeeksCheckboxes');
   const prevChecked = Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
@@ -1329,7 +1348,6 @@ function renderTeamTab(){
   const numWeeks = getNumWeeks(year, month, lastDay);
   const defaultWeekIdx = getWeekIndexForDay(year, month, dataLastDay);
 
-  // Inicializa as caixas de marcação se ainda não existirem ou mudou o mês
   const container = document.getElementById('teamWeeksCheckboxes');
   if(container.children.length !== numWeeks){
     populateTeamWeeksCheckboxes(numWeeks, defaultWeekIdx);
@@ -1536,12 +1554,6 @@ async function handleFile(file){
   updateFileStatus();
 }
 
-// ---- Modo analista: trava a aba "Simulação Plano de Voo" por senha. ----
-// Isso NÃO é segurança de verdade (o app é um arquivo estático, qualquer um
-// com acesso ao código-fonte consegue contornar) — é só pra a aba não aparecer
-// no dia a dia de quem não é analista de performance. Guarda só o hash
-// SHA-256 da senha (não a senha em texto puro) e lembra o destravo no
-// localStorage deste navegador, então não precisa digitar de novo.
 const ANALYST_PASS_HASH = '4a1898716ef67796fcc80c7426c4f876d398de27da5c73a3accf425e42a7f412';
 let analystUnlocked = false;
 
@@ -1598,41 +1610,36 @@ function switchTab(tab){
   if(tab==='sim' && !analystUnlocked){ tab = 'dash'; }
   document.getElementById('tabDashBtn').className = tab==='dash' ? 'tab-btn active' : 'tab-btn';
   document.getElementById('tabSimBtn').className = tab==='sim' ? 'tab-btn active' : 'tab-btn';
-  document.getElementById('tabHistBtn').className = tab==='hist' ? 'tab-btn active' : 'tab-btn';
   document.getElementById('tabTeamBtn').className = tab==='team' ? 'tab-btn active' : 'tab-btn';
   document.getElementById('tabEmpBtn').className = tab==='emp' ? 'tab-btn active' : 'tab-btn';
+  document.getElementById('tabHistBtn').className = tab==='hist' ? 'tab-btn active' : 'tab-btn';
+  
   document.getElementById('tabDashContent').style.display = tab==='dash' ? 'block' : 'none';
   document.getElementById('tabSimContent').style.display = tab==='sim' ? 'block' : 'none';
-  document.getElementById('tabHistContent').style.display = tab==='hist' ? 'block' : 'none';
   document.getElementById('tabTeamContent').style.display = tab==='team' ? 'block' : 'none';
   document.getElementById('tabEmpContent').style.display = tab==='emp' ? 'block' : 'none';
+  document.getElementById('tabHistContent').style.display = tab==='hist' ? 'block' : 'none';
 
   if(tab==='dash'){
     if(currentRecords.length>0) render();
   } else if(tab==='sim'){
     buildSimMetaBar();
     renderPdvTable();
-  } else if(tab==='hist'){
-    renderHistorico();
   } else if(tab==='team'){
     renderTeamTab();
   } else if(tab==='emp'){
     renderEmpreendimentosTab();
+  } else if(tab==='hist'){
+    renderHistorico();
   }
 }
 
-// Formata número como moeda brasileira (R$).
 function fmtBRL(v){
   return (v||0).toLocaleString('pt-BR', {style:'currency', currency:'BRL', minimumFractionDigits:2, maximumFractionDigits:2});
 }
 
 const META_PRECO_PROPOSTA = 276170;
 
-// Aba Empreendimentos: KPI de preço médio x meta, e árvore
-// Regional -> Cidade -> Empreendimento -> UH (ordenada por preço).
-// Usa os registros do mês "de referência" (mesma lógica de mês majoritário
-// usada no resto do painel), sem filtro de status/canal — é o mesmo universo
-// de "gerados" que aparece nos outros KPIs do painel.
 function renderEmpreendimentosTab(){
   const emptyMsg = document.getElementById('empEmptyMsg');
   const treeWrap = document.getElementById('empTreeWrap');
@@ -1656,8 +1663,6 @@ function renderEmpreendimentosTab(){
     return d && d.getFullYear()===year && d.getMonth()===month;
   });
 
-  // Preço = (VALOR_DA_PROPOSTA - VALOR_TOTAL_PARCELA_DESCONTO) somado de todas
-  // as vendas, dividido pelo número TOTAL de vendas do mês (não só as com preço).
   const somaLiquida = monthRecords.reduce((s,r)=> s + (r.valorProposta - r.valorDesconto), 0);
   const mediaLiquida = monthRecords.length ? somaLiquida / monthRecords.length : 0;
   const pctMeta = META_PRECO_PROPOSTA>0 ? (mediaLiquida/META_PRECO_PROPOSTA*100) : 0;
@@ -1677,9 +1682,6 @@ function renderEmpreendimentosTab(){
     : pctMeta>=70 ? 'var(--amber)'
     : 'var(--red)';
 
-  // Regional = SPI resolvido pelo de-para de mapeamento-regionais.json
-  // (mesmo mapeamento Empreendimento -> SPI usado no resto do painel), não o
-  // atributo REGIONAL do XML.
   const tree = {};
   monthRecords.forEach(r=>{
     const spiKey = resolveSpi(r.empreendimento);
@@ -1728,10 +1730,14 @@ function renderEmpreendimentosTab(){
         cidCount += count; cidSoma += soma;
 
         const itemsHtml = itemsSorted.map(it=>
-          `<li>${it.desc} <span class="team-tree-loja">— ${fmtBRL(it.precoLiquido)}</span> ${it.emCash ? '<span class="emp-emcash-yes">EmCash</span>' : '<span class="emp-emcash-no">Não EmCash</span>'}</li>`
+          `<div class="emp-item-row">
+             <div class="emp-item-desc">${it.desc}</div>
+             <div class="emp-item-val">${fmtBRL(it.precoLiquido)}</div>
+             <div class="emp-item-emcash">${it.emCash ? '<span class="emp-emcash-dot" title="EmCash"></span>' : '<span class="emp-emcash-empty"></span>'}</div>
+           </div>`
         ).join('');
 
-        cidHtml += `<details class="team-lvl-pessoa"><summary><span class="team-lvl-label">${emp}</span><span class="team-lvl-total">${count} uds · méd. ${fmtBRL(media)}</span></summary><ul class="team-tree-list">${itemsHtml}</ul></details>`;
+        cidHtml += `<details class="team-lvl-pessoa"><summary><span class="team-lvl-label">${emp}</span><span class="team-lvl-total">${count} uds · méd. ${fmtBRL(media)}</span></summary><div>${itemsHtml}</div></details>`;
       });
 
       const cidMedia = cidCount ? cidSoma/cidCount : 0;
