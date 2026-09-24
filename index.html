@@ -224,23 +224,23 @@
   .team-tree-list{margin:2px 0 4px 16px;padding:0 0 0 10px;list-style:none;border-left:2px solid var(--green-light);}
   .team-tree-loja{color:#2554a8;font-weight:600;}
   
-  /* Estilos estruturados em grid idêntico ao cabeçalho para alinhamento perfeito */
-  .emp-header-row { background: var(--green); color: #fff; display: flex; padding: 5px 8px; font-weight: 700; font-size: 10px; align-items: center; border-radius: 4px 4px 0 0; }
-  .emp-header-col { flex: 1.2; text-align: center; }
-  .emp-header-col:first-child { text-align: left; flex: 3; }
+  /* Sistema de colunas idêntico e padronizado em flexbox para alinhamento perfeito */
+  .emp-header-row { background: var(--green); color: #fff; display: flex; padding: 5px 8px; font-weight: 700; font-size: 10.5px; align-items: center; border-radius: 4px 4px 0 0; }
+  .emp-header-col { flex: 1; text-align: center; }
+  .emp-header-col:first-child { text-align: left; flex: 3.5; }
   
   .team-tree-root details > summary { display: flex; align-items: center; justify-content: space-between; width: 100%; }
-  .emp-summary-right { display: flex; width: 60%; align-items: center; font-size: 10px; font-weight: 800; color: var(--muted); }
-  .emp-col-vendas { flex: 1; text-align: center; }
-  .emp-col-preco { flex: 1.2; text-align: center; }
-  .emp-col-emcash { flex: 1; text-align: center; }
+  .emp-summary-right { display: flex; width: 55%; align-items: center; font-size: 10.5px; font-weight: 800; color: var(--muted); }
+  .emp-col-vendas { flex: 1; text-align: center; font-size: 10.5px; }
+  .emp-col-preco { flex: 1; text-align: center; font-size: 10.5px; }
+  .emp-col-emcash { flex: 1; text-align: center; font-size: 10.5px; }
 
   .emp-item-row { display: flex; align-items: center; padding: 4px 8px 4px 20px; font-size: 10.5px; font-weight: 500; color: var(--ink); border-bottom: 1px solid var(--line); background: #fff; }
   .emp-item-row:hover { background: #f0f5f1; }
-  .emp-item-desc { flex: 3; text-align: left; font-weight: 600; color: var(--ink); }
-  .emp-item-vendas { flex: 1; text-align: center; color: var(--muted); font-size: 10px; }
-  .emp-item-val { flex: 1.2; text-align: center; font-weight: 600; color: var(--green-dark); }
-  .emp-item-emcash { flex: 1; text-align: center; }
+  .emp-item-desc { flex: 3.5; text-align: left; font-weight: 600; color: var(--ink); }
+  .emp-item-vendas { flex: 1; text-align: center; color: var(--muted); font-size: 10.5px; }
+  .emp-item-val { flex: 1; text-align: center; font-weight: 600; color: var(--green-dark); font-size: 10.5px; }
+  .emp-item-emcash { flex: 1; text-align: center; font-size: 10.5px; }
 
   .emp-emcash-dot { display: inline-block; width: 10px; height: 10px; background-color: var(--good-green); border-radius: 50%; box-shadow: 0 0 3px rgba(0,0,0,0.2); }
   .emp-emcash-empty { display: inline-block; width: 10px; height: 10px; }
@@ -614,7 +614,7 @@
       <h3 style="margin:0 0 8px;font-size:12px;color:var(--green-dark);">🏢 Empreendimentos vendidos — Regional › Cidade › Empreendimento › UH</h3>
       <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">Dentro de cada empreendimento, as unidades vendidas aparecem ordenadas por preço.</p>
       
-      <!-- Cabeçalho alinhado com as colunas Vendas, Méd. Preço Vendido e Emcash -->
+      <!-- Cabeçalho alinhado e padronizado -->
       <div class="emp-header-row" style="margin-bottom: 4px;">
         <div class="emp-header-col">Unidade / Empreendimento</div>
         <div class="emp-header-col">Vendas</div>
