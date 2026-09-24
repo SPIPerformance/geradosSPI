@@ -182,10 +182,10 @@
   table.week td:first-child{text-align:left;font-weight:700;color:var(--green-dark);padding-left:6px;}
   table.week tr.total-row td{background:var(--green-light);font-weight:800;border-top:2px solid var(--green);}
 
-  /* ESTILOS DA ÁRVORE DE EMPREENDIMENTOS (IDÊNTICO À ABA DE GERENTES) */
-  .emp-tree-root { font-size: 11px; }
-  .emp-tree-root details { margin: 0; }
-  .emp-tree-root summary {
+  /* ESTILOS DA ÁRVORE DE EMPREENDIMENTOS E GERENTES */
+  .emp-tree-root, .team-tree-root { font-size: 10.5px; }
+  .emp-tree-root details, .team-tree-root details { margin: 0; }
+  .emp-tree-root summary, .team-tree-root summary {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -194,8 +194,9 @@
     list-style: none;
     outline: none;
   }
-  .emp-tree-root summary::-webkit-details-marker { display: none; }
-  .emp-tree-label::before {
+  .emp-tree-root summary::-webkit-details-marker, .team-tree-root summary::-webkit-details-marker { display: none; }
+  
+  .emp-tree-label::before, .team-lvl-label::before {
     content: '▸';
     display: inline-block;
     margin-right: 6px;
@@ -203,11 +204,12 @@
     color: var(--muted);
     transition: transform .15s;
   }
-  .emp-tree-root details[open] > summary .emp-tree-label::before {
+  .emp-tree-root details[open] > summary .emp-tree-label::before,
+  .team-tree-root details[open] > summary .team-lvl-label::before {
     transform: rotate(90deg);
   }
 
-  /* Cabeçalho Fixo do Empreendimento */
+  /* Cabeçalho Fixo do Empreendimento e Gerentes */
   .emp-header-bar {
     display: flex;
     align-items: center;
@@ -216,7 +218,7 @@
     color: #fff;
     padding: 6px 10px;
     font-weight: 700;
-    font-size: 11px;
+    font-size: 9.5px;
     border-radius: 4px;
     margin-bottom: 6px;
   }
@@ -229,7 +231,7 @@
     padding-right: 10px;
   }
 
-  /* Níveis da Árvore */
+  /* Níveis da Árvore Empreendimentos */
   details.emp-lvl-reg {
     border-top: 1.5px solid var(--green);
     margin-top: 6px;
@@ -273,7 +275,6 @@
     color: var(--ink);
   }
 
-  /* Linhas das Unidades (Folhas) com alinhamento perfeito e fonte padronizada */
   .emp-units-list {
     margin: 2px 0 4px 28px;
     list-style: none;
@@ -310,7 +311,7 @@
     padding-right: 10px;
     flex-shrink: 0;
   }
-  .emp-col-vendas { width: 65px; text-align: center; font-weight: 700; font-size: 10.5px; }
+  .emp-col-vendas { width: 65px; text-align: center; font-weight: 700; font-size: 10.5px; color: var(--ink); }
   .emp-col-preco { width: 140px; text-align: right; font-weight: 700; color: inherit; font-size: 10.5px; }
   .emp-col-emcash { width: 55px; text-align: center; font-weight: 700; font-size: 10.5px; }
 
@@ -320,26 +321,86 @@
   .team-count-badge{background:var(--green-light);color:var(--green-dark);font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:10px;}
   .team-section{margin-bottom:0 !important;}
 
-  .team-tree-root{font-size:11px;}
-  .team-tree-root details{margin:0;}
-  .team-tree-root summary{display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;list-style:none;outline:none;}
-  .team-tree-root summary::-webkit-details-marker{display:none;}
-  .team-lvl-label::before{content:'▸';display:inline-block;margin-right:6px;font-size:9px;color:var(--muted);transition:transform .15s;}
-  .team-tree-root details[open] > summary .team-lvl-label::before{transform:rotate(90deg);}
-  .team-lvl-total{font-size:10px;font-weight:800;color:var(--muted);flex:none;}
+  /* Níveis da Árvore Gerentes & Supervisores alinhados perfeitamente */
+  details.team-lvl-regional {
+    border-top: 1.5px solid var(--green);
+    margin-top: 6px;
+    padding-top: 2px;
+  }
+  details.team-lvl-regional:first-child { margin-top: 0; }
+  details.team-lvl-regional > summary {
+    padding: 6px 6px;
+    background: #eef4f0;
+    border-radius: 4px;
+  }
+  details.team-lvl-regional > summary .team-lvl-label {
+    font-weight: 800;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: .02em;
+    color: var(--green-dark);
+  }
 
-  details.team-lvl-regional{border-top:1.5px solid var(--green);margin-top:6px;padding-top:2px;}
-  details.team-lvl-regional:first-child{margin-top:0;}
-  details.team-lvl-regional > summary{padding:6px 6px;background:#eef4f0;border-radius:4px;}
-  details.team-lvl-regional > summary .team-lvl-label{font-weight:800;font-size:10.5px;text-transform:uppercase;letter-spacing:.02em;color:var(--green-dark);}
+  details.team-lvl-canal { margin: 3px 0 3px 16px; }
+  details.team-lvl-canal > summary {
+    padding: 4px 6px;
+    background: #f2f6fb;
+    border-radius: 4px;
+  }
+  details.team-lvl-canal > summary .team-lvl-label {
+    font-weight: 700;
+    font-size: 10.5px;
+    color: #2554a8;
+  }
 
-  details.team-lvl-canal{margin:3px 0 3px 16px;}
-  details.team-lvl-canal > summary{padding:4px 6px;background:#f2f6fb;border-radius:4px;}
-  details.team-lvl-canal > summary .team-lvl-label{font-weight:700;font-size:10.5px;color:#2554a8;}
+  details.team-lvl-pessoa, details.team-lvl-supervisor { margin: 2px 0 2px 16px; }
+  details.team-lvl-pessoa > summary, details.team-lvl-supervisor > summary {
+    padding: 3px 6px;
+    background: #fafcfb;
+    border-radius: 3px;
+  }
+  details.team-lvl-pessoa > summary:hover, details.team-lvl-supervisor > summary:hover { background: #f0f5f1; }
+  details.team-lvl-pessoa > summary .team-lvl-label, details.team-lvl-supervisor > summary .team-lvl-label {
+    font-weight: 700;
+    font-size: 10.5px;
+    color: var(--ink);
+  }
 
-  details.team-lvl-pessoa{margin:2px 0 2px 16px;}
-  details.team-lvl-pessoa > summary{padding:3px 6px;}
-  details.team-lvl-pessoa > summary .team-lvl-label{font-weight:600;font-size:10.5px;color:var(--ink);}
+  .team-tree-list {
+    margin: 2px 0 4px 28px;
+    list-style: none;
+    padding: 0;
+  }
+  .team-tree-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3px 6px;
+    border-bottom: 1px solid var(--line);
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--ink);
+    background: #fff;
+  }
+  .team-tree-list li:hover { background: #f7faf8; }
+  .team-tree-loja { color: var(--muted); font-weight: normal; }
+
+  .team-metric-box {
+    width: 65px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 10.5px;
+    color: var(--ink);
+    flex-shrink: 0;
+  }
+  .team-leaf-meta {
+    width: 65px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 10.5px;
+    color: var(--ink);
+    flex-shrink: 0;
+  }
 
   .team-grand-total{margin-top:8px;padding:6px 8px;background:var(--green-light);border-radius:5px;font-weight:800;color:var(--green-dark);text-align:right;font-size:11px;}
   .team-empty-msg{color:var(--muted);font-size:11px;padding:10px 4px;}
@@ -651,8 +712,8 @@
 
   <!-- ---- ABA 3: GERENTES & SUPERVISORES ---- -->
   <div id="tabTeamContent" style="display:none;">
-    <div class="card" style="margin-bottom:10px;">
-      <h3 style="margin:0 0 4px;font-size:12px;color:var(--green-dark);">👥 Vendas por semana — Gerentes e Supervisores</h3>
+    <div class="card" style="margin-bottom:10px; padding:10px 14px;">
+      <h3 style="margin:0 0 8px;font-size:12px;color:var(--green-dark);">👥 Vendas por semana — Gerentes e Supervisores</h3>
       <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
         <label style="font-size:11px;font-weight:700;color:var(--green-dark);">📅 Semana(s):</label>
         <div id="teamWeeksCheckboxes" class="team-weeks-container"></div>
@@ -666,12 +727,23 @@
       <p>Carregue o XML do mês para ver os números por gerente/supervisor.</p>
     </div>
 
-    <div id="teamSectionsWrap">
-      <div class="card team-section" style="border-left:4px solid var(--green);">
-        <h4 style="margin:0 0 8px;font-size:12px;color:var(--green-dark);display:flex;align-items:center;gap:6px;">🧑‍💼 Gerentes &amp; Supervisores (AGS / House / Imob) <span id="teamGerentesCount" class="team-count-badge"></span></h4>
-        <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">No canal Imob, o supervisor aparece dentro do gerente dele — as vendas não somam 2x no Total Geral. Selecionando várias semanas, os números são somados.</p>
-        <div class="team-tree-root" id="teamGerentesTree"></div>
+    <div class="card" id="teamSectionsWrap" style="padding:10px 14px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+        <h4 style="margin:0;font-size:12px;color:var(--green-dark);display:flex;align-items:center;gap:6px;">🧑‍💼 Gerentes &amp; Supervisores (AGS / House / Imob) <span id="teamGerentesCount" class="team-count-badge"></span></h4>
       </div>
+      <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">No canal Imob, o supervisor aparece dentro do gerente dele — as vendas não somam 2x no Total Geral. Selecionando várias semanas, os números são somados.</p>
+      
+      <!-- Cabeçalho idêntico à aba de empreendimentos para perfeito alinhamento -->
+      <div class="emp-header-bar">
+        <span>Equipe / Unidade / Loja</span>
+        <div class="emp-header-metrics">
+          <span style="width:65px; text-align:center;">Vendas</span>
+          <span style="width:140px; text-align:right; visibility:hidden;">—</span>
+          <span style="width:55px; text-align:center; visibility:hidden;">—</span>
+        </div>
+      </div>
+
+      <div class="team-tree-root" id="teamGerentesTree"></div>
     </div>
   </div>
 
@@ -1299,18 +1371,18 @@ function renderPessoaNode(name, count, items, levelClass){
   });
   const leaves = Object.values(agg).sort((a,b)=> b.count - a.count);
   const leavesHtml = leaves.map(l =>
-    `<li><span>${l.empreendimento} <span class="team-tree-loja">— ${l.loja}</span></span>${l.count>1 ? ` <b>(${l.count})</b>` : ''}</li>`
+    `<li><span>${l.empreendimento} <span class="team-tree-loja">— ${l.loja}</span></span><span class="team-leaf-meta">${l.count}</span></li>`
   ).join('');
   const semGerenteCls = name === 'SEM GERENTE' ? ' team-sem-gerente' : '';
   const label = name === 'SEM GERENTE' ? '⚠️ SEM GERENTE' : name;
   const cls = (levelClass || 'team-lvl-pessoa') + semGerenteCls;
-  return `<details class="${cls}"><summary><span class="team-lvl-label">${label}</span><span class="team-lvl-total">${count}</span></summary><ul class="team-tree-list">${leavesHtml}</ul></details>`;
+  return `<details class="${cls}"><summary><span class="team-lvl-label">${label}</span><span class="team-metric-box">${count}</span></summary><ul class="team-tree-list">${leavesHtml}</ul></details>`;
 }
 
 function renderGerenteComSupervisoresNode(name, count, supervisoresHtml){
   const semGerenteCls = name === 'SEM GERENTE' ? ' team-sem-gerente' : '';
   const label = name === 'SEM GERENTE' ? '⚠️ SEM GERENTE' : name;
-  return `<details class="team-lvl-pessoa${semGerenteCls}"><summary><span class="team-lvl-label">${label}</span><span class="team-lvl-total">${count}</span></summary>${supervisoresHtml}</details>`;
+  return `<details class="team-lvl-pessoa${semGerenteCls}"><summary><span class="team-lvl-label">${label}</span><span class="team-metric-box">${count}</span></summary>${supervisoresHtml}</details>`;
 }
 
 function renderTeamTree(containerId, countId, records, year, month, lastDay, weekIndices){
@@ -1367,14 +1439,14 @@ function renderTeamTree(containerId, countId, records, year, month, lastDay, wee
         }
       });
 
-      regionalHtml += `<details class="team-lvl-canal"><summary><span class="team-lvl-label">${cl}</span><span class="team-lvl-total">${canalTotal}</span></summary>${gerentesHtml}</details>`;
+      regionalHtml += `<details class="team-lvl-canal"><summary><span class="team-lvl-label">${cl}</span><span class="team-metric-box">${canalTotal}</span></summary>${gerentesHtml}</details>`;
     });
 
     if(!regionalHtml) return;
     grandTotal += regionalTotal;
 
     const label = rk === 'FORA' ? '🚩 Fora' : SPI_GROUPS[SPI_KEYS.indexOf(rk)];
-    html += `<details class="team-lvl-regional"><summary><span class="team-lvl-label">${label}</span><span class="team-lvl-total">${regionalTotal}</span></summary>${regionalHtml}</details>`;
+    html += `<details class="team-lvl-regional"><summary><span class="team-lvl-label">${label}</span><span class="team-metric-box">${regionalTotal}</span></summary>${regionalHtml}</details>`;
   });
 
   if(countBadge) countBadge.textContent = totalGerentes > 0 ? `${totalGerentes} nome${totalGerentes>1?'s':''}` : '0 nomes';
