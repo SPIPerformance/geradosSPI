@@ -182,8 +182,8 @@
   table.week td:first-child{text-align:left;font-weight:700;color:var(--green-dark);padding-left:6px;}
   table.week tr.total-row td{background:var(--green-light);font-weight:800;border-top:2px solid var(--green);}
 
-  /* ESTILOS DA ÁRVORE DE EMPREENDIMENTOS E GERENTES - PROPORCIONAL E MODERNO */
-  .emp-tree-root, .team-tree-root { font-size: 11px; }
+  /* ESTILOS DA ÁRVORE DE EMPREENDIMENTOS E GERENTES - PROPORCIONAL E HARMONIOSO */
+  .emp-tree-root, .team-tree-root { font-size: 11px; max-width: 900px; }
   .emp-tree-root details, .team-tree-root details { margin: 0; }
   .emp-tree-root summary, .team-tree-root summary {
     display: flex;
@@ -209,7 +209,6 @@
     transform: rotate(90deg);
   }
 
-  /* Cabeçalho Fixo do Empreendimento e Gerentes com bom aproveitamento de largura */
   .emp-header-bar {
     display: flex;
     align-items: center;
@@ -232,10 +231,6 @@
     padding-right: 10px;
   }
 
-  /* Níveis da Árvore Empreendimentos */
-  .emp-tree-root {
-    max-width: 900px;
-  }
   details.emp-lvl-reg {
     border-top: 1.5px solid var(--green);
     margin-top: 6px;
@@ -325,10 +320,7 @@
   .team-count-badge{background:var(--green-light);color:var(--green-dark);font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:10px;}
   .team-section{margin-bottom:0 !important;}
 
-  /* Níveis da Árvore Gerentes & Supervisores - Proporcional e Centralizado harmonicamente */
-  .team-tree-root {
-    max-width: 900px;
-  }
+  /* Gerentes & Supervisores Tree Fixes */
   details.team-lvl-regional {
     border-top: 1.5px solid var(--green);
     margin-top: 6px;
@@ -549,7 +541,7 @@
   @media print {
     @page { size: landscape; margin: 4mm; }
     body { background: #fff !important; padding: 0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .topbar, .actions, .tabs, .btn, .upload-group, #settingsBtn, #exportXmlBtn { display: none !important; }
+    .topbar, .actions, .tabs, .btn, .upload-group, #settingsBtn { display: none !important; }
     #teamWeekSelect, #teamPrintBtn { display: none !important; }
     .card { box-shadow: none !important; border: 1px solid var(--line) !important; page-break-inside: avoid; margin-bottom: 4px !important; padding: 6px !important; }
     .wrap { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
@@ -592,7 +584,6 @@
     <div class="actions">
       <button class="btn secondary" id="analystLockBtn" type="button" title="Destravar aba de Simulação" style="padding:0 8px;">🔒</button>
       <button class="btn secondary" id="settingsBtn" type="button">⚙ Config.</button>
-      <button class="btn secondary" id="exportXmlBtn" type="button">⬇ Baixar XML</button>
       <div class="upload-group">
         <button class="btn" id="uploadBtn" type="button">⭱ Carregar XML</button>
         <input type="file" id="fileInput" accept=".xml">
@@ -750,7 +741,6 @@
       </div>
       <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">No canal Imob, o supervisor aparece dentro do gerente dele — as vendas não somam 2x no Total Geral. Selecionando várias semanas, os números são somados.</p>
       
-      <!-- Cabeçalho proporcional e agradável -->
       <div class="emp-header-bar">
         <span>Equipe / Unidade / Loja</span>
         <div style="width: 70px; text-align: center; font-weight: 700; font-size: 10.5px;">Vendas</div>
@@ -2547,22 +2537,6 @@ document.getElementById('uploadBtn').onclick = ()=>document.getElementById('file
 document.getElementById('fileInput').addEventListener('change', e=>{
   if(e.target.files.length>0) handleFile(e.target.files[0]);
 });
-
-function exportXml() {
-  if (!currentXmlText) {
-    alert("Nenhum dado carregado para exportar.");
-    return;
-  }
-  const blob = new Blob([currentXmlText], {type: 'application/xml;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = '{DEDBD38E-D54E-DF11-AD89-001B78B9D994}';
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-document.getElementById('exportXmlBtn').addEventListener('click', exportXml);
 
 (async function init(){
   initAnalystLock();
