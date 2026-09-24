@@ -182,9 +182,6 @@
   table.week td:first-child{text-align:left;font-weight:700;color:var(--green-dark);padding-left:6px;}
   table.week tr.total-row td{background:var(--green-light);font-weight:800;border-top:2px solid var(--green);}
 
-  .team-count-badge{background:var(--green-light);color:var(--green-dark);font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:10px;}
-  .team-section{margin-bottom:0 !important;}
-
   /* ESTILOS DA ÁRVORE DE EMPREENDIMENTOS (IDÊNTICO À ABA DE GERENTES) */
   .emp-tree-root { font-size: 11px; }
   .emp-tree-root details { margin: 0; }
@@ -225,8 +222,11 @@
   }
   .emp-header-metrics {
     display: flex;
-    gap: 35px;
+    gap: 20px;
     text-align: right;
+    width: 320px;
+    justify-content: flex-end;
+    padding-right: 10px;
   }
 
   /* Níveis da Árvore */
@@ -273,7 +273,7 @@
     color: var(--ink);
   }
 
-  /* Linhas das Unidades (Folhas) */
+  /* Linhas das Unidades (Folhas) com alinhamento perfeito */
   .emp-units-list {
     margin: 2px 0 4px 28px;
     list-style: none;
@@ -285,23 +285,34 @@
     justify-content: space-between;
     padding: 3px 6px;
     border-bottom: 1px solid var(--line);
-    font-size: 10px;
-    font-weight: 500;
+    font-size: 10.5px;
+    font-weight: 600;
     color: var(--ink);
     background: #fff;
   }
   .emp-unit-item:hover { background: #f7faf8; }
-  .emp-unit-info { display: flex; gap: 20px; align-items: center; margin-left: auto; }
+  .emp-unit-info {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    width: 320px;
+    justify-content: flex-end;
+    padding-right: 10px;
+    flex-shrink: 0;
+  }
   
   .emp-metric-group {
     display: flex;
-    gap: 30px;
+    gap: 20px;
     align-items: center;
+    width: 320px;
+    justify-content: flex-end;
+    padding-right: 10px;
     flex-shrink: 0;
   }
-  .emp-col-vendas { width: 45px; text-align: center; font-weight: 700; }
-  .emp-col-preco { width: 130px; text-align: right; font-weight: 700; color: var(--green-dark); }
-  .emp-col-emcash { width: 45px; text-align: center; font-weight: 700; }
+  .emp-col-vendas { width: 65px; text-align: center; font-weight: 700; }
+  .emp-col-preco { width: 140px; text-align: right; font-weight: 700; color: inherit; }
+  .emp-col-emcash { width: 55px; text-align: center; font-weight: 700; }
 
   .emp-emcash-dot { display: inline-block; width: 9px; height: 9px; background-color: var(--good-green); border-radius: 50%; box-shadow: 0 0 3px rgba(0,0,0,0.2); }
   .emp-emcash-empty { display: inline-block; width: 9px; height: 9px; }
@@ -664,7 +675,7 @@
     </div>
   </div>
 
-  <!-- ---- ABA 4: EMPREENDIMENTOS (Árvore Nativa Retorcida com Métricas Alinhadas) ---- -->
+  <!-- ---- ABA 4: EMPREENDIMENTOS (Árvore Nativa Alinhada e Estilizada) ---- -->
   <div id="tabEmpContent" style="display:none;">
     <div class="card" style="margin-bottom:10px; padding:10px 14px;">
       <h3 style="margin:0 0 8px;font-size:12px;color:var(--green-dark);">💰 Preço médio das propostas</h3>
@@ -701,9 +712,9 @@
       <div class="emp-header-bar">
         <span>Unidade / Empreendimento</span>
         <div class="emp-header-metrics">
-          <span style="width:45px; text-align:center;">Vendas</span>
-          <span style="width:130px; text-align:right;">Méd. Preço Vendido</span>
-          <span style="width:45px; text-align:center;">Emcash</span>
+          <span style="width:65px; text-align:center;">Vendas</span>
+          <span style="width:140px; text-align:right;">Méd. Preço Vendido</span>
+          <span style="width:55px; text-align:center;">Emcash</span>
         </div>
       </div>
       
