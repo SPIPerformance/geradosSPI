@@ -29,10 +29,10 @@
     font-family:'Verdana', 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
     background:#eef2ef;
     color:var(--ink);
-    padding:6px 10px;
+    padding:8px 14px;
     overflow-x: hidden;
   }
-  .wrap{max-width:1380px;margin:0 auto;}
+  .wrap{max-width:1750px;width:96%;margin:0 auto;}
 
   .topbar{
     display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
@@ -116,7 +116,7 @@
 
   .chart-card{padding:6px 10px 2px;position:relative;display:flex;flex-direction:column;}
   .chart-card h3{margin:0 0 2px;font-size:11.5px;color:var(--ink);font-weight:700;}
-  .chart-wrap{flex:1;min-height:165px;position:relative;}
+  .chart-wrap{flex:1;min-height:185px;position:relative;}
 
   .grid-bottom{display:grid;grid-template-columns:1fr 340px;gap:6px;}
   .matrix-card{padding:6px 10px;overflow-x:auto; -webkit-overflow-scrolling:touch;}
@@ -206,7 +206,6 @@
   details.team-lvl-pessoa > summary{padding:3px 6px;}
   details.team-lvl-pessoa > summary .team-lvl-label{font-weight:600;font-size:10.5px;color:var(--ink);}
 
-  /* NOVO SISTEMA DE GRELHA UNIFICADA PARA A ABA DE EMPREENDIMENTOS */
   .emp-grid-row {
     display: grid;
     grid-template-columns: 1fr 90px 180px 80px;
@@ -411,7 +410,7 @@
   @media print {
     @page { size: landscape; margin: 4mm; }
     body { background: #fff !important; padding: 0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .topbar, .actions, .tabs, .btn, .upload-group, #settingsBtn, #exportXmlBtn { display: none !important; }
+    .topbar, .actions, .tabs, .btn, .upload-group, #settingsBtn { display: none !important; }
     #teamWeekSelect, #teamPrintBtn { display: none !important; }
     details.team-lvl-regional:not([open]) > *:not(summary),
     details.team-lvl-canal:not([open]) > *:not(summary) { display: block !important; }
@@ -456,7 +455,6 @@
     <div class="actions">
       <button class="btn secondary" id="analystLockBtn" type="button" title="Destravar aba de Simulação" style="padding:0 8px;">🔒</button>
       <button class="btn secondary" id="settingsBtn" type="button">⚙ Config.</button>
-      <button class="btn secondary" id="exportXmlBtn" type="button">⬇ Baixar XML</button>
       <div class="upload-group">
         <button class="btn" id="uploadBtn" type="button">⭱ Carregar XML</button>
         <input type="file" id="fileInput" accept=".xml">
@@ -650,7 +648,6 @@
       <h3 style="margin:0 0 8px;font-size:12px;color:var(--green-dark);">🏢 Empreendimentos vendidos — Regional › Cidade › Empreendimento › UH</h3>
       <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">Dentro de cada empreendimento, as unidades vendidas aparecem ordenadas por preço.</p>
       
-      <!-- Cabeçalho perfeitamente alinhado por Grid -->
       <div class="emp-grid-row emp-header-row" style="margin-bottom: 4px;">
         <div class="emp-col-nome">Unidade / Empreendimento</div>
         <div class="emp-col-vendas">Vendas</div>
@@ -675,27 +672,17 @@
         </select>
       </div>
       <div id="histProjSummary" style="font-size:11px;color:var(--ink);margin-bottom:10px;"></div>
-      <div style="position:relative;height:260px;">
+      <div style="position:relative;height:280px;">
         <canvas id="histProjChart"></canvas>
       </div>
     </div>
 
-    <div class="card">
-      <h3 style="margin:0 0 6px;font-size:12px;color:var(--green-dark);">Histórico de fechamentos mensais</h3>
-      <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">Dados carregados de <code>historico/fechamentos.json</code> no GitHub. Cada mês fechado é uma chave (ano-mês) nesse arquivo — fechar um mês que já existe SUBSTITUI o registro daquele mês, nunca duplica. <b>Essa tabela é diferente do gráfico acima</b>: aqui só aparecem os meses que você já fechou manualmente clicando em "Fechar mês atual"; o gráfico de projeção usa o histórico diário completo (<code>historico-gerados.json</code>) e não depende de fechamento nenhum.</p>
-      <div style="margin-bottom:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+    <div class="card" style="padding:10px 14px;">
+      <h3 style="margin:0 0 4px;font-size:12px;color:var(--green-dark);">📌 Fechamento de Mês</h3>
+      <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">Pega o total já calculado por SPI e as metas da aba Simulação, e baixa o <code>fechamentos.json</code> atualizado para subir em <code>historico/fechamentos.json</code>.</p>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <button class="btn" type="button" onclick="fecharMesAtual()">📌 Fechar mês atual (usa o XML carregado)</button>
-        <span style="font-size:10px;color:var(--muted);">Pega o total já calculado por SPI e as metas da aba Simulação, e baixa o fechamentos.json atualizado.</span>
       </div>
-      <div style="margin-bottom:8px;">
-        <label style="font-size:11px;font-weight:600;margin-right:4px;">Selecionar mês:</label>
-        <select id="histMonthSelect" onchange="renderHistorico()"></select>
-      </div>
-      <div id="histEmptyMsg" style="display:none;font-size:11px;color:var(--muted);">Nenhum histórico encontrado ainda. Assim que você fechar o primeiro mês em <code>historico/fechamentos.json</code>, ele aparece aqui.</div>
-      <div class="pdv-scroll-wrap">
-        <table class="matrix" id="histTable"></table>
-      </div>
-      <div id="histForecast" style="font-size:11px;color:var(--ink);margin-top:8px;font-weight:600;"></div>
     </div>
   </div>
 
@@ -829,7 +816,7 @@ async function loadPlanejamento(){
       localStorage.setItem('spi-pdv-pcts-map', JSON.stringify(allPdvPctsByMonth));
       loadMonthSettings();
     }
-  }catch(e){/* se não houver arquivo remoto, mantém o local */}
+  }catch(e){}
 }
 
 function baixarPlanejamento(){
@@ -854,7 +841,7 @@ async function loadMapping(){
       const data = await response.json();
       DEFAULT_MAPPING = data;
     }
-  }catch(e){ /* mantem o mapeamento atual em caso de falha de rede */ }
+  }catch(e){}
 }
 
 async function loadRelacaoGerentes(){
@@ -863,7 +850,7 @@ async function loadRelacaoGerentes(){
     if(response.ok){
       LOJA_GERENTE_MAP = await response.json();
     }
-  }catch(e){ /* mantem o mapeamento atual em caso de falha de rede */ }
+  }catch(e){}
 }
 
 async function loadHistoricoGerados(){
@@ -872,7 +859,7 @@ async function loadHistoricoGerados(){
     if(response.ok){
       HISTORICO_GERADOS = await response.json();
     }
-  }catch(e){ /* mantem o histórico atual em caso de falha de rede */ }
+  }catch(e){}
 }
 
 let histProjChartInstance = null;
@@ -915,10 +902,6 @@ function cosineSim(a, b){
   return dot / (Math.sqrt(na)*Math.sqrt(nb));
 }
 
-// Acha, no histórico, o mês cujo ritmo diário (dia 1 até "elapsedDays") mais
-// se parece com o do mês atual até agora — o "plano de voo" de referência.
-// Se forcedMonthKey vier preenchido (ex: "2026-03"), usa esse mês direto,
-// sem procurar o mais parecido (comparação escolhida manualmente).
 function findClosestFlightPlan(curDaily, elapsedDays, curYear, curMonth, forcedMonthKey){
   const curKey = `${curYear}-${String(curMonth+1).padStart(2,'0')}`;
 
@@ -971,9 +954,6 @@ function findClosestFlightPlan(curDaily, elapsedDays, curYear, curMonth, forcedM
   return best;
 }
 
-// Preenche o seletor "Comparar com" com todos os meses que existem no
-// historico-gerados.json (exceto o mês atual), preservando a seleção do
-// usuário quando ainda for válida.
 function populateHistCompareMonthSelect(curKey){
   const sel = document.getElementById('histCompareMonthSelect');
   if(!sel) return;
@@ -1056,8 +1036,6 @@ function renderHistoricoGerados(){
     projecaoCum.push(projectedTotal ? Math.round(fracAtD * projectedTotal) : null);
   }
 
-  // Planejado = mesmo plano de voo da aba Simulação (soma de todas as SPIs),
-  // acumulado dia a dia — é a curva "oficial" da meta do mês.
   const cumPlano = [];
   let runPlano = 0;
   for(let d=1; d<=lastDay; d++){
@@ -1082,14 +1060,39 @@ function renderHistoricoGerados(){
   }
 
   const comparaTxt = best.forced
-    ? `Comparando com <b>${mesRefLabel}</b> (escolhido manualmente, ${simPct}% de similaridade até o dia ${elapsedDays}).`
-    : `Ritmo mais parecido: <b>${mesRefLabel}</b> (${simPct}% de similaridade).`;
+    ? `Comparando com <b>${mesRefLabel}</b> (escolhido manualmente, ${simPct}% de similaridade até o dia ${elapsedDays}). Este mês fechou com <b>${best.total}</b> gerados no total.`
+    : `Ritmo mais parecido: <b>${mesRefLabel}</b> (${simPct}% de similaridade — fechou com <b>${best.total}</b> gerados no total).`;
 
   summaryEl.innerHTML = `${comparaTxt} ` +
     `Até o dia ${elapsedDays}, já foram <b>${curCumElapsed}</b> gerados. ` +
     `Seguindo esse ritmo, o mês deve fechar em torno de <b>${projectedTotal ? Math.round(projectedTotal) : '—'}</b>.${metaTxt}`;
 
   const labels = Array.from({length: lastDay}, (_,i)=> String(i+1));
+
+  // Plugin customizado para desenhar os números em cima dos pontos do gráfico
+  const dataLabelsPlugin = {
+    id: 'dataLabelsPlugin',
+    afterDatasetsDraw(chart) {
+      const {ctx} = chart;
+      chart.data.datasets.forEach((dataset, datasetIndex) => {
+        const meta = chart.getDatasetMeta(datasetIndex);
+        if (!meta.hidden) {
+          meta.data.forEach((element, index) => {
+            const value = dataset.data[index];
+            if (value !== null && value !== undefined) {
+              ctx.save();
+              ctx.font = '7.5px Verdana, Arial, sans-serif';
+              ctx.fillStyle = dataset.borderColor || '#1c2b22';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'bottom';
+              ctx.fillText(String(value), element.x, element.y - 4);
+              ctx.restore();
+            }
+          });
+        }
+      });
+    }
+  };
 
   if(histProjChartInstance) histProjChartInstance.destroy();
   histProjChartInstance = new Chart(chartEl.getContext('2d'), {
@@ -1104,7 +1107,7 @@ function renderHistoricoGerados(){
           borderDash: [3,3],
           fill: false,
           tension: 0.25,
-          pointRadius: 0
+          pointRadius: 2
         },
         {
           label: 'Realizado',
@@ -1114,7 +1117,7 @@ function renderHistoricoGerados(){
           fill: true,
           tension: 0.25,
           spanGaps: false,
-          pointRadius: 2
+          pointRadius: 3
         },
         {
           label: `Projeção (ritmo de ${mesRefLabel})`,
@@ -1123,7 +1126,7 @@ function renderHistoricoGerados(){
           borderDash: [6,4],
           fill: false,
           tension: 0.25,
-          pointRadius: 0
+          pointRadius: 2
         }
       ]
     },
@@ -1136,7 +1139,8 @@ function renderHistoricoGerados(){
         x: { title: { display: true, text: 'Dia do mês', font: { size: 10 } }, ticks: { font: { size: 9 } } },
         y: { title: { display: true, text: 'Acumulado', font: { size: 10 } }, beginAtZero: true, ticks: { font: { size: 9 } } }
       }
-    }
+    },
+    plugins: [dataLabelsPlugin]
   });
 }
 
@@ -1186,62 +1190,11 @@ function fecharMesAtual(){
   a.click();
   URL.revokeObjectURL(url);
 
-  renderHistorico();
   alert(`Mês ${mKey} fechado com ${totalGerados} gerados. Arquivo fechamentos.json baixado — suba ele em historico/ no GitHub, SUBSTITUINDO o antigo (mesmo nome de arquivo), pra não duplicar o mês.`);
 }
 
 function renderHistorico(){
   renderHistoricoGerados();
-
-  const sel = document.getElementById('histMonthSelect');
-  const table = document.getElementById('histTable');
-  const emptyMsg = document.getElementById('histEmptyMsg');
-  const forecastBox = document.getElementById('histForecast');
-  const months = Object.keys(historicoFechamentos).sort();
-
-  if(months.length === 0){
-    sel.innerHTML = '';
-    table.innerHTML = '';
-    forecastBox.innerHTML = '';
-    emptyMsg.style.display = 'block';
-    return;
-  }
-  emptyMsg.style.display = 'none';
-
-  if(sel.options.length !== months.length){
-    sel.innerHTML = months.map(m => `<option value="${m}">${m}</option>`).join('');
-    sel.value = months[months.length - 1];
-  }
-
-  const mKey = sel.value || months[months.length - 1];
-  const entry = historicoFechamentos[mKey];
-  if(!entry){ table.innerHTML = ''; forecastBox.innerHTML = ''; return; }
-
-  let rows = '<tr><th>SPI</th><th>Meta</th><th>Realizado</th><th>% Atingido</th></tr>';
-  let totalMeta = 0, totalReal = 0;
-  SPI_KEYS.forEach((key, i) => {
-    const meta = (entry.metas && entry.metas[key]) || 0;
-    const real = (entry.porSpi && entry.porSpi[key]) || 0;
-    totalMeta += meta; totalReal += real;
-    const pct = meta ? (real / meta * 100).toFixed(1) : '0.0';
-    rows += `<tr><td>${SPI_GROUPS[i]}</td><td>${meta}</td><td>${real}</td><td>${pct}%</td></tr>`;
-  });
-  const totalPct = totalMeta ? (totalReal / totalMeta * 100).toFixed(1) : '0.0';
-  rows += `<tr class="total-row"><td>Total</td><td>${totalMeta}</td><td>${totalReal}</td><td>${totalPct}%</td></tr>`;
-  table.innerHTML = rows;
-
-  const idx = months.indexOf(mKey);
-  if(idx > 0){
-    const prevEntry = historicoFechamentos[months[idx - 1]];
-    const prevReal = prevEntry ? (prevEntry.totalGerados || 0) : 0;
-    const curReal = entry.totalGerados || totalReal;
-    const delta = prevReal ? (((curReal - prevReal) / prevReal) * 100).toFixed(1) : null;
-    forecastBox.innerHTML = delta !== null
-      ? `Variação vs ${months[idx-1]}: ${delta > 0 ? '+' : ''}${delta}% (${prevReal} → ${curReal} gerados)`
-      : '';
-  } else {
-    forecastBox.innerHTML = '';
-  }
 }
 
 function normLoja(s){
@@ -1274,7 +1227,6 @@ const TEAM_CANAL_ORDER = ['AGS', 'House', 'Imob'];
 
 function buildTeamTree(records, year, month, lastDay){
   const numWeeks = getNumWeeks(year, month, lastDay);
-
   const tree = {};
 
   records.forEach(r=>{
@@ -2352,7 +2304,7 @@ function drawChart(labels, plano, gerados){
 
   const rect = wrap.getBoundingClientRect();
   const w = rect.width > 50 ? rect.width : 550;
-  const h = rect.height > 50 ? rect.height : 165;
+  const h = rect.height > 50 ? rect.height : 185;
 
   const padL = 30, padR = 14, padT = 12, padB = 22;
   const cW = w - padL - padR;
@@ -2489,22 +2441,6 @@ document.getElementById('uploadBtn').onclick = ()=>document.getElementById('file
 document.getElementById('fileInput').addEventListener('change', e=>{
   if(e.target.files.length>0) handleFile(e.target.files[0]);
 });
-
-function exportXml() {
-  if (!currentXmlText) {
-    alert("Nenhum dado carregado para exportar.");
-    return;
-  }
-  const blob = new Blob([currentXmlText], {type: 'application/xml;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = '{DEDBD38E-D54E-DF11-AD89-001B78B9D994}';
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-document.getElementById('exportXmlBtn').addEventListener('click', exportXml);
 
 (async function init(){
   initAnalystLock();
