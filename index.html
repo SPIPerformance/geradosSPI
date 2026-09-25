@@ -168,11 +168,11 @@
   .team-section{margin-bottom:0 !important;}
   .team-tree-root{font-size:12.5px;}
   .team-tree-root details{margin:0;}
-  .team-tree-root summary{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;list-style:none;outline:none;}
+  .team-tree-root summary{display:grid;grid-template-columns:1fr 80px;align-items:center;gap:10px;cursor:pointer;list-style:none;outline:none;}
   .team-tree-root summary::-webkit-details-marker{display:none;}
   .team-lvl-label::before{content:'▸';display:inline-block;margin-right:8px;font-size:10px;color:var(--muted);transition:transform .15s;}
   .team-tree-root details[open]>summary .team-lvl-label::before{transform:rotate(90deg);}
-  .team-lvl-total{font-size:11.5px;font-weight:800;color:var(--muted);flex:none;}
+  .team-lvl-total{font-size:11.5px;font-weight:800;color:#000;flex:none;}
 
   details.team-lvl-regional{border-top:2px solid var(--green);margin-top:8px;padding-top:4px;}
   details.team-lvl-regional:first-child{margin-top:0;}
@@ -383,22 +383,6 @@
     table.spi-table th,
     table.spi-table td { padding: 4px 3px; font-size: 11px; }
   }
-/* ── ALINHAMENTO COLUNA VENDAS ── */
-details.team-lvl-regional > summary,
-details.team-lvl-canal > summary,
-details.team-lvl-pessoa > summary {
-  display: grid !important;
-  grid-template-columns: 1fr 80px;
-  align-items: center;
-}
-
-details.team-lvl-regional > summary .team-lvl-total,
-details.team-lvl-canal > summary .team-lvl-total,
-details.team-lvl-pessoa > summary .team-lvl-total {
-  text-align: center;
-  color: #000 !important;
-  font-weight: 700;
-}
 
 @media print {
   @page { size: landscape; margin: 4mm; }
