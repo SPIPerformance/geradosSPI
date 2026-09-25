@@ -314,127 +314,69 @@
      BREAKPOINTS RESPONSIVOS
   ════════════════════════════════════════ */
 
-  /* Ultra-wide / monitores grandes */
-  @media (min-width: 1400px) {
-    .grid-top { grid-template-columns: 360px 1fr; }
-    .grid-bottom { grid-template-columns: 1fr 380px; }
-  }
+/* Ultra-wide */
+@media (min-width: 1400px) {
+  .grid-top { grid-template-columns: 360px 1fr; }
+  .grid-bottom { grid-template-columns: 1fr 380px; }
+}
 
-  /* Notebooks médios (1100–1399px) */
-  @media (max-width: 1399px) and (min-width: 1101px) {
-    .grid-top { grid-template-columns: 320px 1fr; }
-    .chart-wrap { min-height: 240px; }
-  }
+/* Notebooks grandes (1100–1399px) */
+@media (min-width: 1100px) and (max-width: 1399px) {
+  .grid-top { grid-template-columns: 300px 1fr; }
+  .grid-bottom { grid-template-columns: 1fr 320px; }
+  .kpi .num { font-size: 18px; }
+  .chart-wrap { min-height: 220px; }
+}
 
-  /* Notebooks pequenos / tablets landscape (851–1100px) */
-  @media (max-width: 1100px) and (min-width: 851px) {
-    .grid-top { grid-template-columns: 1fr; }
-    .chart-wrap { min-height: 220px; }
-    .kpi .num { font-size: 19px; }
-  }
+/* Notebooks pequenos / tablets landscape (900–1099px) */
+@media (min-width: 900px) and (max-width: 1099px) {
+  .grid-top { grid-template-columns: 260px 1fr; }
+  .grid-bottom { grid-template-columns: 1fr 280px; }
+  .kpi .num { font-size: 16px; }
+  .kpi .lbl { font-size: 10px; }
+  .chart-wrap { min-height: 200px; }
+  body { font-size: 12px; }
+  .tab-btn { padding: 5px 10px; font-size: 12px; }
+}
 
-  /* Tablets portrait / telas médias (481–850px) */
-  @media (max-width: 850px) {
-    body { padding: 6px; }
-    .wrap { padding: 0 4px; }
+/* Tablets portrait (601–899px) */
+@media (max-width: 899px) and (min-width: 601px) {
+  body { padding: 6px; }
+  .grid-top { grid-template-columns: 1fr; }
+  .grid-bottom { grid-template-columns: 1fr; }
+  .kpi .num { font-size: 16px; }
+  .chart-wrap { min-height: 200px; }
+  .actions { width: 100%; flex-wrap: wrap; }
+  .tab-btn { padding: 7px 10px; font-size: 12px; }
+}
 
-    /* Topbar */
-    .topbar { flex-direction: column; align-items: stretch; gap: 8px; padding: 10px 12px; }
-    .brand { justify-content: flex-start; }
-    .actions { width: 100%; flex-direction: row; flex-wrap: wrap; justify-content: flex-end; }
-    .actions .btn { flex: 1 1 auto; min-width: 120px; }
-    .upload-group { flex: 1 1 auto; }
-    .upload-group .btn { width: 100%; }
-    .file-status { position: relative; top: auto; right: auto; margin-top: 3px; text-align: center; display: block; }
+/* Mobile (≤600px) */
+@media (max-width: 600px) {
+  body { padding: 4px; font-size: 12px; }
+  .topbar { flex-direction: column; align-items: stretch; }
+  .actions { width: 100%; flex-direction: column; align-items: stretch; }
+  .actions .btn, .actions .upload-group, .upload-group .btn { width: 100%; }
+  .file-status { position: relative; top: auto; right: auto; margin-top: 3px; text-align: center; display: block; }
+  .btn { height: 40px; font-size: 13px; }
+  .tab-btn { padding: 9px 10px; font-size: 12px; }
+  .tabs { flex-wrap: wrap; }
+  .kpi .num { font-size: 15px; }
+  .chart-wrap { min-height: 180px; }
+}
 
-    /* Tabs */
-    .tab-btn { padding: 8px 12px; font-size: 12px; }
-
-    /* KPI */
-    .kpi .num { font-size: 18px; }
-    .kpi .lbl { font-size: 10px; }
-
-    /* Gráfico */
-    .chart-wrap { min-height: 200px; }
-
-    /* Emp grid — colapsa coluna de preço */
-    .emp-grid-row,
-    .team-tree-root details.emp-node > summary,
-    .emp-unit-row {
-      grid-template-columns: 1fr 60px 120px 55px;
-    }
-    .emp-header-row { font-size: 11px; }
-  }
-
-  /* Mobile (≤480px) */
-  @media (max-width: 480px) {
-    body { padding: 4px; font-size: 12px; }
-    .wrap { padding: 0 2px; }
-
-    /* Topbar compacta */
-    .topbar { padding: 8px 10px; }
-    .brand h1 { font-size: 15px; }
-    .brand p { font-size: 11px; }
-    .brand-badge { width: 36px; height: 36px; font-size: 9px; }
-    .actions { flex-direction: column; }
-    .actions .btn,
-    .upload-group,
-    .upload-group .btn { width: 100%; }
-    .btn { height: 40px; font-size: 13px; }
-
-    /* Tabs */
-    .tab-btn { padding: 9px 10px; font-size: 12px; }
-
-    /* KPI */
-    .kpi-row { gap: 6px; }
-    .kpi .num { font-size: 16px; }
-    .kpi-divider { display: none; }
-
-    /* Status mini */
-    .status-mini { gap: 4px; }
-    .status-mini .n { font-size: 13px; }
-    .status-mini .l { font-size: 9px; }
-
-    /* Gráfico */
-    .chart-wrap { min-height: 180px; }
-
-    /* Emp grid — remove coluna de preço em mobile */
-    .emp-grid-row,
-    .team-tree-root details.emp-node > summary,
-    .emp-unit-row {
-      grid-template-columns: 1fr 50px 50px;
-    }
-    .emp-col-preco,
-    .emp-unit-val { display: none; }
-    .emp-header-row .emp-col-preco { display: none; }
-
-    /* Modal */
-    .modal { padding: 12px 14px; max-height: 90vh; }
-    .map-row { grid-template-columns: 1fr; }
-    .modal-topbar-actions { flex-wrap: wrap; }
-
-    /* Sim meta bar */
-    .sim-meta-field input { width: 70px; font-size: 12px; }
-
-    /* Team tree */
-    details.team-lvl-canal { margin-left: 10px; }
-    details.team-lvl-pessoa { margin-left: 10px; }
-  }
-
-  /* ── PRINT ── */
-  @media print {
-    @page { size: landscape; margin: 4mm; }
-    body { background: #fff !important; padding: 0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .topbar, .actions, .tabs, .btn, .upload-group, #settingsBtn { display: none !important; }
-    #teamWeekSelect, #teamPrintBtn { display: none !important; }
-    details.team-lvl-regional:not([open]) > *:not(summary),
-    details.team-lvl-canal:not([open]) > *:not(summary) { display: block !important; }
-    .card { box-shadow: none !important; border: 1px solid var(--line) !important; page-break-inside: avoid; margin-bottom: 6px !important; padding: 8px !important; }
-    .wrap { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
-    #dashboard { display: block !important; }
-    .grid-top { margin-bottom: 6px !important; gap: 6px !important; }
-    .grid-bottom { gap: 6px !important; }
-    .chart-wrap { min-height: 160px !important; }
+@media print {
+  @page { size: landscape; margin: 4mm; }
+  body { background: #fff !important; padding: 0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .topbar, .actions, .tabs, .btn, .upload-group, #settingsBtn { display: none !important; }
+  #teamWeekSelect, #teamPrintBtn { display: none !important; }
+  details.team-lvl-regional:not([open]) > *:not(summary),
+  details.team-lvl-canal:not([open]) > *:not(summary) { display: block !important; }
+  .card { box-shadow: none !important; border: 1px solid var(--line) !important; page-break-inside: avoid; margin-bottom: 6px !important; padding: 8px !important; }
+  .wrap { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+  #dashboard { display: block !important; }
+  .grid-top { margin-bottom: 6px !important; gap: 6px !important; }
+  .grid-bottom { gap: 6px !important; }
+  .chart-wrap { min-height: 160px !important; }
   }
 </style>
 
