@@ -1315,8 +1315,8 @@ function renderTeamTree(containerId, countId, records, year, month, lastDay, wee
   // ── CABEÇALHO ──
   html += `
     <div style="
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: 1fr 120px;
       align-items: center;
       background: var(--green);
       color: #fff;
@@ -1327,7 +1327,7 @@ function renderTeamTree(containerId, countId, records, year, month, lastDay, wee
       margin-bottom: 6px;
     ">
       <span>Regional / Canal / Gerente</span>
-      <span style="min-width: 48px; text-align: center;">Vendas</span>
+      <span style="text-align: center;">Vendas</span>
     </div>`;
 
   regionalKeys.forEach(rk=>{
@@ -1365,14 +1365,14 @@ function renderTeamTree(containerId, countId, records, year, month, lastDay, wee
         }
       });
 
-      regionalHtml += `<details class="team-lvl-canal"><summary><span class="team-lvl-label">${cl}</span><span class="team-lvl-total" style="min-width:48px;text-align:center;">${canalTotal}</span></summary>${gerentesHtml}</details>`;
+      regionalHtml += `<details class="team-lvl-canal"><summary style="display:grid;grid-template-columns:1fr 120px;"><span class="team-lvl-label">${cl}</span><span class="team-lvl-total" style="text-align:center;color:#000;">${canalTotal}</span></summary>${gerentesHtml}</details>`;
     });
 
     if(!regionalHtml) return;
     grandTotal += regionalTotal;
 
     const label = rk === 'FORA' ? '🚩 Fora' : SPI_GROUPS[SPI_KEYS.indexOf(rk)];
-    html += `<details class="team-lvl-regional"><summary><span class="team-lvl-label">${label}</span><span class="team-lvl-total" style="min-width:48px;text-align:center;">${regionalTotal}</span></summary>${regionalHtml}</details>`;
+    html += `<details class="team-lvl-regional"><summary style="display:grid;grid-template-columns:1fr 120px;"><span class="team-lvl-label">${label}</span><span class="team-lvl-total" style="text-align:center;color:#000;">${regionalTotal}</span></summary>${regionalHtml}</details>`;
   });
 
   if(countBadge) countBadge.textContent = totalGerentes > 0 ? `${totalGerentes} nome${totalGerentes>1?'s':''}` : '0 nomes';
