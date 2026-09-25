@@ -426,6 +426,47 @@ details.team-lvl-pessoa>summary .team-lvl-label{font-weight:600;font-size:12px;c
     font-size: 9px;
   }
 }
+    /* === FIX DEFINITIVO: MODO COMPACTO E CENTRALIZADO === */
+  .wrap {
+    max-width: 1366px !important; /* Centraliza e impede que estique no ultrawide */
+    margin: 0 auto !important;
+  }
+  body {
+    padding: 4px 8px !important;
+  }
+  
+  /* Reduz barras superiores e vãos */
+  .topbar { padding: 6px 12px !important; margin-bottom: 6px !important; }
+  .tabs { margin-bottom: 6px !important; padding-bottom: 4px !important; }
+  .grid-top, .grid-bottom { gap: 6px !important; margin-bottom: 6px !important; }
+  .card { padding: 8px 10px !important; }
+
+  /* Trava altura máxima do gráfico (Resolve o sumiço das tabelas de baixo) */
+  .chart-card {
+    max-height: 290px !important;
+  }
+  .chart-wrap {
+    min-height: 150px !important;
+    max-height: 230px !important; 
+  }
+
+  /* Comprime as tabelas para remover barra de rolagem e ganhar altura */
+  .kpi-row { margin-bottom: 4px !important; }
+  .kpi .num { font-size: 16px !important; }
+  .status-mini { margin-top: 4px !important; padding-top: 4px !important; }
+  
+  table.spi-table th, table.spi-table td { 
+    padding: 3px 2px !important; 
+    font-size: 11px !important; 
+  }
+  table.matrix th, table.matrix td, table.week th, table.week td { 
+    padding: 2px !important; 
+    font-size: 10.5px !important; 
+  }
+  .matrix-card h3, .week-card h3 { 
+    margin: 0 0 4px !important; 
+    font-size: 12px !important; 
+  }
 </style>
 
 <meta id="exportMeta" name="export-timestamp" content="1788263887199"></head>
