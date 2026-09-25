@@ -83,7 +83,7 @@
     background:var(--green);color:#fff;
   }
 
-  /* Forçado a coluna única (empilhado) por predefinição para portáteis e ecrãs normais */
+  /* Padrão para Notebooks e telas menores: Coluna única empilhada */
   .grid-top{
     display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:8px;
   }
@@ -118,7 +118,7 @@
 
   .chart-card{padding:10px 14px 4px;position:relative;display:flex;flex-direction:column;}
   .chart-card h3{margin:0 0 4px;font-size:13px;color:var(--ink);font-weight:700;}
-  .chart-wrap{flex:1;min-height:300px;position:relative;}
+  .chart-wrap{flex:1;min-height:260px;position:relative;}
 
   .grid-bottom{display:grid;grid-template-columns:1fr;gap:8px;}
   .matrix-card{padding:10px 14px;overflow-x:auto; -webkit-overflow-scrolling:touch;}
@@ -424,6 +424,16 @@
     .chart-wrap { min-height: 160px !important; }
   }
 
+  /* Em telas gigantes (monitores de mesa ultra-wide / acima de 1400px), usamos layout lado a lado */
+  @media (min-width: 1400px) {
+    .grid-top {
+      grid-template-columns: 360px 1fr;
+    }
+    .grid-bottom {
+      grid-template-columns: 1fr 380px;
+    }
+  }
+
   @media (max-width: 850px) {
     body { padding: 6px; }
     .actions { width: 100%; flex-direction: column; align-items: stretch; }
@@ -432,7 +442,7 @@
     .btn { height: 40px; font-size: 13px; }
     .tab-btn { padding: 9px 14px; font-size: 13px; width: 100%; text-align: center; }
     .tabs { flex-wrap: wrap; }
-    .chart-wrap { min-height: 260px; }
+    .chart-wrap { min-height: 240px; }
   }
 </style>
 <meta id="exportMeta" name="export-timestamp" content="1788263887199"></head>
@@ -680,7 +690,7 @@
 
     <div class="card" style="padding:12px 16px;">
       <h3 style="margin:0 0 6px;font-size:13px;color:var(--green-dark);">📌 Fechamento de Mês</h3>
-      <p style="font-size:11px;color:var(--muted);margin:0 0 10px;">Pega o total já calculado por SPI e las metas da aba Simulação, e baixa o <code>fechamentos.json</code> atualizado para subir em <code>historico/fechamentos.json</code>.</p>
+      <p style="font-size:11px;color:var(--muted);margin:0 0 10px;">Pega o total já calculado por SPI e as metas da aba Simulação, e baixa o <code>fechamentos.json</code> atualizado para subir em <code>historico/fechamentos.json</code>.</p>
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
         <button class="btn" type="button" onclick="fecharMesAtual()">📌 Fechar mês atual (usa o XML carregado)</button>
       </div>
@@ -2306,7 +2316,7 @@ function drawChart(labels, plano, gerados){
 
   const rect = wrap.getBoundingClientRect();
   const w = rect.width > 50 ? rect.width : 550;
-  const h = rect.height > 50 ? rect.height : 300;
+  const h = rect.height > 50 ? rect.height : 260;
 
   const padL = 35, padR = 16, padT = 14, padB = 26;
   const cW = w - padL - padR;
