@@ -1312,6 +1312,24 @@ function renderTeamTree(containerId, countId, records, year, month, lastDay, wee
   let totalGerentes = 0;
   let grandTotal = 0;
 
+  // ── CABEÇALHO ──
+  html += `
+    <div style="
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--green);
+      color: #fff;
+      font-weight: 700;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 5px;
+      margin-bottom: 6px;
+    ">
+      <span>Regional / Canal / Gerente</span>
+      <span style="min-width: 48px; text-align: center;">Vendas</span>
+    </div>`;
+
   regionalKeys.forEach(rk=>{
     const canalObj = tree[rk];
     const canalLabels = Object.keys(canalObj);
@@ -1347,14 +1365,14 @@ function renderTeamTree(containerId, countId, records, year, month, lastDay, wee
         }
       });
 
-      regionalHtml += `<details class="team-lvl-canal"><summary><span class="team-lvl-label">${cl}</span><span class="team-lvl-total">${canalTotal}</span></summary>${gerentesHtml}</details>`;
+      regionalHtml += `<details class="team-lvl-canal"><summary><span class="team-lvl-label">${cl}</span><span class="team-lvl-total" style="min-width:48px;text-align:center;">${canalTotal}</span></summary>${gerentesHtml}</details>`;
     });
 
     if(!regionalHtml) return;
     grandTotal += regionalTotal;
 
     const label = rk === 'FORA' ? '🚩 Fora' : SPI_GROUPS[SPI_KEYS.indexOf(rk)];
-    html += `<details class="team-lvl-regional"><summary><span class="team-lvl-label">${label}</span><span class="team-lvl-total">${regionalTotal}</span></summary>${regionalHtml}</details>`;
+    html += `<details class="team-lvl-regional"><summary><span class="team-lvl-label">${label}</span><span class="team-lvl-total" style="min-width:48px;text-align:center;">${regionalTotal}</span></summary>${regionalHtml}</details>`;
   });
 
   if(countBadge) countBadge.textContent = totalGerentes > 0 ? `${totalGerentes} nome${totalGerentes>1?'s':''}` : '0 nomes';
