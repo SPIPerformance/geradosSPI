@@ -378,6 +378,37 @@
   .grid-bottom { gap: 6px !important; }
   .chart-wrap { min-height: 160px !important; }
   }
+  /* Corrige altura excessiva do gráfico em notebooks */
+@media (max-width: 1500px) {
+  .chart-wrap {
+    min-height: 180px !important;
+    max-height: 320px !important;
+  }
+
+  .chart-card {
+    max-height: 380px;
+  }
+
+  .kpi .num {
+    font-size: 17px;
+  }
+
+  .kpi-row {
+    margin-bottom: 4px;
+  }
+
+  .kpi-card {
+    padding: 7px 12px;
+  }
+
+  .status-mini .n {
+    font-size: 13px;
+  }
+
+  .status-mini .l {
+    font-size: 9px;
+  }
+}
 </style>
 
 <meta id="exportMeta" name="export-timestamp" content="1788263887199"></head>
