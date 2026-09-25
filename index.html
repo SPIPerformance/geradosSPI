@@ -33,13 +33,13 @@
     font-size:13px;
     overflow-x:hidden;
   }
-  .wrap{width:100%;max-width:none;margin:0;padding:0 8px;}
+  .wrap{width:100%;max-width:1440px;margin:0 auto;padding:4px 8px;}
 
-  /* ── TOPBAR ── */
+/* ── TOPBAR ── */
   .topbar{
     display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
-    margin-bottom:8px;
-    background:var(--paper);padding:8px 16px 12px;border-radius:6px;border:1px solid var(--line);
+    margin-bottom:6px; /* Reduzido para caber na tela */
+    background:var(--paper);padding:6px 16px 8px;border-radius:6px;border:1px solid var(--line); /* Reduzido */
     position:relative;z-index:10;
   }
   .brand{display:flex;align-items:center;gap:10px;flex:1;min-width:0;}
@@ -120,10 +120,10 @@
   table.spi-table tr.total-row td{background:var(--green-light);font-weight:800;color:var(--green-dark);border-top:2px solid var(--green);}
   .gap-cell{border-radius:4px;font-weight:700;padding:2px 4px;display:inline-block;min-width:36px;font-size:11px;color:#1c2b22;}
 
-  /* ── GRÁFICO ── */
-  .chart-card{padding:10px 14px 4px;position:relative;display:flex;flex-direction:column;max-height:380px;}
+/* ── GRÁFICO ── */
+  .chart-card{padding:8px 12px 4px;position:relative;display:flex;flex-direction:column;max-height:310px;} /* Altura reduzida */
   .chart-card h3{margin:0 0 4px;font-size:13px;color:var(--ink);font-weight:700;}
-  .chart-wrap{flex:1;min-height:200px;max-height:320px;position:relative;}
+  .chart-wrap{flex:1;min-height:160px;max-height:260px;position:relative;} /* Altura reduzida */
 
   /* ── GRID BOTTOM ── */
   .grid-bottom{display:grid;grid-template-columns:1fr;gap:8px;}
@@ -368,26 +368,18 @@ details.team-lvl-pessoa>summary .team-lvl-label{font-weight:600;font-size:12px;c
   .kpi .num { font-size: 15px; }
   .chart-wrap { min-height: 180px; }
 }
-  /* ── CORRIGE BURACO NO NOTEBOOK ── */
+ /* ── CORRIGE BURACO NO NOTEBOOK ── */
   @media (max-width: 1500px) {
     .chart-card {
       display: flex;
       flex-direction: column;
+      max-height: 290px !important; /* Trava a altura máxima no notebook */
     }
     .chart-wrap {
       flex: 1;
       min-height: 150px !important;
-      max-height: none !important;
+      max-height: 240px !important; /* Impede o gráfico de empurrar a tela pra baixo */
     }
-    .kpi .num { font-size: 17px; }
-    .kpi-row { margin-bottom: 3px; }
-    .kpi-card { padding: 6px 12px; }
-    .status-mini { margin-top: 4px; padding-top: 4px; }
-    .status-mini .n { font-size: 13px; }
-    .status-mini .l { font-size: 9px; }
-    table.spi-table th,
-    table.spi-table td { padding: 4px 3px; font-size: 11px; }
-  }
 
 @media print {
   @page { size: landscape; margin: 4mm; }
