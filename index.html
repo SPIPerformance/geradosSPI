@@ -383,8 +383,22 @@
     table.spi-table th,
     table.spi-table td { padding: 4px 3px; font-size: 11px; }
   }
+/* ── ALINHAMENTO COLUNA VENDAS ── */
+details.team-lvl-regional > summary,
+details.team-lvl-canal > summary,
+details.team-lvl-pessoa > summary {
+  display: grid !important;
+  grid-template-columns: 1fr 80px;
+  align-items: center;
+}
 
-  @media print {
+details.team-lvl-regional > summary .team-lvl-total,
+details.team-lvl-canal > summary .team-lvl-total,
+details.team-lvl-pessoa > summary .team-lvl-total {
+  text-align: center;
+  color: #000 !important;
+  font-weight: 700;
+}
 
 @media print {
   @page { size: landscape; margin: 4mm; }
