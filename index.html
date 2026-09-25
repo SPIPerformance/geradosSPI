@@ -363,6 +363,28 @@
   .kpi .num { font-size: 15px; }
   .chart-wrap { min-height: 180px; }
 }
+  /* ── CORRIGE BURACO NO NOTEBOOK ── */
+  @media (max-width: 1500px) {
+    .chart-card {
+      display: flex;
+      flex-direction: column;
+    }
+    .chart-wrap {
+      flex: 1;
+      min-height: 150px !important;
+      max-height: none !important;
+    }
+    .kpi .num { font-size: 17px; }
+    .kpi-row { margin-bottom: 3px; }
+    .kpi-card { padding: 6px 12px; }
+    .status-mini { margin-top: 4px; padding-top: 4px; }
+    .status-mini .n { font-size: 13px; }
+    .status-mini .l { font-size: 9px; }
+    table.spi-table th,
+    table.spi-table td { padding: 4px 3px; font-size: 11px; }
+  }
+
+  @media print {
 
 @media print {
   @page { size: landscape; margin: 4mm; }
