@@ -423,6 +423,12 @@
     .chart-wrap { min-height: 160px !important; }
   }
 
+  /* Ajustes dinâmicos para Notebooks e Telas Menores (até 1200px) */
+  @media (max-width: 1200px) {
+    body { padding: 8px 10px; }
+    .grid-top, .grid-bottom { grid-template-columns: 1fr; }
+  }
+
   @media (max-width: 850px) {
     body { padding: 6px; }
     .grid-top, .grid-bottom { grid-template-columns: 1fr; }
@@ -1070,7 +1076,6 @@ function renderHistoricoGerados(){
 
   const labels = Array.from({length: lastDay}, (_,i)=> String(i+1));
 
-  // Plugin refinado para exibir os números de forma limpa (a cada 5 dias e no último dia para não poluir)
   const dataLabelsPlugin = {
     id: 'dataLabelsPlugin',
     afterDatasetsDraw(chart) {
