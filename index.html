@@ -666,7 +666,11 @@
   <div id="tabHistContent" style="display:none;">
     <div class="card" style="margin-bottom:8px;">
       <h3 style="margin:0 0 4px;font-size:12px;color:var(--green-dark);">📈 Projeção de fechamento (plano de voo)</h3>
-      <p style="font-size:10px;color:var(--muted);margin:0 0 10px;">Compara o ritmo diário do mês em andamento com um mês do histórico, e projeta como o mês deve fechar seguindo essa mesma curva. O gráfico mostra o Planejado (plano de voo da aba Simulação), o Realizado até hoje e a Projeção baseada no histórico.</p>
+      <p style="font-size:10px;color:var(--muted);margin:0 0 10px;">
+        <span style="color:#7c8c82;font-weight:700;">■ Planejado</span> (meta da aba Simulação) ·
+        <span style="color:#FF8B22;font-weight:700;">■ Plano de voo atual</span> (realizado até hoje) ·
+        <span style="color:#006B3F;font-weight:700;">■ Tendência</span> (projeção com base no mês do histórico escolhido).
+      </p>
       <div id="histProjEmptyMsg" style="display:none;font-size:11px;color:var(--muted);">Carregue o XML do mês atual e suba o <code>historico-gerados.json</code> na raiz do repositório pra ver a projeção.</div>
       <div id="histProjControls" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
         <label style="font-size:11px;font-weight:600;">Comparar com:</label>
@@ -675,27 +679,14 @@
         </select>
       </div>
       <div id="histProjSummary" style="font-size:11px;color:var(--ink);margin-bottom:10px;"></div>
-      <div style="position:relative;height:260px;">
+      <div style="position:relative;height:300px;">
         <canvas id="histProjChart"></canvas>
       </div>
     </div>
 
-    <div class="card">
-      <h3 style="margin:0 0 6px;font-size:12px;color:var(--green-dark);">Histórico de fechamentos mensais</h3>
-      <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">Dados carregados de <code>historico/fechamentos.json</code> no GitHub. Cada mês fechado é uma chave (ano-mês) nesse arquivo — fechar um mês que já existe SUBSTITUI o registro daquele mês, nunca duplica. <b>Essa tabela é diferente do gráfico acima</b>: aqui só aparecem os meses que você já fechou manualmente clicando em "Fechar mês atual"; o gráfico de projeção usa o histórico diário completo (<code>historico-gerados.json</code>) e não depende de fechamento nenhum.</p>
-      <div style="margin-bottom:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-        <button class="btn" type="button" onclick="fecharMesAtual()">📌 Fechar mês atual (usa o XML carregado)</button>
-        <span style="font-size:10px;color:var(--muted);">Pega o total já calculado por SPI e as metas da aba Simulação, e baixa o fechamentos.json atualizado.</span>
-      </div>
-      <div style="margin-bottom:8px;">
-        <label style="font-size:11px;font-weight:600;margin-right:4px;">Selecionar mês:</label>
-        <select id="histMonthSelect" onchange="renderHistorico()"></select>
-      </div>
-      <div id="histEmptyMsg" style="display:none;font-size:11px;color:var(--muted);">Nenhum histórico encontrado ainda. Assim que você fechar o primeiro mês em <code>historico/fechamentos.json</code>, ele aparece aqui.</div>
-      <div class="pdv-scroll-wrap">
-        <table class="matrix" id="histTable"></table>
-      </div>
-      <div id="histForecast" style="font-size:11px;color:var(--ink);margin-top:8px;font-weight:600;"></div>
+    <div class="card" style="padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <button class="btn" type="button" onclick="fecharMesAtual()">📌 Fechar mês atual (usa o XML carregado)</button>
+      <span style="font-size:10px;color:var(--muted);">Salva o total já calculado por SPI e as metas da aba Simulação em <code>historico/fechamentos.json</code> — fechar um mês que já existe SUBSTITUI o registro daquele mês, nunca duplica.</span>
     </div>
   </div>
 
@@ -876,6 +867,46 @@ async function loadHistoricoGerados(){
 }
 
 let histProjChartInstance = null;
+
+// Plugin do Chart.js que desenha o valor de cada ponto em cima da linha
+// (rótulo de dados). Pra não virar uma poluição visual com 3 linhas x ~30
+// dias, só rotula de 5 em 5 dias + sempre o último ponto de cada linha
+// (assim o total mais recente de cada curva sempre aparece).
+const histChartDataLabelsPlugin = {
+  id: 'histChartDataLabels',
+  afterDatasetsDraw(chart){
+    const { ctx } = chart;
+    chart.data.datasets.forEach((ds, dsIndex) => {
+      const meta = chart.getDatasetMeta(dsIndex);
+      if(meta.hidden) return;
+      const data = ds.data;
+      let lastIdx = -1;
+      for(let i=data.length-1; i>=0; i--){
+        if(data[i] !== null && data[i] !== undefined){ lastIdx = i; break; }
+      }
+      if(lastIdx === -1) return;
+
+      meta.data.forEach((point, idx) => {
+        const val = data[idx];
+        if(val === null || val === undefined) return;
+        const isMilestone = (idx % 5 === 0) || idx === lastIdx;
+        if(!isMilestone) return;
+
+        const label = String(val);
+        ctx.save();
+        ctx.font = 'bold 9px Verdana, Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+        ctx.strokeText(label, point.x, point.y - 6);
+        ctx.fillStyle = ds.borderColor;
+        ctx.fillText(label, point.x, point.y - 6);
+        ctx.restore();
+      });
+    });
+  }
+};
 const HIST_GER_MES_NOMES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 
 function histDayTotal(dayObj){
@@ -1098,7 +1129,7 @@ function renderHistoricoGerados(){
       labels,
       datasets: [
         {
-          label: 'Planejado (plano de voo)',
+          label: 'Planejado',
           data: cumPlano,
           borderColor: '#7c8c82',
           borderDash: [3,3],
@@ -1107,19 +1138,19 @@ function renderHistoricoGerados(){
           pointRadius: 0
         },
         {
-          label: 'Realizado',
+          label: 'Plano de voo atual',
           data: realizadoCum,
-          borderColor: '#1a7d3f',
-          backgroundColor: 'rgba(26,125,63,0.12)',
+          borderColor: '#FF8B22',
+          backgroundColor: 'rgba(255,139,34,0.12)',
           fill: true,
           tension: 0.25,
           spanGaps: false,
           pointRadius: 2
         },
         {
-          label: `Projeção (ritmo de ${mesRefLabel})`,
+          label: `Tendência (${mesRefLabel})`,
           data: projecaoCum,
-          borderColor: '#2554a8',
+          borderColor: '#006B3F',
           borderDash: [6,4],
           fill: false,
           tension: 0.25,
@@ -1127,9 +1158,11 @@ function renderHistoricoGerados(){
         }
       ]
     },
+    plugins: [histChartDataLabelsPlugin],
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      layout: { padding: { top: 16 } },
       interaction: { mode: 'index', intersect: false },
       plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } },
       scales: {
@@ -1191,57 +1224,11 @@ function fecharMesAtual(){
 }
 
 function renderHistorico(){
+  // A aba Histórico agora é só o gráfico de projeção + o botão de fechar mês;
+  // o histórico de fechamentos continua sendo salvo em historico/fechamentos.json
+  // (fecharMesAtual usa historicoFechamentos pra não duplicar mês), só não tem
+  // mais tabela/seletor próprios aqui.
   renderHistoricoGerados();
-
-  const sel = document.getElementById('histMonthSelect');
-  const table = document.getElementById('histTable');
-  const emptyMsg = document.getElementById('histEmptyMsg');
-  const forecastBox = document.getElementById('histForecast');
-  const months = Object.keys(historicoFechamentos).sort();
-
-  if(months.length === 0){
-    sel.innerHTML = '';
-    table.innerHTML = '';
-    forecastBox.innerHTML = '';
-    emptyMsg.style.display = 'block';
-    return;
-  }
-  emptyMsg.style.display = 'none';
-
-  if(sel.options.length !== months.length){
-    sel.innerHTML = months.map(m => `<option value="${m}">${m}</option>`).join('');
-    sel.value = months[months.length - 1];
-  }
-
-  const mKey = sel.value || months[months.length - 1];
-  const entry = historicoFechamentos[mKey];
-  if(!entry){ table.innerHTML = ''; forecastBox.innerHTML = ''; return; }
-
-  let rows = '<tr><th>SPI</th><th>Meta</th><th>Realizado</th><th>% Atingido</th></tr>';
-  let totalMeta = 0, totalReal = 0;
-  SPI_KEYS.forEach((key, i) => {
-    const meta = (entry.metas && entry.metas[key]) || 0;
-    const real = (entry.porSpi && entry.porSpi[key]) || 0;
-    totalMeta += meta; totalReal += real;
-    const pct = meta ? (real / meta * 100).toFixed(1) : '0.0';
-    rows += `<tr><td>${SPI_GROUPS[i]}</td><td>${meta}</td><td>${real}</td><td>${pct}%</td></tr>`;
-  });
-  const totalPct = totalMeta ? (totalReal / totalMeta * 100).toFixed(1) : '0.0';
-  rows += `<tr class="total-row"><td>Total</td><td>${totalMeta}</td><td>${totalReal}</td><td>${totalPct}%</td></tr>`;
-  table.innerHTML = rows;
-
-  const idx = months.indexOf(mKey);
-  if(idx > 0){
-    const prevEntry = historicoFechamentos[months[idx - 1]];
-    const prevReal = prevEntry ? (prevEntry.totalGerados || 0) : 0;
-    const curReal = entry.totalGerados || totalReal;
-    const delta = prevReal ? (((curReal - prevReal) / prevReal) * 100).toFixed(1) : null;
-    forecastBox.innerHTML = delta !== null
-      ? `Variação vs ${months[idx-1]}: ${delta > 0 ? '+' : ''}${delta}% (${prevReal} → ${curReal} gerados)`
-      : '';
-  } else {
-    forecastBox.innerHTML = '';
-  }
 }
 
 function normLoja(s){
