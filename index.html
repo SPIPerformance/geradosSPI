@@ -857,11 +857,34 @@ async function loadRelacaoGerentes(){
   }catch(e){ /* mantem o mapeamento atual em caso de falha de rede */ }
 }
 
+// Converte a lista "achatada" de vendas do historico-gerados.json (um objeto
+// por UH vendida, com GERACAO em DD/MM/AAAA) pro formato agregado que o
+// resto do painel espera: { "AAAA-MM-DD": { CANAL: { EMPREENDIMENTO: qtd } } }.
+function buildHistoricoGeradosFromRecords(records){
+  const out = {};
+  records.forEach(r=>{
+    const dataStr = r.GERACAO || r.geracao;
+    if(!dataStr) return;
+    const partes = dataStr.split('/');
+    if(partes.length !== 3) return;
+    const dateKey = `${partes[2]}-${partes[1]}-${partes[0]}`;
+    const canal = (r.TIPO_CANAL || r.canal || '(sem canal)').toUpperCase();
+    const emp = r.EMPREENDIMENTO || r.empreendimento || '(sem empreendimento)';
+    out[dateKey] = out[dateKey] || {};
+    out[dateKey][canal] = out[dateKey][canal] || {};
+    out[dateKey][canal][emp] = (out[dateKey][canal][emp] || 0) + 1;
+  });
+  return out;
+}
+
 async function loadHistoricoGerados(){
   try{
     const response = await fetch('historico-gerados.json?t=' + new Date().getTime());
     if(response.ok){
-      HISTORICO_GERADOS = await response.json();
+      const raw = await response.json();
+      // Aceita tanto o formato novo (lista de vendas, uma por UH) quanto o
+      // formato antigo já agregado por dia/canal/empreendimento.
+      HISTORICO_GERADOS = Array.isArray(raw) ? buildHistoricoGeradosFromRecords(raw) : raw;
     }
   }catch(e){ /* mantem o histórico atual em caso de falha de rede */ }
 }
