@@ -114,9 +114,9 @@
   table.spi-table tr.total-row td{background:var(--green-light);font-weight:800;color:var(--green-dark);border-top:2px solid var(--green);}
   .gap-cell{border-radius:4px;font-weight:700;padding:1px 2px;display:inline-block;min-width:32px;font-size:9.5px;color:#1c2b22;}
 
-  .chart-card{padding:6px 10px 2px;position:relative;display:flex;flex-direction:column;min-width:0;}
-  .chart-card h3{margin:0 0 2px;font-size:11.5px;color:var(--ink);font-weight:700;}
-  .chart-wrap{flex:1;min-height:165px;min-width:0;position:relative;}
+  .chart-card{padding:8px 12px 4px;position:relative;display:flex;flex-direction:column;min-width:0;}
+  .chart-card h3{margin:0 0 4px;font-size:14px;color:var(--ink);font-weight:700;}
+  .chart-wrap{flex:1;min-height:175px;min-width:0;position:relative;}
 
   .grid-bottom{display:grid;grid-template-columns:minmax(0, 1fr) minmax(260px, 340px);gap:6px;}
   .matrix-card{padding:6px 10px;overflow-x:auto; -webkit-overflow-scrolling:touch;min-width:0;}
@@ -206,7 +206,6 @@
   details.team-lvl-pessoa > summary{padding:3px 6px;}
   details.team-lvl-pessoa > summary .team-lvl-label{font-weight:600;font-size:10.5px;color:var(--ink);}
 
-  /* NOVO SISTEMA DE GRELHA UNIFICADA PARA A ABA DE EMPREENDIMENTOS */
   .emp-grid-row {
     display: grid;
     grid-template-columns: 1fr 90px 180px 80px;
@@ -346,13 +345,13 @@
     padding:6px 10px;margin-bottom:8px;
   }
   .sim-meta-bar .sim-meta-title{
-    width:100%;font-size:10.5px;font-weight:700;color:var(--green-dark);margin-bottom:2px;
+    width:100%;font-size:11px;font-weight:700;color:var(--green-dark);margin-bottom:2px;
   }
   .sim-meta-field{display:flex;flex-direction:column;gap:2px;align-items:center;}
-  .sim-meta-field label{font-size:9.5px;color:var(--green-dark);font-weight:700;text-align:center;}
+  .sim-meta-field label{font-size:10px;color:var(--green-dark);font-weight:700;text-align:center;}
   .sim-meta-field input{
     width:78px;padding:4px 5px;border:1.5px solid var(--green);border-radius:5px;
-    font-size:11.5px;font-weight:700;text-align:center;color:var(--green-dark);background:#fff;
+    font-size:12px;font-weight:700;text-align:center;color:var(--green-dark);background:#fff;
   }
 
   .pdv-scroll-wrap{
@@ -369,18 +368,18 @@
   .pdv-scroll-wrap::-webkit-scrollbar-track{background:#e3ebe6;border-radius:5px;}
   .pdv-scroll-wrap::-webkit-scrollbar-thumb{background:var(--green);border-radius:5px;}
 
-  table.pdv-table{width:100%;border-collapse:separate;border-spacing:0;font-size:10px;min-width:1000px;}
-  table.pdv-table th{background:var(--green);color:#fff;padding:4px 2px;font-size:9.5px;text-align:center;border:1px solid #057d45;position:sticky;z-index:4;}
+  table.pdv-table{width:100%;border-collapse:separate;border-spacing:0;font-size:11px;min-width:1000px;}
+  table.pdv-table th{background:var(--green);color:#fff;padding:5px 3px;font-size:10.5px;text-align:center;border:1px solid #057d45;position:sticky;z-index:4;}
   table.pdv-table thead tr:nth-child(1) th { top: 0; }
-  table.pdv-table thead tr:nth-child(2) th { top: 22px; }
+  table.pdv-table thead tr:nth-child(2) th { top: 24px; }
 
-  table.pdv-table td{padding:2px 2px;text-align:center;border:1px solid var(--line);color:var(--ink);font-weight:600;}
-  table.pdv-table input[type="text"]{width:48px;padding:2px;text-align:center;border:1px solid var(--line);border-radius:3px;font-size:10px;background:#fff;}
+  table.pdv-table td{padding:3px 3px;text-align:center;border:1px solid var(--line);color:var(--ink);font-weight:600;font-size:11px;}
+  table.pdv-table input[type="text"]{width:52px;padding:3px;text-align:center;border:1px solid var(--line);border-radius:3px;font-size:11px;background:#fff;}
   table.pdv-table tr.total-row td{background:var(--green-light);font-weight:800;border-top:2px solid var(--green);}
 
-  table.pdv-table th:nth-child(1), table.pdv-table td:nth-child(1){position:sticky;left:0;min-width:70px;z-index:2;}
-  table.pdv-table th:nth-child(2), table.pdv-table td:nth-child(2){position:sticky;left:70px;min-width:52px;z-index:2;}
-  table.pdv-table th:nth-child(3), table.pdv-table td:nth-child(3){position:sticky;left:122px;min-width:48px;z-index:2;}
+  table.pdv-table th:nth-child(1), table.pdv-table td:nth-child(1){position:sticky;left:0;min-width:75px;z-index:2;}
+  table.pdv-table th:nth-child(2), table.pdv-table td:nth-child(2){position:sticky;left:75px;min-width:55px;z-index:2;}
+  table.pdv-table th:nth-child(3), table.pdv-table td:nth-child(3){position:sticky;left:130px;min-width:50px;z-index:2;}
   table.pdv-table th:nth-child(1), table.pdv-table th:nth-child(2), table.pdv-table th:nth-child(3){z-index:5;background:var(--green);}
   table.pdv-table td:nth-child(1), table.pdv-table td:nth-child(2), table.pdv-table td:nth-child(3){background:#fbfdfb;}
   table.pdv-table tr.total-row td:nth-child(1), table.pdv-table tr.total-row td:nth-child(2), table.pdv-table tr.total-row td:nth-child(3){background:var(--green-light);}
@@ -420,7 +419,7 @@
     #dashboard { display: block !important; }
     .grid-top { margin-bottom: 4px !important; gap: 4px !important; }
     .grid-bottom { gap: 4px !important; }
-    .chart-wrap { min-height: 140px !important; }
+    .chart-wrap { min-height: 150px !important; }
   }
 
   @media (max-width: 850px) {
@@ -545,9 +544,9 @@
 
         <div class="card chart-card">
           <h3>Plano de Voo</h3>
-          <div style="display:flex; gap:12px; font-size:10px; font-weight:600; margin-bottom:1px; color:var(--muted);">
-            <span style="display:flex; align-items:center; gap:3px;"><span style="display:inline-block; width:8px; height:8px; background:#7c8c82; border-radius:2px;"></span> Planejado</span>
-            <span style="display:flex; align-items:center; gap:3px;"><span style="display:inline-block; width:8px; height:8px; background:#FF8B22; border-radius:2px;"></span> Real</span>
+          <div style="display:flex; gap:12px; font-size:11px; font-weight:600; margin-bottom:2px; color:var(--muted);">
+            <span style="display:flex; align-items:center; gap:3px;"><span style="display:inline-block; width:9px; height:9px; background:#7c8c82; border-radius:2px;"></span> Planejado</span>
+            <span style="display:flex; align-items:center; gap:3px;"><span style="display:inline-block; width:9px; height:9px; background:#FF8B22; border-radius:2px;"></span> Real</span>
           </div>
           <div class="chart-wrap" id="mainChartWrap"></div>
         </div>
@@ -571,8 +570,8 @@
     <div class="card sim-container">
       <div class="sim-controls">
         <div>
-          <h3 style="margin:0 0 2px;font-size:12px;color:var(--green-dark);">Planejamento de Vendas — Curva e Lançamentos</h3>
-          <p style="font-size:10px;color:var(--muted);margin:0;">As metas informadas calculam % e Norm automaticamente com base nos pesos dos quarters e dias da semana.</p>
+          <h3 style="margin:0 0 2px;font-size:13.5px;color:var(--green-dark);">Planejamento de Vendas — Curva e Lançamentos</h3>
+          <p style="font-size:11px;color:var(--muted);margin:0;">As metas informadas calculam % e Norm automaticamente com base nos pesos dos quarters e dias da semana.</p>
         </div>
         <div>
           <label style="font-size:11px;font-weight:600;margin-right:4px;">Filtrar Regional:</label>
@@ -583,7 +582,7 @@
       </div>
 
       <div class="sim-meta-bar" id="simMetaBar"></div>
-      <div id="simMonthLabel" style="font-size:10px;color:var(--muted);font-weight:600;margin-bottom:4px;"></div>
+      <div id="simMonthLabel" style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:4px;"></div>
 
       <div class="pdv-scroll-wrap">
         <table class="pdv-table" id="pdvTable"><tbody></tbody></table>
@@ -650,7 +649,6 @@
       <h3 style="margin:0 0 8px;font-size:12px;color:var(--green-dark);">🏢 Empreendimentos vendidos — Regional › Cidade › Empreendimento › UH</h3>
       <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">Dentro de cada empreendimento, as unidades vendidas aparecem ordenadas por preço.</p>
       
-      <!-- Cabeçalho perfeitamente alinhado por Grid -->
       <div class="emp-grid-row emp-header-row" style="margin-bottom: 4px;">
         <div class="emp-col-nome">Unidade / Empreendimento</div>
         <div class="emp-col-vendas">Vendas</div>
@@ -665,8 +663,8 @@
   <!-- ---- ABA 5: HISTORICO ---- -->
   <div id="tabHistContent" style="display:none;">
     <div class="card" style="margin-bottom:8px;">
-      <h3 style="margin:0 0 4px;font-size:12px;color:var(--green-dark);">📈 Projeção de fechamento (plano de voo)</h3>
-      <p style="font-size:10px;color:var(--muted);margin:0 0 10px;">
+      <h3 style="margin:0 0 4px;font-size:13px;color:var(--green-dark);">📈 Projeção de fechamento (plano de voo)</h3>
+      <p style="font-size:10.5px;color:var(--muted);margin:0 0 10px;">
         <span style="color:#7c8c82;font-weight:700;">■ Planejado</span> (meta da aba Simulação) ·
         <span style="color:#FF8B22;font-weight:700;">■ Plano de voo atual</span> (realizado até hoje) ·
         <span style="color:#006B3F;font-weight:700;">■ Tendência</span> (projeção com base no mês do histórico escolhido).
@@ -678,8 +676,8 @@
           <option value="auto">Automático (mês mais parecido)</option>
         </select>
       </div>
-      <div id="histProjSummary" style="font-size:11px;color:var(--ink);margin-bottom:10px;"></div>
-      <div style="position:relative;height:300px;">
+      <div id="histProjSummary" style="font-size:11.5px;color:var(--ink);margin-bottom:10px;"></div>
+      <div style="position:relative;height:320px;">
         <canvas id="histProjChart"></canvas>
       </div>
     </div>
@@ -820,7 +818,7 @@ async function loadPlanejamento(){
       localStorage.setItem('spi-pdv-pcts-map', JSON.stringify(allPdvPctsByMonth));
       loadMonthSettings();
     }
-  }catch(e){/* se não houver arquivo remoto, mantém o local */}
+  }catch(e){}
 }
 
 function baixarPlanejamento(){
@@ -845,7 +843,7 @@ async function loadMapping(){
       const data = await response.json();
       DEFAULT_MAPPING = data;
     }
-  }catch(e){ /* mantem o mapeamento atual em caso de falha de rede */ }
+  }catch(e){}
 }
 
 async function loadRelacaoGerentes(){
@@ -854,12 +852,9 @@ async function loadRelacaoGerentes(){
     if(response.ok){
       LOJA_GERENTE_MAP = await response.json();
     }
-  }catch(e){ /* mantem o mapeamento atual em caso de falha de rede */ }
+  }catch(e){}
 }
 
-// Converte a lista "achatada" de vendas do historico-gerados.json (um objeto
-// por UH vendida, com GERACAO em DD/MM/AAAA) pro formato agregado que o
-// resto do painel espera: { "AAAA-MM-DD": { CANAL: { EMPREENDIMENTO: qtd } } }.
 function buildHistoricoGeradosFromRecords(records){
   const out = {};
   records.forEach(r=>{
@@ -882,19 +877,13 @@ async function loadHistoricoGerados(){
     const response = await fetch('historico-gerados.json?t=' + new Date().getTime());
     if(response.ok){
       const raw = await response.json();
-      // Aceita tanto o formato novo (lista de vendas, uma por UH) quanto o
-      // formato antigo já agregado por dia/canal/empreendimento.
       HISTORICO_GERADOS = Array.isArray(raw) ? buildHistoricoGeradosFromRecords(raw) : raw;
     }
-  }catch(e){ /* mantem o histórico atual em caso de falha de rede */ }
+  }catch(e){}
 }
 
 let histProjChartInstance = null;
 
-// Plugin do Chart.js que desenha o valor de cada ponto em cima da linha
-// (rótulo de dados). Pra não virar uma poluição visual com 3 linhas x ~30
-// dias, só rotula de 5 em 5 dias + sempre o último ponto de cada linha
-// (assim o total mais recente de cada curva sempre aparece).
 const histChartDataLabelsPlugin = {
   id: 'histChartDataLabels',
   afterDatasetsDraw(chart){
@@ -917,7 +906,7 @@ const histChartDataLabelsPlugin = {
 
         const label = String(val);
         ctx.save();
-        ctx.font = 'bold 9px Verdana, Arial, sans-serif';
+        ctx.font = 'bold 10px Verdana, Arial, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'bottom';
         ctx.lineWidth = 3;
@@ -969,66 +958,6 @@ function cosineSim(a, b){
   return dot / (Math.sqrt(na)*Math.sqrt(nb));
 }
 
-// Com poucos dias de dados no mês atual (ex: dia 1), comparar o "formato" das
-// vendas por similaridade de cosseno não funciona: um vetor de 1 número só
-// sempre dá 100% de parecido com qualquer outro número positivo, então o mês
-// "escolhido" acaba sendo arbitrário e pode ter uma proporção dia1/total bem
-// fora da curva — foi isso que gerou a projeção de 41 vendas com meta de 750.
-// Abaixo desse mínimo de dias, em vez de tentar achar "o mês mais parecido",
-// usamos a MÉDIA de todos os meses do histórico (cada mês normalizado pelo
-// próprio total antes de entrar na média, pra nenhum mês pesar mais que outro).
-const MIN_DIAS_PARA_SIMILARIDADE = 5;
-
-function buildAverageFlightPlan(curYear, curMonth, elapsedDays){
-  const curKey = `${curYear}-${String(curMonth+1).padStart(2,'0')}`;
-  const monthsSet = new Set(Object.keys(HISTORICO_GERADOS).map(k=>k.slice(0,7)));
-
-  const curvas = [];
-  monthsSet.forEach(mk=>{
-    if(mk === curKey) return;
-    const [y,m] = mk.split('-').map(Number);
-    const my = y, mm = m-1;
-    const dim = daysInMonth(my, mm);
-    const histDaily = buildMonthDailyFromHist(my, mm);
-    const total = histDaily.reduce((s,v)=> s+v, 0);
-    if(total <= 0) return;
-    const temFechamento = histDaily.slice(Math.max(1, dim-2), dim+1).some(v=>v>0);
-    if(!temFechamento) return;
-    curvas.push({ dim, histDaily, total });
-  });
-  if(curvas.length === 0) return null;
-
-  const maxDim = Math.max(...curvas.map(c=>c.dim));
-  // fracPerDay[d] = média, entre os meses do histórico, da fração do mês
-  // vendida naquele dia (vendas do dia d ÷ total daquele mês).
-  const fracPerDay = new Array(maxDim+1).fill(0);
-  for(let d=1; d<=maxDim; d++){
-    let soma = 0, n = 0;
-    curvas.forEach(c=>{
-      if(d > c.dim) return;
-      soma += c.histDaily[d] / c.total;
-      n++;
-    });
-    fracPerDay[d] = n>0 ? soma/n : 0;
-  }
-
-  const effElapsed = Math.min(elapsedDays, maxDim);
-  return {
-    mesKey: null,
-    sim: null,
-    total: fracPerDay.reduce((s,v)=> s+v, 0), // soma das frações médias (~1)
-    fracAtElapsed: fracPerDay.slice(1, effElapsed+1).reduce((s,v)=>s+v, 0),
-    histDaily: fracPerDay,
-    dim: maxDim,
-    averaged: true,
-    numMeses: curvas.length
-  };
-}
-
-// Acha, no histórico, o mês cujo ritmo diário (dia 1 até "elapsedDays") mais
-// se parece com o do mês atual até agora — o "plano de voo" de referência.
-// Se forcedMonthKey vier preenchido (ex: "2026-03"), usa esse mês direto,
-// sem procurar o mais parecido (comparação escolhida manualmente).
 function findClosestFlightPlan(curDaily, elapsedDays, curYear, curMonth, forcedMonthKey){
   const curKey = `${curYear}-${String(curMonth+1).padStart(2,'0')}`;
 
@@ -1081,9 +1010,6 @@ function findClosestFlightPlan(curDaily, elapsedDays, curYear, curMonth, forcedM
   return best;
 }
 
-// Preenche o seletor "Comparar com" com todos os meses que existem no
-// historico-gerados.json (exceto o mês atual), preservando a seleção do
-// usuário quando ainda for válida.
 function populateHistCompareMonthSelect(curKey){
   const sel = document.getElementById('histCompareMonthSelect');
   if(!sel) return;
@@ -1139,10 +1065,7 @@ function renderHistoricoGerados(){
     return;
   }
 
-  const usarMedia = forcedMonthKey === 'auto' && elapsedDays < MIN_DIAS_PARA_SIMILARIDADE;
-  const best = usarMedia
-    ? buildAverageFlightPlan(year, month, elapsedDays)
-    : findClosestFlightPlan(curDaily, elapsedDays, year, month, forcedMonthKey);
+  const best = findClosestFlightPlan(curDaily, elapsedDays, year, month, forcedMonthKey);
   if(!best){
     summaryEl.textContent = forcedMonthKey !== 'auto'
       ? 'O mês escolhido não tem dados suficientes no histórico pra essa comparação.'
@@ -1169,8 +1092,6 @@ function renderHistoricoGerados(){
     projecaoCum.push(projectedTotal ? Math.round(fracAtD * projectedTotal) : null);
   }
 
-  // Planejado = mesmo plano de voo da aba Simulação (soma de todas as SPIs),
-  // acumulado dia a dia — é a curva "oficial" da meta do mês.
   const cumPlano = [];
   let runPlano = 0;
   for(let d=1; d<=lastDay; d++){
@@ -1181,9 +1102,9 @@ function renderHistoricoGerados(){
     cumPlano.push(Math.round(runPlano));
   }
 
-  const mesRefLabel = best.averaged
-    ? `média de ${best.numMeses} meses do histórico`
-    : (()=>{ const [my, mm] = best.mesKey.split('-').map(Number); return `${HIST_GER_MES_NOMES[mm-1]}/${my}`; })();
+  const [my, mm] = best.mesKey.split('-').map(Number);
+  const mesRefLabel = `${HIST_GER_MES_NOMES[mm-1]}/${my}`;
+  const simPct = (best.sim*100).toFixed(0);
 
   let metaTxt = '';
   if(lastMonthStats && lastMonthStats.metas){
@@ -1194,20 +1115,12 @@ function renderHistoricoGerados(){
     }
   }
 
-  let comparaTxt, fechouTxt;
-  if(best.averaged){
-    comparaTxt = `Ainda são poucos dias registrados este mês (dia ${elapsedDays}) pra achar um mês parecido com confiança — usando a <b>${mesRefLabel}</b> como referência (a comparação por mês específico volta a partir do dia ${MIN_DIAS_PARA_SIMILARIDADE}).`;
-    fechouTxt = '';
-  } else {
-    const simPct = (best.sim*100).toFixed(0);
-    comparaTxt = best.forced
-      ? `Comparando com <b>${mesRefLabel}</b> (escolhido manualmente, ${simPct}% de similaridade até o dia ${elapsedDays}).`
-      : `Ritmo mais parecido: <b>${mesRefLabel}</b> (${simPct}% de similaridade).`;
-    fechouTxt = `${mesRefLabel} fechou com <b>${best.total}</b> vendas no total. `;
-  }
+  const comparaTxt = best.forced
+    ? `Comparando com <b>${mesRefLabel}</b> (escolhido manualmente, ${simPct}% de similaridade até o dia ${elapsedDays}).`
+    : `Ritmo mais parecido: <b>${mesRefLabel}</b> (${simPct}% de similaridade).`;
 
   summaryEl.innerHTML = `${comparaTxt} ` +
-    `${fechouTxt}` +
+    `${mesRefLabel} fechou com <b>${best.total}</b> vendas no total. ` +
     `Até o dia ${elapsedDays}, já foram <b>${curCumElapsed}</b> gerados. ` +
     `Seguindo esse ritmo, o mês deve fechar em torno de <b>${projectedTotal ? Math.round(projectedTotal) : '—'}</b>.${metaTxt}`;
 
@@ -1235,7 +1148,7 @@ function renderHistoricoGerados(){
           fill: true,
           tension: 0.25,
           spanGaps: false,
-          pointRadius: 2
+          pointRadius: 2.5
         },
         {
           label: `Tendência (${mesRefLabel})`,
@@ -1251,12 +1164,12 @@ function renderHistoricoGerados(){
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      layout: { padding: { top: 16 } },
+      layout: { padding: { top: 18 } },
       interaction: { mode: 'index', intersect: false },
-      plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } },
+      plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } },
       scales: {
-        x: { title: { display: true, text: 'Dia do mês', font: { size: 10 } }, ticks: { font: { size: 9 } } },
-        y: { title: { display: true, text: 'Acumulado', font: { size: 10 } }, beginAtZero: true, ticks: { font: { size: 9 } } }
+        x: { title: { display: true, text: 'Dia do mês', font: { size: 11 } }, ticks: { font: { size: 10 } } },
+        y: { title: { display: true, text: 'Acumulado', font: { size: 11 } }, beginAtZero: true, ticks: { font: { size: 10 } } }
       }
     }
   });
@@ -1313,10 +1226,6 @@ function fecharMesAtual(){
 }
 
 function renderHistorico(){
-  // A aba Histórico agora é só o gráfico de projeção + o botão de fechar mês;
-  // o histórico de fechamentos continua sendo salvo em historico/fechamentos.json
-  // (fecharMesAtual usa historicoFechamentos pra não duplicar mês), só não tem
-  // mais tabela/seletor próprios aqui.
   renderHistoricoGerados();
 }
 
@@ -2428,9 +2337,9 @@ function drawChart(labels, plano, gerados){
 
   const rect = wrap.getBoundingClientRect();
   const w = rect.width > 50 ? rect.width : 550;
-  const h = rect.height > 50 ? rect.height : 165;
+  const h = rect.height > 50 ? rect.height : 175;
 
-  const padL = 30, padR = 14, padT = 12, padB = 22;
+  const padL = 34, padR = 16, padT = 16, padB = 24;
   const cW = w - padL - padR;
   const cH = h - padT - padB;
 
@@ -2474,31 +2383,31 @@ function drawChart(labels, plano, gerados){
     if(val === null || val === undefined) return;
     const x = getX(i), y = getY(val);
     const label = String(val);
-    const bw = label.length * 4.5 + 4;
-    const bh = 11;
+    const bw = label.length * 6 + 6;
+    const bh = 15;
     const bx = x - bw / 2;
-    const by = y - 5 - bh;
-    svg += `<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh}" rx="2" ry="2" fill="#5a6e63" opacity="0.88"/>`;
-    svg += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2" fill="#7c8c82"/>`;
-    svg += `<text x="${x.toFixed(1)}" y="${(by + bh - 2).toFixed(1)}" fill="#ffffff" font-size="7.5" font-weight="700" font-family="Verdana,Arial,sans-serif" text-anchor="middle">${label}</text>`;
+    const by = y - 7 - bh;
+    svg += `<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh}" rx="3" ry="3" fill="#5a6e63" opacity="0.88"/>`;
+    svg += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.5" fill="#7c8c82"/>`;
+    svg += `<text x="${x.toFixed(1)}" y="${(by + bh - 4).toFixed(1)}" fill="#ffffff" font-size="10" font-weight="700" font-family="Verdana,Arial,sans-serif" text-anchor="middle">${label}</text>`;
   });
 
   gerados.forEach((val, i) => {
     if(val === null || val === undefined) return;
     const x = getX(i), y = getY(val);
     const label = String(val);
-    const bw = label.length * 4.5 + 4;
-    const bh = 11;
+    const bw = label.length * 6 + 6;
+    const bh = 15;
     const bx = x - bw / 2;
-    const by = y + 4;
-    svg += `<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh}" rx="2" ry="2" fill="#FF8B22" opacity="0.92"/>`;
-    svg += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.5" fill="#FF8B22"/>`;
-    svg += `<text x="${x.toFixed(1)}" y="${(by + bh - 2).toFixed(1)}" fill="#ffffff" font-size="7.5" font-weight="700" font-family="Verdana,Arial,sans-serif" text-anchor="middle">${label}</text>`;
+    const by = y + 5;
+    svg += `<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh}" rx="3" ry="3" fill="#FF8B22" opacity="0.92"/>`;
+    svg += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="#FF8B22"/>`;
+    svg += `<text x="${x.toFixed(1)}" y="${(by + bh - 4).toFixed(1)}" fill="#ffffff" font-size="10" font-weight="700" font-family="Verdana,Arial,sans-serif" text-anchor="middle">${label}</text>`;
   });
 
   labels.forEach((lbl, i) => {
     const x = getX(i);
-    svg += `<text x="${x.toFixed(1)}" y="${(h - 4).toFixed(1)}" fill="#6b7d72" font-size="7.5" font-family="Verdana,Arial,sans-serif" text-anchor="middle">${lbl}</text>`;
+    svg += `<text x="${x.toFixed(1)}" y="${(h - 5).toFixed(1)}" fill="#6b7d72" font-size="10" font-family="Verdana,Arial,sans-serif" text-anchor="middle">${lbl}</text>`;
   });
 
   svg += `</svg>`;
