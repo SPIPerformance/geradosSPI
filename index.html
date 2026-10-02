@@ -1140,6 +1140,7 @@ function renderHistoricoGerados(){
     : `Ritmo mais parecido: <b>${mesRefLabel}</b> (${simPct}% de similaridade).`;
 
   summaryEl.innerHTML = `${comparaTxt} ` +
+    `${mesRefLabel} fechou com <b>${best.total}</b> vendas no total. ` +
     `Até o dia ${elapsedDays}, já foram <b>${curCumElapsed}</b> gerados. ` +
     `Seguindo esse ritmo, o mês deve fechar em torno de <b>${projectedTotal ? Math.round(projectedTotal) : '—'}</b>.${metaTxt}`;
 
@@ -1155,7 +1156,6 @@ function renderHistoricoGerados(){
           label: 'Planejado',
           data: cumPlano,
           borderColor: '#7c8c82',
-          borderDash: [3,3],
           fill: false,
           tension: 0.25,
           pointRadius: 0
@@ -1174,7 +1174,6 @@ function renderHistoricoGerados(){
           label: `Tendência (${mesRefLabel})`,
           data: projecaoCum,
           borderColor: '#006B3F',
-          borderDash: [6,4],
           fill: false,
           tension: 0.25,
           pointRadius: 0
