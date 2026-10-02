@@ -969,6 +969,62 @@ function cosineSim(a, b){
   return dot / (Math.sqrt(na)*Math.sqrt(nb));
 }
 
+// Com poucos dias de dados no mês atual (ex: dia 1), comparar o "formato" das
+// vendas por similaridade de cosseno não funciona: um vetor de 1 número só
+// sempre dá 100% de parecido com qualquer outro número positivo, então o mês
+// "escolhido" acaba sendo arbitrário e pode ter uma proporção dia1/total bem
+// fora da curva — foi isso que gerou a projeção de 41 vendas com meta de 750.
+// Abaixo desse mínimo de dias, em vez de tentar achar "o mês mais parecido",
+// usamos a MÉDIA de todos os meses do histórico (cada mês normalizado pelo
+// próprio total antes de entrar na média, pra nenhum mês pesar mais que outro).
+const MIN_DIAS_PARA_SIMILARIDADE = 5;
+
+function buildAverageFlightPlan(curYear, curMonth, elapsedDays){
+  const curKey = `${curYear}-${String(curMonth+1).padStart(2,'0')}`;
+  const monthsSet = new Set(Object.keys(HISTORICO_GERADOS).map(k=>k.slice(0,7)));
+
+  const curvas = [];
+  monthsSet.forEach(mk=>{
+    if(mk === curKey) return;
+    const [y,m] = mk.split('-').map(Number);
+    const my = y, mm = m-1;
+    const dim = daysInMonth(my, mm);
+    const histDaily = buildMonthDailyFromHist(my, mm);
+    const total = histDaily.reduce((s,v)=> s+v, 0);
+    if(total <= 0) return;
+    const temFechamento = histDaily.slice(Math.max(1, dim-2), dim+1).some(v=>v>0);
+    if(!temFechamento) return;
+    curvas.push({ dim, histDaily, total });
+  });
+  if(curvas.length === 0) return null;
+
+  const maxDim = Math.max(...curvas.map(c=>c.dim));
+  // fracPerDay[d] = média, entre os meses do histórico, da fração do mês
+  // vendida naquele dia (vendas do dia d ÷ total daquele mês).
+  const fracPerDay = new Array(maxDim+1).fill(0);
+  for(let d=1; d<=maxDim; d++){
+    let soma = 0, n = 0;
+    curvas.forEach(c=>{
+      if(d > c.dim) return;
+      soma += c.histDaily[d] / c.total;
+      n++;
+    });
+    fracPerDay[d] = n>0 ? soma/n : 0;
+  }
+
+  const effElapsed = Math.min(elapsedDays, maxDim);
+  return {
+    mesKey: null,
+    sim: null,
+    total: fracPerDay.reduce((s,v)=> s+v, 0), // soma das frações médias (~1)
+    fracAtElapsed: fracPerDay.slice(1, effElapsed+1).reduce((s,v)=>s+v, 0),
+    histDaily: fracPerDay,
+    dim: maxDim,
+    averaged: true,
+    numMeses: curvas.length
+  };
+}
+
 // Acha, no histórico, o mês cujo ritmo diário (dia 1 até "elapsedDays") mais
 // se parece com o do mês atual até agora — o "plano de voo" de referência.
 // Se forcedMonthKey vier preenchido (ex: "2026-03"), usa esse mês direto,
@@ -1083,7 +1139,10 @@ function renderHistoricoGerados(){
     return;
   }
 
-  const best = findClosestFlightPlan(curDaily, elapsedDays, year, month, forcedMonthKey);
+  const usarMedia = forcedMonthKey === 'auto' && elapsedDays < MIN_DIAS_PARA_SIMILARIDADE;
+  const best = usarMedia
+    ? buildAverageFlightPlan(year, month, elapsedDays)
+    : findClosestFlightPlan(curDaily, elapsedDays, year, month, forcedMonthKey);
   if(!best){
     summaryEl.textContent = forcedMonthKey !== 'auto'
       ? 'O mês escolhido não tem dados suficientes no histórico pra essa comparação.'
@@ -1122,9 +1181,9 @@ function renderHistoricoGerados(){
     cumPlano.push(Math.round(runPlano));
   }
 
-  const [my, mm] = best.mesKey.split('-').map(Number);
-  const mesRefLabel = `${HIST_GER_MES_NOMES[mm-1]}/${my}`;
-  const simPct = (best.sim*100).toFixed(0);
+  const mesRefLabel = best.averaged
+    ? `média de ${best.numMeses} meses do histórico`
+    : (()=>{ const [my, mm] = best.mesKey.split('-').map(Number); return `${HIST_GER_MES_NOMES[mm-1]}/${my}`; })();
 
   let metaTxt = '';
   if(lastMonthStats && lastMonthStats.metas){
@@ -1135,12 +1194,20 @@ function renderHistoricoGerados(){
     }
   }
 
-  const comparaTxt = best.forced
-    ? `Comparando com <b>${mesRefLabel}</b> (escolhido manualmente, ${simPct}% de similaridade até o dia ${elapsedDays}).`
-    : `Ritmo mais parecido: <b>${mesRefLabel}</b> (${simPct}% de similaridade).`;
+  let comparaTxt, fechouTxt;
+  if(best.averaged){
+    comparaTxt = `Ainda são poucos dias registrados este mês (dia ${elapsedDays}) pra achar um mês parecido com confiança — usando a <b>${mesRefLabel}</b> como referência (a comparação por mês específico volta a partir do dia ${MIN_DIAS_PARA_SIMILARIDADE}).`;
+    fechouTxt = '';
+  } else {
+    const simPct = (best.sim*100).toFixed(0);
+    comparaTxt = best.forced
+      ? `Comparando com <b>${mesRefLabel}</b> (escolhido manualmente, ${simPct}% de similaridade até o dia ${elapsedDays}).`
+      : `Ritmo mais parecido: <b>${mesRefLabel}</b> (${simPct}% de similaridade).`;
+    fechouTxt = `${mesRefLabel} fechou com <b>${best.total}</b> vendas no total. `;
+  }
 
   summaryEl.innerHTML = `${comparaTxt} ` +
-    `${mesRefLabel} fechou com <b>${best.total}</b> vendas no total. ` +
+    `${fechouTxt}` +
     `Até o dia ${elapsedDays}, já foram <b>${curCumElapsed}</b> gerados. ` +
     `Seguindo esse ritmo, o mês deve fechar em torno de <b>${projectedTotal ? Math.round(projectedTotal) : '—'}</b>.${metaTxt}`;
 
