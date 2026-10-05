@@ -411,7 +411,7 @@
   @media print {
     @page { size: landscape; margin: 4mm; }
     body { background: #fff !important; padding: 0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .topbar, .actions, .tabs, .btn, .upload-group, #settingsBtn, #exportXmlBtn { display: none !important; }
+    .topbar, .actions, .tabs, .btn, .upload-group, #settingsBtn { display: none !important; }
     #teamWeekSelect, #teamPrintBtn { display: none !important; }
     details.team-lvl-regional:not([open]) > *:not(summary),
     details.team-lvl-canal:not([open]) > *:not(summary) { display: block !important; }
@@ -437,12 +437,6 @@
 </style>
 <meta id="exportMeta" name="export-timestamp" content="1788263887199"></head>
 <body>
-<noscript>
-  <div style="background:#d32f2f;color:#fff;padding:10px;text-align:center;font-weight:bold;margin-bottom:10px;border-radius:5px;font-family:sans-serif;">
-    ⚠️ ALERTA: O painel está bloqueado no SharePoint/OneDrive. Faça o download do arquivo e abra no navegador (Chrome, Edge ou Safari).
-  </div>
-</noscript>
-
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
@@ -456,7 +450,6 @@
     <div class="actions">
       <button class="btn secondary" id="analystLockBtn" type="button" title="Destravar aba de Simulação" style="padding:0 8px;">🔒</button>
       <button class="btn secondary" id="settingsBtn" type="button">⚙ Config.</button>
-      <button class="btn secondary" id="exportXmlBtn" type="button">⬇ Baixar XML</button>
       <div class="upload-group">
         <button class="btn" id="uploadBtn" type="button">⭱ Carregar XML</button>
         <input type="file" id="fileInput" accept=".xml">
@@ -671,6 +664,14 @@
         <span style="color:#FF8B22;font-weight:700;">■ Plano de voo atual</span> (realizado até hoje) ·
         <span style="color:#006B3F;font-weight:700;">■ Tendência</span> (projeção com base no mês do histórico escolhido).
       </p>
+      <details style="margin-bottom:10px;">
+        <summary style="font-size:10px;color:var(--green-dark);font-weight:700;cursor:pointer;">ℹ️ Como esse cálculo é feito</summary>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5;">
+          <p style="margin:0 0 4px;"><b>Com 5 dias ou mais de vendas registradas no mês atual:</b> o painel compara o formato das vendas dia a dia deste mês com o de cada mês do <code>historico-gerados.json</code> (similaridade de cosseno) e usa o mês mais parecido como referência — ou o mês que você escolher manualmente em "Comparar com". A linha de Tendência é a curva desse mês de referência, reescalada pro tamanho do mês atual.</p>
+          <p style="margin:0 0 4px;"><b>Com menos de 5 dias de dados:</b> comparar o "formato" das vendas com tão pouca informação não é confiável (um único dia sempre parece 100% parecido com qualquer outro), então o painel usa a <b>média de todos os meses do histórico</b> em vez de tentar achar um só mês parecido.</p>
+          <p style="margin:0;"><b>Nos primeiros 10 dias do mês</b>, a projeção final também é misturada com a <b>meta</b> da aba Simulação — o peso do histórico cresce dia a dia até virar 100% a partir do dia 10. Isso evita que pouquíssimos dias de dado real gerem uma projeção fora da realidade logo no início do mês.</p>
+        </div>
+      </details>
       <div id="histProjEmptyMsg" style="display:none;font-size:11px;color:var(--muted);">Carregue o XML do mês atual e suba o <code>historico-gerados.json</code> na raiz do repositório pra ver a projeção.</div>
       <div id="histProjControls" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
         <label style="font-size:11px;font-weight:600;">Comparar com:</label>
@@ -2584,22 +2585,6 @@ document.getElementById('uploadBtn').onclick = ()=>document.getElementById('file
 document.getElementById('fileInput').addEventListener('change', e=>{
   if(e.target.files.length>0) handleFile(e.target.files[0]);
 });
-
-function exportXml() {
-  if (!currentXmlText) {
-    alert("Nenhum dado carregado para exportar.");
-    return;
-  }
-  const blob = new Blob([currentXmlText], {type: 'application/xml;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = '{DEDBD38E-D54E-DF11-AD89-001B78B9D994}';
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-document.getElementById('exportXmlBtn').addEventListener('click', exportXml);
 
 (async function init(){
   initAnalystLock();
