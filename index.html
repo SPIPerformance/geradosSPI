@@ -346,13 +346,13 @@
     padding:6px 10px;margin-bottom:8px;
   }
   .sim-meta-bar .sim-meta-title{
-    width:100%;font-size:10.5px;font-weight:700;color:var(--green-dark);margin-bottom:2px;
+    width:100%;font-size:12px;font-weight:700;color:var(--green-dark);margin-bottom:2px;
   }
   .sim-meta-field{display:flex;flex-direction:column;gap:2px;align-items:center;}
-  .sim-meta-field label{font-size:9.5px;color:var(--green-dark);font-weight:700;text-align:center;}
+  .sim-meta-field label{font-size:11px;color:var(--green-dark);font-weight:700;text-align:center;}
   .sim-meta-field input{
-    width:78px;padding:4px 5px;border:1.5px solid var(--green);border-radius:5px;
-    font-size:11.5px;font-weight:700;text-align:center;color:var(--green-dark);background:#fff;
+    width:84px;padding:5px;border:1.5px solid var(--green);border-radius:5px;
+    font-size:13px;font-weight:700;text-align:center;color:var(--green-dark);background:#fff;
   }
 
   .pdv-scroll-wrap{
@@ -369,13 +369,13 @@
   .pdv-scroll-wrap::-webkit-scrollbar-track{background:#e3ebe6;border-radius:5px;}
   .pdv-scroll-wrap::-webkit-scrollbar-thumb{background:var(--green);border-radius:5px;}
 
-  table.pdv-table{width:100%;border-collapse:separate;border-spacing:0;font-size:10px;min-width:1000px;}
-  table.pdv-table th{background:var(--green);color:#fff;padding:4px 2px;font-size:9.5px;text-align:center;border:1px solid #057d45;position:sticky;z-index:4;}
+  table.pdv-table{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px;min-width:1150px;}
+  table.pdv-table th{background:var(--green);color:#fff;padding:5px 3px;font-size:11.5px;text-align:center;border:1px solid #057d45;position:sticky;z-index:4;}
   table.pdv-table thead tr:nth-child(1) th { top: 0; }
   table.pdv-table thead tr:nth-child(2) th { top: 22px; }
 
-  table.pdv-table td{padding:2px 2px;text-align:center;border:1px solid var(--line);color:var(--ink);font-weight:600;}
-  table.pdv-table input[type="text"]{width:48px;padding:2px;text-align:center;border:1px solid var(--line);border-radius:3px;font-size:10px;background:#fff;}
+  table.pdv-table td{padding:3px 3px;text-align:center;border:1px solid var(--line);color:var(--ink);font-weight:600;}
+  table.pdv-table input[type="text"]{width:56px;padding:3px;text-align:center;border:1px solid var(--line);border-radius:3px;font-size:11.5px;background:#fff;}
   table.pdv-table tr.total-row td{background:var(--green-light);font-weight:800;border-top:2px solid var(--green);}
 
   table.pdv-table th:nth-child(1), table.pdv-table td:nth-child(1){position:sticky;left:0;min-width:70px;z-index:2;}
@@ -564,8 +564,8 @@
     <div class="card sim-container">
       <div class="sim-controls">
         <div>
-          <h3 style="margin:0 0 2px;font-size:12px;color:var(--green-dark);">Planejamento de Vendas — Curva e Lançamentos</h3>
-          <p style="font-size:10px;color:var(--muted);margin:0;">As metas informadas calculam % e Norm automaticamente com base nos pesos dos quarters e dias da semana.</p>
+          <h3 style="margin:0 0 2px;font-size:13.5px;color:var(--green-dark);">Planejamento de Vendas — Curva e Lançamentos</h3>
+          <p style="font-size:11px;color:var(--muted);margin:0;">As metas informadas calculam % e Norm automaticamente com base nos pesos dos quarters e dias da semana.</p>
         </div>
         <div>
           <label style="font-size:11px;font-weight:600;margin-right:4px;">Filtrar Regional:</label>
@@ -576,7 +576,7 @@
       </div>
 
       <div class="sim-meta-bar" id="simMetaBar"></div>
-      <div id="simMonthLabel" style="font-size:10px;color:var(--muted);font-weight:600;margin-bottom:4px;"></div>
+      <div id="simMonthLabel" style="font-size:11.5px;color:var(--muted);font-weight:600;margin-bottom:4px;"></div>
 
       <div class="pdv-scroll-wrap">
         <table class="pdv-table" id="pdvTable"><tbody></tbody></table>
@@ -658,28 +658,28 @@
   <!-- ---- ABA 5: HISTORICO ---- -->
   <div id="tabHistContent" style="display:none;">
     <div class="card" style="margin-bottom:8px;">
-      <h3 style="margin:0 0 4px;font-size:12px;color:var(--green-dark);">📈 Projeção de fechamento (plano de voo)</h3>
-      <p style="font-size:10px;color:var(--muted);margin:0 0 10px;">
+      <h3 style="margin:0 0 4px;font-size:14px;color:var(--green-dark);">📈 Projeção de fechamento (plano de voo)</h3>
+      <p style="font-size:11.5px;color:var(--muted);margin:0 0 10px;">
         <span style="color:#7c8c82;font-weight:700;">■ Planejado</span> (meta da aba Simulação) ·
         <span style="color:#FF8B22;font-weight:700;">■ Plano de voo atual</span> (realizado até hoje) ·
         <span style="color:#006B3F;font-weight:700;">■ Tendência</span> (projeção com base no mês do histórico escolhido).
       </p>
       <details style="margin-bottom:10px;">
-        <summary style="font-size:10px;color:var(--green-dark);font-weight:700;cursor:pointer;">ℹ️ Como esse cálculo é feito</summary>
-        <div style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5;">
+        <summary style="font-size:11.5px;color:var(--green-dark);font-weight:700;cursor:pointer;">ℹ️ Como esse cálculo é feito</summary>
+        <div style="font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.55;">
           <p style="margin:0 0 4px;"><b>Com 5 dias ou mais de vendas registradas no mês atual:</b> o painel compara o formato das vendas dia a dia deste mês com o de cada mês do <code>historico-gerados.json</code> (similaridade de cosseno) e usa o mês mais parecido como referência — ou o mês que você escolher manualmente em "Comparar com". A linha de Tendência é a curva desse mês de referência, reescalada pro tamanho do mês atual.</p>
           <p style="margin:0 0 4px;"><b>Com menos de 5 dias de dados:</b> comparar o "formato" das vendas com tão pouca informação não é confiável (um único dia sempre parece 100% parecido com qualquer outro), então o painel usa a <b>média de todos os meses do histórico</b> em vez de tentar achar um só mês parecido.</p>
           <p style="margin:0;"><b>Nos primeiros 10 dias do mês</b>, a projeção final também é misturada com a <b>meta</b> da aba Simulação — o peso do histórico cresce dia a dia até virar 100% a partir do dia 10. Isso evita que pouquíssimos dias de dado real gerem uma projeção fora da realidade logo no início do mês.</p>
         </div>
       </details>
-      <div id="histProjEmptyMsg" style="display:none;font-size:11px;color:var(--muted);">Carregue o XML do mês atual e suba o <code>historico-gerados.json</code> na raiz do repositório pra ver a projeção.</div>
+      <div id="histProjEmptyMsg" style="display:none;font-size:12.5px;color:var(--muted);">Carregue o XML do mês atual e suba o <code>historico-gerados.json</code> na raiz do repositório pra ver a projeção.</div>
       <div id="histProjControls" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-        <label style="font-size:11px;font-weight:600;">Comparar com:</label>
-        <select id="histCompareMonthSelect" onchange="renderHistoricoGerados()" style="padding:3px 6px;border:1px solid var(--line);border-radius:5px;font-size:11px;">
+        <label style="font-size:12.5px;font-weight:600;">Comparar com:</label>
+        <select id="histCompareMonthSelect" onchange="renderHistoricoGerados()" style="padding:4px 7px;border:1px solid var(--line);border-radius:5px;font-size:12.5px;">
           <option value="auto">Automático (mês mais parecido)</option>
         </select>
       </div>
-      <div id="histProjSummary" style="font-size:11px;color:var(--ink);margin-bottom:10px;"></div>
+      <div id="histProjSummary" style="font-size:12.5px;color:var(--ink);margin-bottom:10px;"></div>
       <div style="position:relative;height:300px;">
         <canvas id="histProjChart"></canvas>
       </div>
@@ -687,7 +687,7 @@
 
     <div class="card" style="padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <button class="btn" type="button" onclick="fecharMesAtual()">📌 Fechar mês atual (usa o XML carregado)</button>
-      <span style="font-size:10px;color:var(--muted);">Salva o total já calculado por SPI e as metas da aba Simulação em <code>historico/fechamentos.json</code> — fechar um mês que já existe SUBSTITUI o registro daquele mês, nunca duplica.</span>
+      <span style="font-size:11.5px;color:var(--muted);">Salva o total já calculado por SPI e as metas da aba Simulação em <code>historico/fechamentos.json</code> — fechar um mês que já existe SUBSTITUI o registro daquele mês, nunca duplica.</span>
     </div>
   </div>
 
@@ -1273,10 +1273,10 @@ function renderHistoricoGerados(){
       maintainAspectRatio: false,
       layout: { padding: { top: 16 } },
       interaction: { mode: 'index', intersect: false },
-      plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } },
+      plugins: { legend: { position: 'bottom', labels: { font: { size: 12 } } } },
       scales: {
-        x: { title: { display: true, text: 'Dia do mês', font: { size: 10 } }, ticks: { font: { size: 9 } } },
-        y: { title: { display: true, text: 'Acumulado', font: { size: 10 } }, beginAtZero: true, ticks: { font: { size: 9 } } }
+        x: { title: { display: true, text: 'Dia do mês', font: { size: 11.5 } }, ticks: { font: { size: 10.5 } } },
+        y: { title: { display: true, text: 'Acumulado', font: { size: 11.5 } }, beginAtZero: true, ticks: { font: { size: 10.5 } } }
       }
     }
   });
