@@ -206,7 +206,6 @@
   details.team-lvl-pessoa > summary{padding:3px 6px;}
   details.team-lvl-pessoa > summary .team-lvl-label{font-weight:600;font-size:10.5px;color:var(--ink);}
 
-  /* NOVO SISTEMA DE GRELHA UNIFICADA PARA A ABA DE EMPREENDIMENTOS */
   .emp-grid-row {
     display: grid;
     grid-template-columns: 1fr 90px 180px 80px;
@@ -643,7 +642,6 @@
       <h3 style="margin:0 0 8px;font-size:12px;color:var(--green-dark);">🏢 Empreendimentos vendidos — Regional › Cidade › Empreendimento › UH</h3>
       <p style="font-size:10px;color:var(--muted);margin:0 0 8px;">Dentro de cada empreendimento, as unidades vendidas aparecem ordenadas por preço.</p>
       
-      <!-- Cabeçalho perfeitamente alinhado por Grid -->
       <div class="emp-grid-row emp-header-row" style="margin-bottom: 4px;">
         <div class="emp-col-nome">Unidade / Empreendimento</div>
         <div class="emp-col-vendas">Vendas</div>
@@ -775,6 +773,9 @@ function getEffectiveGeracaoDate(d, year, month){
   if(d.getFullYear() > year || (d.getFullYear() === year && d.getMonth() > month)){
     return new Date(year, month, daysInMonth(year, month));
   }
+  if(d.getFullYear() < year || (d.getFullYear() === year && d.getMonth() < month)){
+    return new Date(year, month, 1);
+  }
   return d;
 }
 
@@ -821,7 +822,7 @@ async function loadPlanejamento(){
       localStorage.setItem('spi-pdv-pcts-map', JSON.stringify(allPdvPctsByMonth));
       loadMonthSettings();
     }
-  }catch(e){/* se não houver arquivo remoto, mantém o local */}
+  }catch(e){}
 }
 
 function baixarPlanejamento(){
@@ -846,7 +847,7 @@ async function loadMapping(){
       const data = await response.json();
       DEFAULT_MAPPING = data;
     }
-  }catch(e){ /* mantem o mapeamento atual em caso de falha de rede */ }
+  }catch(e){}
 }
 
 async function loadRelacaoGerentes(){
@@ -855,12 +856,9 @@ async function loadRelacaoGerentes(){
     if(response.ok){
       LOJA_GERENTE_MAP = await response.json();
     }
-  }catch(e){ /* mantem o mapeamento atual em caso de falha de rede */ }
+  }catch(e){}
 }
 
-// Converte a lista "achatada" de vendas do historico-gerados.json (um objeto
-// por UH vendida, com GERACAO em DD/MM/AAAA) pro formato agregado que o
-// resto do painel espera: { "AAAA-MM-DD": { CANAL: { EMPREENDIMENTO: qtd } } }.
 function buildHistoricoGeradosFromRecords(records){
   const out = {};
   records.forEach(r=>{
@@ -883,19 +881,13 @@ async function loadHistoricoGerados(){
     const response = await fetch('historico-gerados.json?t=' + new Date().getTime());
     if(response.ok){
       const raw = await response.json();
-      // Aceita tanto o formato novo (lista de vendas, uma por UH) quanto o
-      // formato antigo já agregado por dia/canal/empreendimento.
       HISTORICO_GERADOS = Array.isArray(raw) ? buildHistoricoGeradosFromRecords(raw) : raw;
     }
-  }catch(e){ /* mantem o histórico atual em caso de falha de rede */ }
+  }catch(e){}
 }
 
 let histProjChartInstance = null;
 
-// Plugin do Chart.js que desenha o valor de cada ponto em cima da linha
-// (rótulo de dados). Pra não virar uma poluição visual com 3 linhas x ~30
-// dias, só rotula de 5 em 5 dias + sempre o último ponto de cada linha
-// (assim o total mais recente de cada curva sempre aparece).
 const histChartDataLabelsPlugin = {
   id: 'histChartDataLabels',
   afterDatasetsDraw(chart){
@@ -970,14 +962,6 @@ function cosineSim(a, b){
   return dot / (Math.sqrt(na)*Math.sqrt(nb));
 }
 
-// Com poucos dias de dados no mês atual (ex: dia 1), comparar o "formato" das
-// vendas por similaridade de cosseno não funciona: um vetor de 1 número só
-// sempre dá 100% de parecido com qualquer outro número positivo, então o mês
-// "escolhido" acaba sendo arbitrário e pode ter uma proporção dia1/total bem
-// fora da curva — foi isso que gerou a projeção de 41 vendas com meta de 750.
-// Abaixo desse mínimo de dias, em vez de tentar achar "o mês mais parecido",
-// usamos a MÉDIA de todos os meses do histórico (cada mês normalizado pelo
-// próprio total antes de entrar na média, pra nenhum mês pesar mais que outro).
 const MIN_DIAS_PARA_SIMILARIDADE = 5;
 
 function buildAverageFlightPlan(curYear, curMonth, elapsedDays){
@@ -1000,8 +984,6 @@ function buildAverageFlightPlan(curYear, curMonth, elapsedDays){
   if(curvas.length === 0) return null;
 
   const maxDim = Math.max(...curvas.map(c=>c.dim));
-  // fracPerDay[d] = média, entre os meses do histórico, da fração do mês
-  // vendida naquele dia (vendas do dia d ÷ total daquele mês).
   const fracPerDay = new Array(maxDim+1).fill(0);
   for(let d=1; d<=maxDim; d++){
     let soma = 0, n = 0;
@@ -1017,7 +999,7 @@ function buildAverageFlightPlan(curYear, curMonth, elapsedDays){
   return {
     mesKey: null,
     sim: null,
-    total: fracPerDay.reduce((s,v)=> s+v, 0), // soma das frações médias (~1)
+    total: fracPerDay.reduce((s,v)=> s+v, 0),
     fracAtElapsed: fracPerDay.slice(1, effElapsed+1).reduce((s,v)=>s+v, 0),
     histDaily: fracPerDay,
     dim: maxDim,
@@ -1026,10 +1008,6 @@ function buildAverageFlightPlan(curYear, curMonth, elapsedDays){
   };
 }
 
-// Acha, no histórico, o mês cujo ritmo diário (dia 1 até "elapsedDays") mais
-// se parece com o do mês atual até agora — o "plano de voo" de referência.
-// Se forcedMonthKey vier preenchido (ex: "2026-03"), usa esse mês direto,
-// sem procurar o mais parecido (comparação escolhida manualmente).
 function findClosestFlightPlan(curDaily, elapsedDays, curYear, curMonth, forcedMonthKey){
   const curKey = `${curYear}-${String(curMonth+1).padStart(2,'0')}`;
 
@@ -1082,9 +1060,6 @@ function findClosestFlightPlan(curDaily, elapsedDays, curYear, curMonth, forcedM
   return best;
 }
 
-// Preenche o seletor "Comparar com" com todos os meses que existem no
-// historico-gerados.json (exceto o mês atual), preservando a seleção do
-// usuário quando ainda for válida.
 function populateHistCompareMonthSelect(curKey){
   const sel = document.getElementById('histCompareMonthSelect');
   if(!sel) return;
@@ -1155,13 +1130,6 @@ function renderHistoricoGerados(){
   const curCumElapsed = curDaily.slice(1, elapsedDays+1).reduce((s,v)=>s+v, 0);
   const projectedTotalBruto = best.fracAtElapsed > 0 ? curCumElapsed / best.fracAtElapsed : null;
 
-  // Extrapolar o mês inteiro a partir de pouquíssimos dias é instável por
-  // natureza (1 dia de ruído vira um erro enorme no total projetado — foi
-  // assim que 13 vendas no dia 1 viraram uma projeção de 41, com meta de
-  // 750). Pra isso não acontecer, a projeção pura só entra com força total
-  // depois de PESO_TOTAL_DIAS dias de dados reais; antes disso, ela é
-  // misturada com a meta do mês (que é a melhor estimativa disponível
-  // quando ainda não há dado suficiente pra confiar 100% no histórico).
   const PESO_TOTAL_DIAS = 10;
   const metaTotalParaMix = (lastMonthStats && lastMonthStats.metas)
     ? Object.values(lastMonthStats.metas).reduce((s,v)=> s+(v||0), 0)
@@ -1188,8 +1156,6 @@ function renderHistoricoGerados(){
     projecaoCum.push(projectedTotal ? Math.round(fracAtD * projectedTotal) : null);
   }
 
-  // Planejado = mesmo plano de voo da aba Simulação (soma de todas as SPIs),
-  // acumulado dia a dia — é a curva "oficial" da meta do mês.
   const cumPlano = [];
   let runPlano = 0;
   for(let d=1; d<=lastDay; d++){
@@ -1333,10 +1299,6 @@ function fecharMesAtual(){
 }
 
 function renderHistorico(){
-  // A aba Histórico agora é só o gráfico de projeção + o botão de fechar mês;
-  // o histórico de fechamentos continua sendo salvo em historico/fechamentos.json
-  // (fecharMesAtual usa historicoFechamentos pra não duplicar mês), só não tem
-  // mais tabela/seletor próprios aqui.
   renderHistoricoGerados();
 }
 
