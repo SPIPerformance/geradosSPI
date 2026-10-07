@@ -874,26 +874,17 @@ function buildHistoricoGeradosFromRecords(records){
     out[dateKey][canal][emp] = (out[dateKey][canal][emp] || 0) + 1;
   });
   return out;
-async function loadHistorico(){
-  try{
-    const response = await fetch('fechamentos.json?t=' + new Date().getTime());
-    if(response.ok){
-      const data = await response.json();
-      delete data._comentario;
-      historicoFechamentos = data;
-
-      // Reconstrói HISTORICO_GERADOS a partir dos registros salvos nos fechamentos
-      HISTORICO_GERADOS = {};
-      Object.values(historicoFechamentos).forEach(fech => {
-        if(Array.isArray(fech.registros)){
-          const built = buildHistoricoGeradosFromRecords(fech.registros);
-          Object.assign(HISTORICO_GERADOS, built);
-        }
-      });
-    }
-  }catch(e){ historicoFechamentos = {}; }
 }
 
+async function loadHistoricoGerados(){
+  try{
+    const response = await fetch('historico-gerados.json?t=' + new Date().getTime());
+    if(response.ok){
+      const raw = await response.json();
+      HISTORICO_GERADOS = Array.isArray(raw) ? buildHistoricoGeradosFromRecords(raw) : raw;
+    }
+  }catch(e){}
+}
 
 let histProjChartInstance = null;
 
@@ -1266,56 +1257,13 @@ async function loadHistorico(){
       historicoFechamentos = data;
     }
   }catch(e){ historicoFechamentos = {}; }
+}
+
 function fecharMesAtual(){
   if(!lastMonthStats){
     alert('Carregue o XML do mês antes de fechar o mês.');
     return;
   }
-  const { year, month, perSpiTotal, metas: metasDoMes } = lastMonthStats;
-  const mKey = `${year}-${String(month+1).padStart(2,'0')}`;
-
-  const totalGerados = SPI_KEYS.reduce((s,k)=> s + (perSpiTotal[k]||0), 0);
-  const porSpi = {}; const metasOut = {};
-  SPI_KEYS.forEach(k=>{ porSpi[k] = perSpiTotal[k]||0; metasOut[k] = Number(metasDoMes[k])||0; });
-
-  if(historicoFechamentos[mKey]){
-    const jaTinha = historicoFechamentos[mKey];
-    const confirmMsg = `Já existe um fechamento salvo para ${mKey} `+
-      `(fechado em ${jaTinha.fechadoEm || '—'}, total ${jaTinha.totalGerados ?? '—'}).\n\n`+
-      `Substituir pelos números atuais (total ${totalGerados})?`;
-    if(!confirm(confirmMsg)) return;
-  }
-
-  // Salva os registros completos do XML para reconstruir o histórico depois
-  const registrosDoMes = currentRecords.filter(r => {
-    const d = parseDateBR(r.geracao);
-    return d && d.getFullYear() === year && d.getMonth() === month;
-  }).map(r => ({
-    GERACAO: r.geracao,
-    TIPO_CANAL: r.canal,
-    EMPREENDIMENTO: r.empreendimento
-  }));
-
-  historicoFechamentos[mKey] = {
-    fechadoEm: new Date().toISOString().slice(0,10),
-    totalGerados,
-    porSpi,
-    metas: metasOut,
-    registros: registrosDoMes
-  };
-
-  const blob = new Blob([JSON.stringify(historicoFechamentos, null, 2)], {type:'application/json;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'fechamentos.json';
-  a.click();
-  URL.revokeObjectURL(url);
-
-  renderHistorico();
-  alert(`Mês ${mKey} fechado com ${totalGerados} gerados. Arquivo fechamentos.json baixado — suba ele na raiz do GitHub, SUBSTITUINDO o antigo.`);
-}
-
   const { year, month, perSpiTotal, metas: metasDoMes } = lastMonthStats;
   const mKey = `${year}-${String(month+1).padStart(2,'0')}`;
 
