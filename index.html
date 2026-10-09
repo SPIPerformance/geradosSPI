@@ -809,8 +809,21 @@ function loadMonthSettings(){
     allPdvPctsByMonth = JSON.parse(localStorage.getItem('spi-pdv-pcts-map') || '{}');
   }catch(e){ allPdvPctsByMonth = {}; }
 
-  metas = allMetasByMonth[mKey] || {};
+  // Prioridade da meta: ajuste manual / planejamento.json do mês -> metas-gerados.json
+  // (metas oficiais por mês, usadas principalmente nos meses passados) -> vazio.
+  const mesIso = `${year}-${String(month+1).padStart(2,'0')}`;
+  metas = allMetasByMonth[mKey] || (METAS_GERADOS[mesIso] ? {...METAS_GERADOS[mesIso]} : {});
   pdvPcts = allPdvPctsByMonth[mKey] || {};
+}
+
+// metas-gerados.json: { "AAAA-MM": { SPI1: n, ..., SPI6: n, Sensia: n } }
+// (gerado da planilha metas_gerados.xlsx; Sensia = SENSIA CP + SENSIA RP).
+let METAS_GERADOS = {};
+async function loadMetasGerados(){
+  try{
+    const response = await fetch('metas-gerados.json?t=' + new Date().getTime());
+    if(response.ok) METAS_GERADOS = await response.json();
+  }catch(e){ /* sem o arquivo, mantém o comportamento anterior */ }
 }
 
 async function loadSettings(){
@@ -2721,6 +2734,7 @@ document.getElementById('fileInput').addEventListener('change', e=>{
 
 (async function init(){
   initAnalystLock();
+  await loadMetasGerados();
   await loadSettings();
   await loadPlanejamento();
   await loadMapping();
