@@ -781,8 +781,15 @@ function getMajorityYearMonth(records){
   return { year: parseInt(parts[0]), month: parseInt(parts[1]) };
 }
 
+// Ajusta a data de geração pro mês de referência do painel:
+// - venda de mês ANTERIOR (ex: contrato gerado em 28/08 que veio no XML de
+//   setembro) conta como dia 1 do mês de referência;
+// - venda de mês POSTERIOR (vazou pro mês seguinte) conta no último dia.
 function getEffectiveGeracaoDate(d, year, month){
   if(!d) return d;
+  if(d.getFullYear() < year || (d.getFullYear() === year && d.getMonth() < month)){
+    return new Date(year, month, 1);
+  }
   if(d.getFullYear() > year || (d.getFullYear() === year && d.getMonth() > month)){
     return new Date(year, month, daysInMonth(year, month));
   }
