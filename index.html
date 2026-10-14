@@ -820,7 +820,12 @@ function loadMonthSettings(){
   // Prioridade da meta: ajuste manual / planejamento.json do mês -> metas-gerados.json
   // (metas oficiais por mês, usadas principalmente nos meses passados) -> vazio.
   const mesIso = `${year}-${String(month+1).padStart(2,'0')}`;
-  metas = allMetasByMonth[mKey] || (METAS_GERADOS[mesIso] ? {...METAS_GERADOS[mesIso]} : {});
+  // Começa pelas metas oficiais do mês (metas_gerados.xlsx) e só sobrepõe com o
+  // que foi editado/salvo manualmente SE o valor for maior que zero — um registro
+  // vazio ou zerado salvo antes no navegador não pode mais esconder a meta oficial.
+  metas = METAS_GERADOS[mesIso] ? {...METAS_GERADOS[mesIso]} : {};
+  const manual = allMetasByMonth[mKey] || {};
+  Object.keys(manual).forEach(k=>{ if(Number(manual[k]) > 0) metas[k] = manual[k]; });
   pdvPcts = allPdvPctsByMonth[mKey] || {};
 }
 
@@ -829,6 +834,7 @@ function loadMonthSettings(){
 // { "AAAA-MM": { SPI1: n, ..., SPI6: n, Sensia: n } } (Sensia = SENSIA CP + SENSIA RP).
 // Se o .xlsx não puder ser lido, usa metas-gerados.json como reserva.
 let METAS_GERADOS = {};
+let METAS_STATUS = 'não carregado';
 
 function parseMetasGeradosXlsx(arrayBuffer){
   const MESES = {jan:1,fev:2,mar:3,abr:4,mai:5,jun:6,jul:7,ago:8,set:9,out:10,nov:11,dez:12};
@@ -857,13 +863,14 @@ async function loadMetasGerados(){
     const resp = await fetch('metas_gerados.xlsx?t=' + new Date().getTime());
     if(resp.ok && typeof XLSX !== 'undefined'){
       const parsed = parseMetasGeradosXlsx(await resp.arrayBuffer());
-      if(Object.keys(parsed).length > 0){ METAS_GERADOS = parsed; return; }
+      if(Object.keys(parsed).length > 0){ METAS_GERADOS = parsed; METAS_STATUS = 'xlsx'; return; }
     }
   }catch(e){ /* cai na reserva em JSON */ }
   try{
     const resp = await fetch('metas-gerados.json?t=' + new Date().getTime());
-    if(resp.ok) METAS_GERADOS = await resp.json();
+    if(resp.ok){ METAS_GERADOS = await resp.json(); METAS_STATUS = 'json'; }
   }catch(e){ /* sem metas históricas */ }
+  if(METAS_STATUS === 'não carregado') console.warn('metas_gerados.xlsx / metas-gerados.json não foram encontrados no repositório.');
 }
 
 async function loadSettings(){
@@ -1989,7 +1996,11 @@ function updateVerMesBanner(){
   if(modoHistoricoMes){
     const [y,m] = modoHistoricoMes.split('-').map(Number);
     banner.style.display = 'inline-block';
-    banner.textContent = `Exibindo ${HIST_GER_MES_NOMES[m-1]}/${y} do histórico — só o Painel Executivo está disponível (sem status, loja, gerente, cidade ou preço).`;
+    const temMeta = Object.values(metas || {}).some(v=>Number(v)>0);
+    banner.textContent = `Exibindo ${HIST_GER_MES_NOMES[m-1]}/${y} do histórico — só o Painel Executivo está disponível (sem status, loja, gerente, cidade ou preço).` +
+      (temMeta ? '' : (METAS_STATUS === 'não carregado'
+        ? ' ⚠ Meta zerada: o arquivo metas_gerados.xlsx não foi encontrado no GitHub (suba na raiz do repositório).'
+        : ' ⚠ Meta zerada: não há meta cadastrada pra esse mês no metas_gerados.xlsx.'));
   } else {
     banner.style.display = 'none';
     banner.textContent = '';
