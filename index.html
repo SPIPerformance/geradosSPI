@@ -5,6 +5,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <title>Diretoria SPI — Gerados Diário</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root{
     --green-dark: #006B3F;
@@ -823,14 +824,46 @@ function loadMonthSettings(){
   pdvPcts = allPdvPctsByMonth[mKey] || {};
 }
 
-// metas-gerados.json: { "AAAA-MM": { SPI1: n, ..., SPI6: n, Sensia: n } }
-// (gerado da planilha metas_gerados.xlsx; Sensia = SENSIA CP + SENSIA RP).
+// Metas oficiais por mês, lidas direto da planilha metas_gerados.xlsx (aba "metas":
+// DataBaseTexto | RegionalComercial | # Vendas Planejado). Resultado:
+// { "AAAA-MM": { SPI1: n, ..., SPI6: n, Sensia: n } } (Sensia = SENSIA CP + SENSIA RP).
+// Se o .xlsx não puder ser lido, usa metas-gerados.json como reserva.
 let METAS_GERADOS = {};
+
+function parseMetasGeradosXlsx(arrayBuffer){
+  const MESES = {jan:1,fev:2,mar:3,abr:4,mai:5,jun:6,jul:7,ago:8,set:9,out:10,nov:11,dez:12};
+  const REG = {'SP INT 1':'SPI1','SP INT 2':'SPI2','SP INT 3':'SPI3','SP INT 4':'SPI4','SP INT 5':'SPI5','SP INT 6':'SPI6','SENSIA CP':'Sensia','SENSIA RP':'Sensia'};
+  const wb = XLSX.read(arrayBuffer, {type:'array'});
+  const ws = wb.Sheets[wb.SheetNames[0]];
+  const linhas = XLSX.utils.sheet_to_json(ws, {header:1, raw:true, defval:null});
+  const out = {};
+  linhas.forEach(r=>{
+    if(!r || typeof r[0] !== 'string') return;
+    const m = r[0].trim().toLowerCase().match(/^([a-zç]{3})\/(\d{4})$/);
+    if(!m || !MESES[m[1]]) return;
+    const spi = REG[String(r[1]||'').trim().toUpperCase()];
+    const val = Number(r[2]);
+    if(!spi || !isFinite(val)) return;
+    const key = `${m[2]}-${String(MESES[m[1]]).padStart(2,'0')}`;
+    out[key] = out[key] || {};
+    out[key][spi] = (out[key][spi] || 0) + val;
+  });
+  Object.keys(out).forEach(k=>{ Object.keys(out[k]).forEach(spi=>{ out[k][spi] = Math.round(out[k][spi]); }); });
+  return out;
+}
+
 async function loadMetasGerados(){
   try{
-    const response = await fetch('metas-gerados.json?t=' + new Date().getTime());
-    if(response.ok) METAS_GERADOS = await response.json();
-  }catch(e){ /* sem o arquivo, mantém o comportamento anterior */ }
+    const resp = await fetch('metas_gerados.xlsx?t=' + new Date().getTime());
+    if(resp.ok && typeof XLSX !== 'undefined'){
+      const parsed = parseMetasGeradosXlsx(await resp.arrayBuffer());
+      if(Object.keys(parsed).length > 0){ METAS_GERADOS = parsed; return; }
+    }
+  }catch(e){ /* cai na reserva em JSON */ }
+  try{
+    const resp = await fetch('metas-gerados.json?t=' + new Date().getTime());
+    if(resp.ok) METAS_GERADOS = await resp.json();
+  }catch(e){ /* sem metas históricas */ }
 }
 
 async function loadSettings(){
