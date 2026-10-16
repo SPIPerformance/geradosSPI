@@ -2775,7 +2775,7 @@ function drawChart(labels, plano, gerados){
   const w = rect.width > 50 ? rect.width : 550;
   const h = rect.height > 50 ? rect.height : 340;
 
-  const padL = 34, padR = 16, padT = 44, padB = 68; // folga em cima/embaixo pros rótulos empilhados
+  const padL = 34, padR = 16, padT = 44, padB = 68;
   const cW = w - padL - padR;
   const cH = h - padT - padB;
 
@@ -2815,16 +2815,9 @@ function drawChart(labels, plano, gerados){
     svg += `<path d="${geradosPath}" fill="none" stroke="#FF8B22" stroke-width="2.5"/>`;
   }
 
-  // ---- Rótulos de dados: TODOS os pontos, sem sobreposição ----
-  // A linha mais alta de cada dia põe o rótulo em cima do ponto e a mais baixa
-  // embaixo, então os rótulos das duas linhas se afastam um do outro. Quando dois
-  // rótulos vizinhos da mesma linha se encostam (tela estreita), o seguinte sobe/
-  // desce um "andar" (zigue-zague), até 3 andares, em vez de ser escondido.
-  const BH = 15, GAP = 6, STEP = BH + 2, MARGIN = 2;
-  const minY = 1, maxY = h - 22; // acima do eixo dos dias
-  const placed = [];
-  const overlaps = (p, q) => !(p.x1 + MARGIN <= q.x0 || q.x1 + MARGIN <= p.x0 || p.y1 + MARGIN <= q.y0 || q.y1 + MARGIN <= p.y0);
-  const hits = box => placed.reduce((n, p) => n + (overlaps(box, p) ? 1 : 0), 0);
+  // ---- Rótulos de dados: organizados em intervalos, sem "zigue-zague" ----
+  const BH = 15, GAP = 6;
+  const minY = 1, maxY = h - 22;
 
   const series = [
     { data: plano,   fill: '#5a6e63', opacity: 0.88, dot: '#7c8c82', r: 2   },
@@ -2839,13 +2832,27 @@ function drawChart(labels, plano, gerados){
   });
 
   const drawn = [];
+  const placed = [];
+  const overlaps = (p, q) => !(p.x1 + 2 <= q.x0 || q.x1 + 2 <= p.x0 || p.y1 + 2 <= q.y0 || q.y1 + 2 <= p.y0);
+
+  // Encontra o último índice válido para cada curva
+  const lastIdxs = series.map(sr => {
+    let last = -1;
+    for(let i = n - 1; i >= 0; i--) { if(sr.data[i] !== null && sr.data[i] !== undefined) { last = i; break; } }
+    return last;
+  });
+
   for(let i = 0; i < n; i++){
     const pv = plano[i], gv = gerados[i];
     series.forEach((sr, si) => {
       const val = sr.data[i];
       if(val === null || val === undefined) return;
+
+      // Mostra rótulo apenas de 5 em 5 dias ou no último dia da curva
+      const isMilestone = (i % 5 === 0) || (i === lastIdxs[si]);
+      if (!isMilestone) return;
+
       const other = si === 0 ? gv : pv;
-      // lado preferido: a linha mais alta (menor y) fica em cima; empate -> Real em cima
       let up;
       if(other === null || other === undefined) up = (si === 0);
       else if(val === other) up = (si === 1);
@@ -2854,23 +2861,23 @@ function drawChart(labels, plano, gerados){
       const x = getX(i), y = getY(val);
       const label = String(val);
       const bw = label.length * 6.6 + 7;
-      const opts = [];
-      [up, !up].forEach(dirUp => {
-        for(let lv = 0; lv < 3; lv++){
-          opts.push(dirUp ? y - GAP - BH - lv*STEP : y + GAP + lv*STEP);
-        }
-      });
-      let best = null, bestHits = Infinity;
-      for(const by of opts){
-        const box = { x0: x - bw/2, x1: x + bw/2, y0: by, y1: by + BH };
-        if(box.y0 < minY || box.y1 > maxY) continue;
-        const hc = hits(box);
-        if(hc === 0){ best = box; bestHits = 0; break; }
-        if(hc < bestHits){ best = box; bestHits = hc; }
+
+      let box = { x0: x - bw/2, x1: x + bw/2, y0: up ? y - GAP - BH : y + GAP, y1: 0 };
+      box.y1 = box.y0 + BH;
+
+      // Se houver conflito com a outra curva no mesmo dia, inverte o lado do rótulo
+      if (placed.some(p => overlaps(box, p))) {
+          up = !up;
+          box.y0 = up ? y - GAP - BH : y + GAP;
+          box.y1 = box.y0 + BH;
       }
-      if(!best) best = { x0: x - bw/2, x1: x + bw/2, y0: Math.max(minY, Math.min(maxY - BH, up ? y - GAP - BH : y + GAP)), y1: 0 }, best.y1 = best.y0 + BH;
-      placed.push(best);
-      drawn.push({ box: best, label, sr });
+      
+      // Limita a exibição dentro da área do gráfico
+      if (box.y0 < minY) { box.y0 = minY; box.y1 = box.y0 + BH; }
+      if (box.y1 > maxY) { box.y1 = maxY; box.y0 = box.y1 - BH; }
+
+      placed.push(box);
+      drawn.push({ box, label, sr });
     });
   }
 
