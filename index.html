@@ -920,11 +920,37 @@ async function loadMapping(){
   }catch(e){ /* mantem o mapeamento atual em caso de falha de rede */ }
 }
 
+function normRegionalRelacao(txt){
+  const t = String(txt||'').trim().toUpperCase();
+  let m = t.match(/^SP\s*INT\s*(\d)$/);
+  if(m) return 'SPI' + m[1];
+  if(t.startsWith('SENSIA')) return 'Sensia';
+  if(/^SPI\s*\d$/.test(t)) return t.replace(/\s+/g,'');
+  return t || null;
+}
+
+function buildLojaGerenteMapFromList(lista){
+  const out = {};
+  lista.forEach(row=>{
+    const loja = row.LOJA || row.loja;
+    if(!loja) return;
+    out[normLoja(loja)] = {
+      regional: normRegionalRelacao(row.REGIONAL || row.regional),
+      gerente: String(row.GERENTE || row.gerente || 'SEM GERENTE').trim(),
+      loja: String(loja).trim()
+    };
+  });
+  return out;
+}
+
 async function loadRelacaoGerentes(){
   try{
     const response = await fetch('relacao-gerentes-lojas.json?t=' + new Date().getTime());
     if(response.ok){
-      LOJA_GERENTE_MAP = await response.json();
+      const raw = await response.json();
+      // Aceita o formato novo (lista: REGIONAL "SP INT 3" | LOJA | GERENTE) e o antigo
+      // (objeto já indexado pela loja, com regional "SPI3").
+      LOJA_GERENTE_MAP = Array.isArray(raw) ? buildLojaGerenteMapFromList(raw) : raw;
     }
   }catch(e){ /* mantem o mapeamento atual em caso de falha de rede */ }
 }
@@ -949,16 +975,82 @@ function buildHistoricoGeradosFromRecords(records){
   return out;
 }
 
-async function loadHistoricoGerados(){
-  try{
-    const response = await fetch('historico-gerados.json?t=' + new Date().getTime());
-    if(response.ok){
-      const raw = await response.json();
-      // Aceita tanto o formato novo (lista de vendas, uma por UH) quanto o
-      // formato antigo já agregado por dia/canal/empreendimento.
-      HISTORICO_GERADOS = Array.isArray(raw) ? buildHistoricoGeradosFromRecords(raw) : raw;
+let HISTORICO_REGISTROS = [];
+
+// Lê o historico_gerados.xlsx direto (aba com cabeçalho: DataAssinaturaContratoSalesforce |
+// NomeImovel | NomeEmpreendimento | NomeGerente | CanalLoja | NomeCorretor | # Vendas).
+// Também aceita o layout simples: DESCRICAO_PRODUTO | EMPREENDIMENTO | TIPO_CANAL | GERACAO.
+function parseHistoricoGeradosXlsx(arrayBuffer){
+  const wb = XLSX.read(arrayBuffer, {type:'array', cellDates:true});
+  const norm = t => String(t==null?'':t).trim().toUpperCase();
+  const fmtData = v => {
+    if(v instanceof Date && !isNaN(v)){
+      return `${String(v.getUTCDate()).padStart(2,'0')}/${String(v.getUTCMonth()+1).padStart(2,'0')}/${v.getUTCFullYear()}`;
     }
-  }catch(e){ /* mantem o histórico atual em caso de falha de rede */ }
+    return String(v==null?'':v).trim();
+  };
+  const out = [];
+  for(const nome of wb.SheetNames){
+    const linhas = XLSX.utils.sheet_to_json(wb.Sheets[nome], {header:1, raw:true, defval:null});
+    let h = -1, col = {};
+    for(let i=0; i<Math.min(linhas.length, 30); i++){
+      const c = {};
+      (linhas[i]||[]).forEach((v,j)=>{
+        const t = norm(v);
+        if(t==='DATAASSINATURACONTRATOSALESFORCE' || t==='GERACAO') c.data = j;
+        else if(t==='NOMEIMOVEL' || t==='DESCRICAO_PRODUTO') c.desc = j;
+        else if(t==='NOMEEMPREENDIMENTO' || t==='EMPREENDIMENTO') c.emp = j;
+        else if(t==='NOMEGERENTE' || t==='GERENTE') c.ger = j;
+        else if(t==='CANALLOJA' || t==='TIPO_CANAL') c.canal = j;
+        else if(t==='NOMECORRETOR' || t==='CORRETOR') c.cor = j;
+        else if(t==='# VENDAS') c.qtd = j;
+      });
+      if(c.data !== undefined && c.emp !== undefined){ h = i; col = c; break; }
+    }
+    if(h < 0) continue;
+    for(let i=h+1; i<linhas.length; i++){
+      const r = linhas[i]; if(!r) continue;
+      const data = fmtData(r[col.data]);
+      if(!/^\d{2}\/\d{2}\/\d{4}$/.test(data)) continue; // pula "Total Geral" e linhas vazias
+      const emp = String(r[col.emp]||'').trim(); if(!emp) continue;
+      const rec = {
+        DESCRICAO_PRODUTO: col.desc!==undefined ? String(r[col.desc]||'').trim() : '',
+        EMPREENDIMENTO: emp,
+        TIPO_CANAL: col.canal!==undefined ? norm(r[col.canal]) : '',
+        GERACAO: data,
+        GERENTE: col.ger!==undefined ? String(r[col.ger]||'').trim() : '',
+        CORRETOR: col.cor!==undefined ? String(r[col.cor]||'').trim() : ''
+      };
+      const q = col.qtd!==undefined ? Math.max(1, Math.round(Number(r[col.qtd])||1)) : 1;
+      for(let k=0; k<q; k++) out.push(rec);
+    }
+    if(out.length) break;
+  }
+  return out;
+}
+
+async function loadHistoricoGerados(){
+  let raw = null;
+  // 1) planilha Excel (fonte principal)
+  try{
+    const resp = await fetch('historico_gerados.xlsx?t=' + new Date().getTime());
+    if(resp.ok && typeof XLSX !== 'undefined'){
+      const lista = parseHistoricoGeradosXlsx(await resp.arrayBuffer());
+      if(lista.length > 0) raw = lista;
+    }
+  }catch(e){ /* tenta a reserva em JSON */ }
+  // 2) reserva: historico-gerados.json
+  if(!raw){
+    try{
+      const resp = await fetch('historico-gerados.json?t=' + new Date().getTime());
+      if(resp.ok) raw = await resp.json();
+    }catch(e){ /* mantém o histórico atual em caso de falha de rede */ }
+  }
+  if(!raw) return;
+  // Aceita lista de vendas (uma por UH) ou o formato antigo já agregado por dia/canal/empreendimento.
+  HISTORICO_GERADOS = Array.isArray(raw) ? buildHistoricoGeradosFromRecords(raw) : raw;
+  // Guarda também a lista bruta (com GERENTE/CORRETOR) pras abas Gerentes e Empreendimentos.
+  HISTORICO_REGISTROS = Array.isArray(raw) ? raw : [];
 }
 
 let histProjChartInstance = null;
@@ -1421,8 +1513,45 @@ function normLoja(s){
     .replace(/\s+/g,' ');
 }
 
+// Regional de cada gerente, deduzida da relação de lojas (a regional mais frequente
+// entre as lojas dele). Usada nos meses do histórico, que não têm a coluna LOJA.
+let _gerenteRegionalCache = null, _gerenteRegionalSrc = null;
+function getGerenteRegionalMap(){
+  if(_gerenteRegionalCache && _gerenteRegionalSrc === LOJA_GERENTE_MAP) return _gerenteRegionalCache;
+  const cont = {};
+  Object.values(LOJA_GERENTE_MAP).forEach(v=>{
+    const g = (v.gerente||'').trim().toUpperCase();
+    if(!g || g === 'SEM GERENTE' || !v.regional) return;
+    cont[g] = cont[g] || {};
+    cont[g][v.regional] = (cont[g][v.regional]||0) + 1;
+  });
+  const out = {};
+  Object.keys(cont).forEach(g=>{
+    out[g] = Object.entries(cont[g]).sort((a,b)=>b[1]-a[1])[0][0];
+  });
+  _gerenteRegionalCache = out; _gerenteRegionalSrc = LOJA_GERENTE_MAP;
+  return out;
+}
+
 function resolvePersonAndRegional(r, personField){
   const personRaw = (r[personField]||'').trim();
+
+  // Registro vindo do histórico (sem LOJA): mesma lógica do XML, mas a regional
+  // vem do gerente (ou, sem gerente, do empreendimento via de-para de SPI).
+  if(r.historico){
+    const gerente = (r.superior||'').trim();
+    const gerenteVazio = !gerente || gerente.toUpperCase()==='SEM GERENTE';
+    const regional = (!gerenteVazio && getGerenteRegionalMap()[gerente.toUpperCase()]) || resolveSpi(r.empreendimento) || null;
+    let displayName;
+    if(personField === 'superior'){
+      displayName = gerenteVazio ? 'SEM GERENTE' : gerente;
+    } else {
+      const vazio = !personRaw || personRaw.toUpperCase()==='SEM GERENTE';
+      displayName = vazio ? 'SEM GERENTE' : personRaw;
+    }
+    return { regional, displayName };
+  }
+
   const lojaInfo = LOJA_GERENTE_MAP[normLoja(r.loja)];
 
   if(lojaInfo){
@@ -1471,7 +1600,7 @@ function buildTeamTree(records, year, month, lastDay){
     const gerenteNode = canalBucket[gerenteName];
     gerenteNode.counts[w]++;
 
-    const venda = { empreendimento: r.empreendimento || '(sem empreendimento)', loja: r.loja || '(sem loja)' };
+    const venda = { empreendimento: r.empreendimento || '(sem empreendimento)', loja: r.loja || (r.historico ? '' : '(sem loja)') };
 
     if(r.canal === 'IMOB'){
       const { displayName: supName } = resolvePersonAndRegional(r, 'corretor');
@@ -1498,7 +1627,7 @@ function renderPessoaNode(name, count, items, levelClass){
   });
   const leaves = Object.values(agg).sort((a,b)=> b.count - a.count);
   const leavesHtml = leaves.map(l =>
-    `<li><span>${l.empreendimento} <span class="team-tree-loja">— ${l.loja}</span></span>${l.count>1 ? ` <b>(${l.count})</b>` : ''}</li>`
+    `<li><span>${l.empreendimento}${l.loja ? ` <span class="team-tree-loja">— ${l.loja}</span>` : ''}</span>${l.count>1 ? ` <b>(${l.count})</b>` : ''}</li>`
   ).join('');
   const semGerenteCls = name === 'SEM GERENTE' ? ' team-sem-gerente' : '';
   const label = name === 'SEM GERENTE' ? '⚠️ SEM GERENTE' : name;
@@ -1618,13 +1747,6 @@ function getWeeksRangeLabel(year, month, weekIndices, lastDay){
 function renderTeamTab(){
   const emptyMsg = document.getElementById('teamEmptyMsg');
   const sectionsWrap = document.getElementById('teamSectionsWrap');
-  if(modoHistoricoMes){
-    emptyMsg.style.display = 'block';
-    emptyMsg.innerHTML = '<h2>Não disponível pra meses do histórico</h2><p>O historico-gerados.json só guarda empreendimento, canal e data — sem loja, corretor ou gerente. Volte pra "Ver mês: Atual" e carregue o XML do mês pra ver essa aba.</p>';
-    sectionsWrap.style.display = 'none';
-    document.getElementById('teamWeekRange').textContent = '';
-    return;
-  }
   if(currentRecords.length === 0){
     emptyMsg.style.display = 'block';
     emptyMsg.innerHTML = '<h2>Nenhum dado carregado ainda</h2><p>Carregue o XML do mês para ver os números por gerente/supervisor.</p>';
@@ -1944,31 +2066,46 @@ function switchTab(tab){
 // Gerentes & Supervisores e Empreendimentos mostram um aviso nesse modo.
 function buildSyntheticRecordsFromHistorico(mesKey){
   const records = [];
+  // cidade por empreendimento, aproveitada do XML atual (o histórico não tem cidade)
+  const cidadePorEmp = {};
+  (liveRecords||[]).forEach(r=>{ if(r.cidade && !cidadePorEmp[r.empreendimento]) cidadePorEmp[r.empreendimento] = r.cidade; });
+
+  if(HISTORICO_REGISTROS.length > 0){
+    HISTORICO_REGISTROS.forEach(h=>{
+      const dataStr = h.GERACAO || '';
+      const p = dataStr.split('/');
+      if(p.length !== 3 || `${p[2]}-${p[1]}` !== mesKey) return;
+      const emp = h.EMPREENDIMENTO || '(sem empreendimento)';
+      records.push({
+        empreendimento: emp,
+        loja: '',
+        geracao: dataStr,
+        status: 'Ativo', // o histórico não guarda status; assume venda já consolidada
+        canal: (h.TIPO_CANAL || '').toUpperCase(),
+        corretor: (h.CORRETOR || '').trim(),
+        superior: (h.GERENTE || '').trim(),
+        regional: '',
+        cidade: cidadePorEmp[emp] || '',
+        descricaoProduto: h.DESCRICAO_PRODUTO || '',
+        valorProposta: 0,
+        valorDesconto: 0,
+        isEmCash: false,
+        historico: true,
+        semPreco: true
+      });
+    });
+    return records;
+  }
+
+  // Reserva: arquivo antigo já agregado (sem gerente/corretor/UH)
   Object.keys(HISTORICO_GERADOS).forEach(dateKey=>{
     if(dateKey.slice(0,7) !== mesKey) return;
     const [y,m,d] = dateKey.split('-');
-    const geracaoBR = `${d}/${m}/${y}`;
     const canalObj = HISTORICO_GERADOS[dateKey];
     Object.keys(canalObj).forEach(canal=>{
-      const empObj = canalObj[canal];
-      Object.keys(empObj).forEach(emp=>{
-        const qtd = empObj[emp];
-        for(let i=0; i<qtd; i++){
-          records.push({
-            empreendimento: emp,
-            loja: '',
-            geracao: geracaoBR,
-            status: 'Ativo', // o histórico não guarda status; assume venda já consolidada
-            canal: canal,
-            corretor: '',
-            superior: '',
-            regional: '',
-            cidade: '',
-            descricaoProduto: '',
-            valorProposta: 0,
-            valorDesconto: 0,
-            isEmCash: false
-          });
+      Object.keys(canalObj[canal]).forEach(emp=>{
+        for(let i=0; i<canalObj[canal][emp]; i++){
+          records.push({ empreendimento: emp, loja:'', geracao:`${d}/${m}/${y}`, status:'Ativo', canal, corretor:'', superior:'', regional:'', cidade: cidadePorEmp[emp]||'', descricaoProduto:'', valorProposta:0, valorDesconto:0, isEmCash:false, historico:true, semPreco:true });
         }
       });
     });
@@ -1997,7 +2134,7 @@ function updateVerMesBanner(){
     const [y,m] = modoHistoricoMes.split('-').map(Number);
     banner.style.display = 'inline-block';
     const temMeta = Object.values(metas || {}).some(v=>Number(v)>0);
-    banner.textContent = `Exibindo ${HIST_GER_MES_NOMES[m-1]}/${y} do histórico — só o Painel Executivo está disponível (sem status, loja, gerente, cidade ou preço).` +
+    banner.textContent = `Exibindo ${HIST_GER_MES_NOMES[m-1]}/${y} do histórico — sem status, loja, preço e EmCash (o histórico não traz essas colunas).` +
       (temMeta ? '' : (METAS_STATUS === 'não carregado'
         ? ' ⚠ Meta zerada: o arquivo metas_gerados.xlsx não foi encontrado no GitHub (suba na raiz do repositório).'
         : ' ⚠ Meta zerada: não há meta cadastrada pra esse mês no metas_gerados.xlsx.'));
@@ -2042,18 +2179,6 @@ function renderEmpreendimentosTab(){
   const emptyMsg = document.getElementById('empEmptyMsg');
   const treeWrap = document.getElementById('empTreeWrap');
 
-  if(modoHistoricoMes){
-    emptyMsg.style.display = 'block';
-    emptyMsg.innerHTML = '<h2>Não disponível pra meses do histórico</h2><p>O historico-gerados.json não guarda cidade nem preço (VALOR_DA_PROPOSTA) — só empreendimento, canal e data. Volte pra "Ver mês: Atual" e carregue o XML do mês pra ver essa aba.</p>';
-    treeWrap.style.display = 'none';
-    document.getElementById('empKpiMedia').textContent = '—';
-    document.getElementById('empKpiMeta').textContent = fmtBRL(META_PRECO_PROPOSTA);
-    document.getElementById('empKpiGap').textContent = '—';
-    document.getElementById('empKpiCount').textContent = '—';
-    document.getElementById('empKpiEmCash').textContent = '—';
-    return;
-  }
-
   if(currentRecords.length === 0){
     emptyMsg.style.display = 'block';
     emptyMsg.innerHTML = '<h2>Nenhum dado carregado ainda</h2><p>Carregue o XML do mês para ver os empreendimentos vendidos.</p>';
@@ -2073,16 +2198,19 @@ function renderEmpreendimentosTab(){
     return d && d.getFullYear()===year && d.getMonth()===month;
   });
 
+  const semPreco = monthRecords.length > 0 && monthRecords.every(r=>r.semPreco);
+  const fmtP = v => semPreco ? '—' : fmtBRL(v);
+  const fmtC = n => semPreco ? '—' : n;
   const somaLiquida = monthRecords.reduce((s,r)=> s + (r.valorProposta - r.valorDesconto), 0);
   const mediaLiquida = monthRecords.length ? somaLiquida / monthRecords.length : 0;
 
   const countEmCash = monthRecords.filter(r=>r.isEmCash).length;
   const pctEmCash = monthRecords.length ? (countEmCash/monthRecords.length*100) : 0;
 
-  document.getElementById('empKpiMedia').textContent = fmtBRL(mediaLiquida);
+  document.getElementById('empKpiMedia').textContent = fmtP(mediaLiquida);
   document.getElementById('empKpiMeta').textContent = fmtBRL(META_PRECO_PROPOSTA);
   document.getElementById('empKpiCount').textContent = monthRecords.length.toLocaleString('pt-BR');
-  document.getElementById('empKpiEmCash').textContent = `${countEmCash} (${pctEmCash.toFixed(1).replace('.',',')}%)`;
+  document.getElementById('empKpiEmCash').textContent = semPreco ? '—' : `${countEmCash} (${pctEmCash.toFixed(1).replace('.',',')}%)`;
 
   const tree = {};
   monthRecords.forEach(r=>{
@@ -2124,7 +2252,7 @@ function renderEmpreendimentosTab(){
 
       emps.forEach(emp=>{
         const data = empsObj[emp];
-        const itemsSorted = [...data.items].sort((a,b)=>a.precoLiquido-b.precoLiquido);
+        const itemsSorted = [...data.items].sort((a,b)=> semPreco ? a.desc.localeCompare(b.desc,'pt-BR',{numeric:true}) : a.precoLiquido-b.precoLiquido);
         const count = itemsSorted.length;
         const emCashCount = itemsSorted.filter(it=>it.emCash).length;
         const soma = itemsSorted.reduce((s,it)=>s+it.precoLiquido, 0);
@@ -2137,20 +2265,20 @@ function renderEmpreendimentosTab(){
           `<div class="emp-unit-row">
              <div class="emp-unit-desc">${it.desc}</div>
              <div class="emp-unit-vendas">1</div>
-             <div class="emp-unit-val">${fmtBRL(it.precoLiquido)}</div>
+             <div class="emp-unit-val">${fmtP(it.precoLiquido)}</div>
              <div class="emp-unit-emcash">${it.emCash ? '<span class="emp-emcash-dot" title="EmCash"></span>' : '<span class="emp-emcash-empty"></span>'}</div>
            </div>`
         ).join('');
 
-        cidHtml += `<details class="team-lvl-pessoa emp-node emp-item"><summary><span class="team-lvl-label">${emp}</span><span class="emp-col-vendas">${count}</span><span class="emp-col-preco">${fmtBRL(media)}</span><span class="emp-col-emcash">${emCashCount}</span></summary><div>${itemsHtml}</div></details>`;
+        cidHtml += `<details class="team-lvl-pessoa emp-node emp-item"><summary><span class="team-lvl-label">${emp}</span><span class="emp-col-vendas">${count}</span><span class="emp-col-preco">${fmtP(media)}</span><span class="emp-col-emcash">${fmtC(emCashCount)}</span></summary><div>${itemsHtml}</div></details>`;
       });
 
       const cidMedia = cidCount ? cidSoma/cidCount : 0;
-      regHtml += `<details class="team-lvl-canal emp-node emp-cid"><summary><span class="team-lvl-label">${cid}</span><span class="emp-col-vendas">${cidCount}</span><span class="emp-col-preco">${fmtBRL(cidMedia)}</span><span class="emp-col-emcash">${cidEmCashCount}</span></summary>${cidHtml}</details>`;
+      regHtml += `<details class="team-lvl-canal emp-node emp-cid"><summary><span class="team-lvl-label">${cid}</span><span class="emp-col-vendas">${cidCount}</span><span class="emp-col-preco">${fmtP(cidMedia)}</span><span class="emp-col-emcash">${fmtC(cidEmCashCount)}</span></summary>${cidHtml}</details>`;
     });
 
     const regMedia = regCount ? regSoma/regCount : 0;
-    html += `<details class="team-lvl-regional emp-node emp-reg"><summary><span class="team-lvl-label">${reg}</span><span class="emp-col-vendas">${regCount}</span><span class="emp-col-preco">${fmtBRL(regMedia)}</span><span class="emp-col-emcash">${regEmCashCount}</span></summary>${regHtml}</details>`;
+    html += `<details class="team-lvl-regional emp-node emp-reg"><summary><span class="team-lvl-label">${reg}</span><span class="emp-col-vendas">${regCount}</span><span class="emp-col-preco">${fmtP(regMedia)}</span><span class="emp-col-emcash">${fmtC(regEmCashCount)}</span></summary>${regHtml}</details>`;
   });
 
   document.getElementById('empTree').innerHTML = html || '<div class="team-empty-msg">Nenhuma venda encontrada neste mês.</div>';
