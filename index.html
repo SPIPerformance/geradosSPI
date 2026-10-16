@@ -117,7 +117,7 @@
 
   .chart-card{padding:6px 10px 2px;position:relative;display:flex;flex-direction:column;min-width:0;}
   .chart-card h3{margin:0 0 2px;font-size:11.5px;color:var(--ink);font-weight:700;}
-  .chart-wrap{flex:1;min-height:240px;min-width:0;position:relative;}
+  .chart-wrap{flex:1;min-height:340px;min-width:0;position:relative;}
 
   .grid-bottom{display:grid;grid-template-columns:minmax(0, 1fr) minmax(260px, 340px);gap:6px;}
   .matrix-card{padding:6px 10px;overflow-x:auto; -webkit-overflow-scrolling:touch;min-width:0;}
@@ -2773,9 +2773,9 @@ function drawChart(labels, plano, gerados){
 
   const rect = wrap.getBoundingClientRect();
   const w = rect.width > 50 ? rect.width : 550;
-  const h = rect.height > 50 ? rect.height : 240;
+  const h = rect.height > 50 ? rect.height : 340;
 
-  const padL = 34, padR = 16, padT = 18, padB = 28;
+  const padL = 34, padR = 16, padT = 44, padB = 68; // folga em cima/embaixo pros rótulos empilhados
   const cW = w - padL - padR;
   const cH = h - padT - padB;
 
@@ -2815,20 +2815,20 @@ function drawChart(labels, plano, gerados){
     svg += `<path d="${geradosPath}" fill="none" stroke="#FF8B22" stroke-width="2.5"/>`;
   }
 
-  // ---- Rótulos de dados sem sobreposição ----
-  // Todos os pontos ganham a bolinha; o rótulo só é desenhado se couber sem
-  // encostar em outro rótulo já posicionado. Ordem de prioridade: último ponto
-  // de cada linha (total atual), depois da direita pra esquerda. Cada rótulo
-  // tenta primeiro a posição preferida (Planejado em cima, Real embaixo), depois
-  // a oposta e posições mais afastadas.
-  const BH = 15, GAP = 6, MARGIN = 2;
-  const plotBottom = padT + cH + 4;
+  // ---- Rótulos de dados: TODOS os pontos, sem sobreposição ----
+  // A linha mais alta de cada dia põe o rótulo em cima do ponto e a mais baixa
+  // embaixo, então os rótulos das duas linhas se afastam um do outro. Quando dois
+  // rótulos vizinhos da mesma linha se encostam (tela estreita), o seguinte sobe/
+  // desce um "andar" (zigue-zague), até 3 andares, em vez de ser escondido.
+  const BH = 15, GAP = 6, STEP = BH + 2, MARGIN = 2;
+  const minY = 1, maxY = h - 22; // acima do eixo dos dias
   const placed = [];
-  const overlaps = (a, b) => !(a.x1 + MARGIN <= b.x0 || b.x1 + MARGIN <= a.x0 || a.y1 + MARGIN <= b.y0 || b.y1 + MARGIN <= a.y0);
+  const overlaps = (p, q) => !(p.x1 + MARGIN <= q.x0 || q.x1 + MARGIN <= p.x0 || p.y1 + MARGIN <= q.y0 || q.y1 + MARGIN <= p.y0);
+  const hits = box => placed.reduce((n, p) => n + (overlaps(box, p) ? 1 : 0), 0);
 
   const series = [
-    { data: plano,   fill: '#5a6e63', opacity: 0.88, dot: '#7c8c82', r: 2,   prefer: 'up'   },
-    { data: gerados, fill: '#FF8B22', opacity: 0.92, dot: '#FF8B22', r: 2.5, prefer: 'down' }
+    { data: plano,   fill: '#5a6e63', opacity: 0.88, dot: '#7c8c82', r: 2   },
+    { data: gerados, fill: '#FF8B22', opacity: 0.92, dot: '#FF8B22', r: 2.5 }
   ];
 
   series.forEach(sr => {
@@ -2838,36 +2838,41 @@ function drawChart(labels, plano, gerados){
     });
   });
 
-  const cands = [];
-  series.forEach((sr, si) => {
-    let last = -1;
-    sr.data.forEach((v, i) => { if(v !== null && v !== undefined) last = i; });
-    sr.data.forEach((val, i) => {
-      if(val === null || val === undefined) return;
-      cands.push({ si, i, val, prio: i === last ? 0 : 1 });
-    });
-  });
-  cands.sort((p, q) => (p.prio - q.prio) || (q.i - p.i) || (p.si - q.si));
-
   const drawn = [];
-  cands.forEach(c => {
-    const sr = series[c.si];
-    const x = getX(c.i), y = getY(c.val);
-    const label = String(c.val);
-    const bw = label.length * 6.6 + 7;
-    const up1 = y - GAP - BH, down1 = y + GAP;
-    const ys = sr.prefer === 'up'
-      ? [up1, down1, up1 - BH - 3, down1 + BH + 3]
-      : [down1, up1, down1 + BH + 3, up1 - BH - 3];
-    for(const by of ys){
-      const box = { x0: x - bw/2, x1: x + bw/2, y0: by, y1: by + BH };
-      if(box.x0 < 0 || box.x1 > w || box.y0 < 1 || box.y1 > plotBottom) continue;
-      if(placed.some(p => overlaps(box, p))) continue;
-      placed.push(box);
-      drawn.push({ box, label, sr });
-      break;
-    }
-  });
+  for(let i = 0; i < n; i++){
+    const pv = plano[i], gv = gerados[i];
+    series.forEach((sr, si) => {
+      const val = sr.data[i];
+      if(val === null || val === undefined) return;
+      const other = si === 0 ? gv : pv;
+      // lado preferido: a linha mais alta (menor y) fica em cima; empate -> Real em cima
+      let up;
+      if(other === null || other === undefined) up = (si === 0);
+      else if(val === other) up = (si === 1);
+      else up = val > other;
+
+      const x = getX(i), y = getY(val);
+      const label = String(val);
+      const bw = label.length * 6.6 + 7;
+      const opts = [];
+      [up, !up].forEach(dirUp => {
+        for(let lv = 0; lv < 3; lv++){
+          opts.push(dirUp ? y - GAP - BH - lv*STEP : y + GAP + lv*STEP);
+        }
+      });
+      let best = null, bestHits = Infinity;
+      for(const by of opts){
+        const box = { x0: x - bw/2, x1: x + bw/2, y0: by, y1: by + BH };
+        if(box.y0 < minY || box.y1 > maxY) continue;
+        const hc = hits(box);
+        if(hc === 0){ best = box; bestHits = 0; break; }
+        if(hc < bestHits){ best = box; bestHits = hc; }
+      }
+      if(!best) best = { x0: x - bw/2, x1: x + bw/2, y0: Math.max(minY, Math.min(maxY - BH, up ? y - GAP - BH : y + GAP)), y1: 0 }, best.y1 = best.y0 + BH;
+      placed.push(best);
+      drawn.push({ box: best, label, sr });
+    });
+  }
 
   drawn.forEach(d => {
     svg += `<rect x="${d.box.x0.toFixed(1)}" y="${d.box.y0.toFixed(1)}" width="${(d.box.x1 - d.box.x0).toFixed(1)}" height="${BH}" rx="2" ry="2" fill="${d.sr.fill}" opacity="${d.sr.opacity}"/>`;
