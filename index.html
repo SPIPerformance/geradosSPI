@@ -2775,13 +2775,13 @@ function drawChart(labels, plano, gerados){
   const w = rect.width > 50 ? rect.width : 550;
   const h = rect.height > 50 ? rect.height : 340;
 
-  const padL = 34, padR = 16, padT = 44, padB = 68;
+  const padL = 34, padR = 16, padT = 30, padB = 26; // Adjusted paddings
   const cW = w - padL - padR;
   const cH = h - padT - padB;
 
   let maxVal = 5;
   [...plano, ...gerados].forEach(v => { if(v !== null && v > maxVal) maxVal = v; });
-  maxVal = Math.ceil(maxVal * 1.15);
+  maxVal = Math.ceil(maxVal * 1.10); // 10% headroom
 
   const n = labels.length;
   const getX = (i) => padL + (n > 1 ? (i / (n - 1)) * cW : cW / 2);
@@ -2815,13 +2815,11 @@ function drawChart(labels, plano, gerados){
     svg += `<path d="${geradosPath}" fill="none" stroke="#FF8B22" stroke-width="2.5"/>`;
   }
 
-  // ---- Rótulos de dados: organizados em intervalos, sem "zigue-zague" ----
-  const BH = 15, GAP = 6;
-  const minY = 1, maxY = h - 22;
-
+  // Exact replication of the image's label logic
+  const BH = 14, GAP = 4;
   const series = [
-    { data: plano,   fill: '#5a6e63', opacity: 0.88, dot: '#7c8c82', r: 2   },
-    { data: gerados, fill: '#FF8B22', opacity: 0.92, dot: '#FF8B22', r: 2.5 }
+    { data: plano,   fill: '#7c8c82', dot: '#7c8c82', r: 2.5, up: true },
+    { data: gerados, fill: '#FF8B22', dot: '#FF8B22', r: 2.5, up: false }
   ];
 
   series.forEach(sr => {
@@ -2832,58 +2830,31 @@ function drawChart(labels, plano, gerados){
   });
 
   const drawn = [];
-  const placed = [];
-  const overlaps = (p, q) => !(p.x1 + 2 <= q.x0 || q.x1 + 2 <= p.x0 || p.y1 + 2 <= q.y0 || q.y1 + 2 <= p.y0);
-
-  // Encontra o último índice válido para cada curva
-  const lastIdxs = series.map(sr => {
-    let last = -1;
-    for(let i = n - 1; i >= 0; i--) { if(sr.data[i] !== null && sr.data[i] !== undefined) { last = i; break; } }
-    return last;
-  });
-
   for(let i = 0; i < n; i++){
-    const pv = plano[i], gv = gerados[i];
-    series.forEach((sr, si) => {
+    series.forEach((sr) => {
       const val = sr.data[i];
       if(val === null || val === undefined) return;
 
-      // Mostra rótulo apenas de 5 em 5 dias ou no último dia da curva
-      const isMilestone = (i % 5 === 0) || (i === lastIdxs[si]);
-      if (!isMilestone) return;
-
-      const other = si === 0 ? gv : pv;
-      let up;
-      if(other === null || other === undefined) up = (si === 0);
-      else if(val === other) up = (si === 1);
-      else up = val > other;
-
       const x = getX(i), y = getY(val);
       const label = String(val);
-      const bw = label.length * 6.6 + 7;
+      const bw = label.length * 6 + 7; // tight width just like the image
 
-      let box = { x0: x - bw/2, x1: x + bw/2, y0: up ? y - GAP - BH : y + GAP, y1: 0 };
+      let box = {
+        x0: x - bw/2,
+        x1: x + bw/2,
+        y0: sr.up ? y - GAP - BH : y + GAP,
+        y1: 0
+      };
       box.y1 = box.y0 + BH;
 
-      // Se houver conflito com a outra curva no mesmo dia, inverte o lado do rótulo
-      if (placed.some(p => overlaps(box, p))) {
-          up = !up;
-          box.y0 = up ? y - GAP - BH : y + GAP;
-          box.y1 = box.y0 + BH;
-      }
-      
-      // Limita a exibição dentro da área do gráfico
-      if (box.y0 < minY) { box.y0 = minY; box.y1 = box.y0 + BH; }
-      if (box.y1 > maxY) { box.y1 = maxY; box.y0 = box.y1 - BH; }
-
-      placed.push(box);
       drawn.push({ box, label, sr });
     });
   }
 
   drawn.forEach(d => {
-    svg += `<rect x="${d.box.x0.toFixed(1)}" y="${d.box.y0.toFixed(1)}" width="${(d.box.x1 - d.box.x0).toFixed(1)}" height="${BH}" rx="2" ry="2" fill="${d.sr.fill}" opacity="${d.sr.opacity}"/>`;
-    svg += `<text x="${((d.box.x0 + d.box.x1)/2).toFixed(1)}" y="${(d.box.y0 + BH - 3.5).toFixed(1)}" fill="#ffffff" font-size="11" font-weight="700" font-family="Verdana,Arial,sans-serif" text-anchor="middle">${d.label}</text>`;
+    // stroke="#ffffff" stroke-width="1.5" creates the visual separation seen in the image when boxes touch
+    svg += `<rect x="${d.box.x0.toFixed(1)}" y="${d.box.y0.toFixed(1)}" width="${(d.box.x1 - d.box.x0).toFixed(1)}" height="${BH}" rx="2" ry="2" fill="${d.sr.fill}" stroke="#ffffff" stroke-width="1.5"/>`;
+    svg += `<text x="${((d.box.x0 + d.box.x1)/2).toFixed(1)}" y="${(d.box.y0 + BH - 3.5).toFixed(1)}" fill="#ffffff" font-size="10" font-weight="700" font-family="Verdana,Arial,sans-serif" text-anchor="middle">${d.label}</text>`;
   });
 
   labels.forEach((lbl, i) => {
