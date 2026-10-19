@@ -117,7 +117,7 @@
 
   .chart-card{padding:6px 10px 2px;position:relative;display:flex;flex-direction:column;min-width:0;}
   .chart-card h3{margin:0 0 2px;font-size:11.5px;color:var(--ink);font-weight:700;}
-  .chart-wrap{flex:1;min-height:340px;min-width:0;position:relative;}
+  .chart-wrap{flex:1;min-height:300px;min-width:0;position:relative;}
 
   .grid-bottom{display:grid;grid-template-columns:minmax(0, 1fr) minmax(260px, 340px);gap:6px;}
   .matrix-card{padding:6px 10px;overflow-x:auto; -webkit-overflow-scrolling:touch;min-width:0;}
@@ -2773,15 +2773,15 @@ function drawChart(labels, plano, gerados){
 
   const rect = wrap.getBoundingClientRect();
   const w = rect.width > 50 ? rect.width : 550;
-  const h = rect.height > 50 ? rect.height : 340;
+  const h = rect.height > 50 ? rect.height : 300;
 
-  const padL = 34, padR = 16, padT = 30, padB = 26; // Adjusted paddings
+  const padL = 34, padR = 16, padT = 26, padB = 48; // folga pros rótulos de cima/de baixo
   const cW = w - padL - padR;
   const cH = h - padT - padB;
 
   let maxVal = 5;
   [...plano, ...gerados].forEach(v => { if(v !== null && v > maxVal) maxVal = v; });
-  maxVal = Math.ceil(maxVal * 1.10); // 10% headroom
+  maxVal = Math.ceil(maxVal * 1.15);
 
   const n = labels.length;
   const getX = (i) => padL + (n > 1 ? (i / (n - 1)) * cW : cW / 2);
@@ -2815,11 +2815,22 @@ function drawChart(labels, plano, gerados){
     svg += `<path d="${geradosPath}" fill="none" stroke="#FF8B22" stroke-width="2.5"/>`;
   }
 
-  // Exact replication of the image's label logic
-  const BH = 14, GAP = 4;
+  // ---- Rótulos de dados (todos os pontos) ----
+  // Regra simples, ponto a ponto: a linha que estiver mais alta naquele dia põe o
+  // rótulo EM CIMA do ponto e a mais baixa põe EMBAIXO — então os rótulos das duas
+  // linhas sempre se afastam. Se uma linha está acima da outra, o rótulo dela sobe;
+  // se inverter, inverte também. Em telas estreitas a fonte do rótulo diminui
+  // sozinha pra ele caber no espaço entre um dia e o próximo.
+  const BH = 15, GAP = 6;
+  const spacing = n > 1 ? cW / (n - 1) : cW;
+  const maxLen = Math.max(1, ...[...plano, ...gerados].filter(v => v !== null && v !== undefined).map(v => String(v).length));
+  const fontSize = Math.max(7, Math.min(11, (spacing - 3 - 6) / (maxLen * 0.62)));
+  const bh = Math.round(BH * fontSize / 11);
+  const labelW = txt => txt.length * 0.62 * fontSize + 6;
+
   const series = [
-    { data: plano,   fill: '#7c8c82', dot: '#7c8c82', r: 2.5, up: true },
-    { data: gerados, fill: '#FF8B22', dot: '#FF8B22', r: 2.5, up: false }
+    { data: plano,   fill: '#5a6e63', opacity: 0.88, dot: '#7c8c82', r: 2   },
+    { data: gerados, fill: '#FF8B22', opacity: 0.92, dot: '#FF8B22', r: 2.5 }
   ];
 
   series.forEach(sr => {
@@ -2829,32 +2840,22 @@ function drawChart(labels, plano, gerados){
     });
   });
 
-  const drawn = [];
-  for(let i = 0; i < n; i++){
-    series.forEach((sr) => {
-      const val = sr.data[i];
+  series.forEach((sr, si) => {
+    sr.data.forEach((val, i) => {
       if(val === null || val === undefined) return;
+      const other = (si === 0 ? gerados : plano)[i];
+      let up;
+      if(other === null || other === undefined) up = (si === 0);   // sozinho: Planejado em cima, Real embaixo
+      else if(val === other) up = (si === 1);                      // empate: Real em cima
+      else up = val > other;                                       // mais alta -> em cima
 
       const x = getX(i), y = getY(val);
       const label = String(val);
-      const bw = label.length * 6 + 7; // tight width just like the image
-
-      let box = {
-        x0: x - bw/2,
-        x1: x + bw/2,
-        y0: sr.up ? y - GAP - BH : y + GAP,
-        y1: 0
-      };
-      box.y1 = box.y0 + BH;
-
-      drawn.push({ box, label, sr });
+      const bw = labelW(label);
+      const by = up ? y - GAP - bh : y + GAP;
+      svg += `<rect x="${(x - bw/2).toFixed(1)}" y="${by.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh}" rx="2" ry="2" fill="${sr.fill}" opacity="${sr.opacity}"/>`;
+      svg += `<text x="${x.toFixed(1)}" y="${(by + bh - bh*0.24).toFixed(1)}" fill="#ffffff" font-size="${fontSize.toFixed(1)}" font-weight="700" font-family="Verdana,Arial,sans-serif" text-anchor="middle">${label}</text>`;
     });
-  }
-
-  drawn.forEach(d => {
-    // stroke="#ffffff" stroke-width="1.5" creates the visual separation seen in the image when boxes touch
-    svg += `<rect x="${d.box.x0.toFixed(1)}" y="${d.box.y0.toFixed(1)}" width="${(d.box.x1 - d.box.x0).toFixed(1)}" height="${BH}" rx="2" ry="2" fill="${d.sr.fill}" stroke="#ffffff" stroke-width="1.5"/>`;
-    svg += `<text x="${((d.box.x0 + d.box.x1)/2).toFixed(1)}" y="${(d.box.y0 + BH - 3.5).toFixed(1)}" fill="#ffffff" font-size="10" font-weight="700" font-family="Verdana,Arial,sans-serif" text-anchor="middle">${d.label}</text>`;
   });
 
   labels.forEach((lbl, i) => {
