@@ -985,7 +985,12 @@ function parseHistoricoGeradosXlsx(arrayBuffer){
   const norm = t => String(t==null?'':t).trim().toUpperCase();
   const fmtData = v => {
     if(v instanceof Date && !isNaN(v)){
-      return `${String(v.getUTCDate()).padStart(2,'0')}/${String(v.getUTCMonth()+1).padStart(2,'0')}/${v.getUTCFullYear()}`;
+      const d = new Date(v.getTime() + 12*3600*1000); // +12h: o mesmo dia em qualquer fuso
+      return `${String(d.getUTCDate()).padStart(2,'0')}/${String(d.getUTCMonth()+1).padStart(2,'0')}/${d.getUTCFullYear()}`;
+    }
+    if(typeof v === 'number' && v > 30000 && v < 80000){ // data serial do Excel
+      const d = new Date(Math.round((v - 25569) * 86400 * 1000));
+      return `${String(d.getUTCDate()).padStart(2,'0')}/${String(d.getUTCMonth()+1).padStart(2,'0')}/${d.getUTCFullYear()}`;
     }
     return String(v==null?'':v).trim();
   };
@@ -1029,24 +1034,31 @@ function parseHistoricoGeradosXlsx(arrayBuffer){
   return out;
 }
 
+let HISTORICO_STATUS = 'não carregado';
+
 async function loadHistoricoGerados(){
   let raw = null;
+  const diag = [];
   // 1) planilha Excel (fonte principal)
   try{
     const resp = await fetch('historico_gerados.xlsx?t=' + new Date().getTime());
-    if(resp.ok && typeof XLSX !== 'undefined'){
+    if(!resp.ok){ diag.push(`historico_gerados.xlsx não encontrado (HTTP ${resp.status})`); }
+    else if(typeof XLSX === 'undefined'){ diag.push('biblioteca de Excel (SheetJS) não carregou'); }
+    else{
       const lista = parseHistoricoGeradosXlsx(await resp.arrayBuffer());
-      if(lista.length > 0) raw = lista;
+      if(lista.length > 0){ raw = lista; HISTORICO_STATUS = `Excel: ${lista.length} vendas`; }
+      else diag.push('historico_gerados.xlsx lido, mas sem linhas reconhecidas (cabeçalho/datas)');
     }
-  }catch(e){ /* tenta a reserva em JSON */ }
+  }catch(e){ diag.push('erro lendo o Excel: ' + (e && e.message ? e.message : e)); }
   // 2) reserva: historico-gerados.json
   if(!raw){
     try{
       const resp = await fetch('historico-gerados.json?t=' + new Date().getTime());
-      if(resp.ok) raw = await resp.json();
-    }catch(e){ /* mantém o histórico atual em caso de falha de rede */ }
+      if(resp.ok){ raw = await resp.json(); HISTORICO_STATUS = `JSON (reserva): ${Array.isArray(raw)?raw.length+' vendas':'formato agregado'}`; }
+      else diag.push(`historico-gerados.json não encontrado (HTTP ${resp.status})`);
+    }catch(e){ diag.push('erro lendo o JSON: ' + (e && e.message ? e.message : e)); }
   }
-  if(!raw) return;
+  if(!raw){ HISTORICO_STATUS = 'FALHOU — ' + diag.join(' | '); console.warn(HISTORICO_STATUS); return; }
   // Aceita lista de vendas (uma por UH) ou o formato antigo já agregado por dia/canal/empreendimento.
   HISTORICO_GERADOS = Array.isArray(raw) ? buildHistoricoGeradosFromRecords(raw) : raw;
   // Guarda também a lista bruta (com GERENTE/CORRETOR) pras abas Gerentes e Empreendimentos.
@@ -1278,6 +1290,9 @@ function renderHistoricoGerados(){
   const semXml = !currentRecords || currentRecords.length === 0;
   if(semHistorico || semXml){
     emptyEl.style.display = 'block';
+    emptyEl.innerHTML = semHistorico
+      ? 'Não consegui carregar o histórico. <b>Diagnóstico:</b> ' + HISTORICO_STATUS + '. Suba o <code>historico_gerados.xlsx</code> na raiz do repositório.'
+      : 'Carregue o XML do mês atual pra ver a projeção.';
     if(controlsEl) controlsEl.style.display = 'none';
     summaryEl.textContent = '';
     if(histProjChartInstance){ histProjChartInstance.destroy(); histProjChartInstance = null; }
