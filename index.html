@@ -1002,7 +1002,7 @@ function parseHistoricoGeradosXlsx(arrayBuffer){
       const c = {};
       (linhas[i]||[]).forEach((v,j)=>{
         const t = norm(v);
-        if(t==='DATAASSINATURACONTRATOSALESFORCE' || t==='GERACAO') c.data = j;
+        if(t==='DATACRIACAOOPORTUNIDADE' || t==='GERACAO') c.data = j;
         else if(t==='NOMEIMOVEL' || t==='DESCRICAO_PRODUTO') c.desc = j;
         else if(t==='NOMEEMPREENDIMENTO' || t==='EMPREENDIMENTO') c.emp = j;
         else if(t==='NOMEGERENTE' || t==='GERENTE') c.ger = j;
