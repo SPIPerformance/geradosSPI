@@ -1,14 +1,14 @@
 {
   "2026-10": {
-    "fechadoEm": "2026-11-03",
-    "totalGerados": 723,
+    "fechadoEm": "2026-11-12",
+    "totalGerados": 683,
     "porSpi": {
-      "SPI1": 162,
-      "SPI2": 75,
-      "SPI3": 102,
-      "SPI4": 111,
-      "SPI5": 144,
-      "SPI6": 114,
+      "SPI1": 153,
+      "SPI2": 72,
+      "SPI3": 100,
+      "SPI4": 106,
+      "SPI5": 132,
+      "SPI6": 105,
       "Sensia": 15
     },
     "metas": {
