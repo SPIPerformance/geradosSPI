@@ -1002,7 +1002,7 @@ function parseHistoricoGeradosXlsx(arrayBuffer){
       const c = {};
       (linhas[i]||[]).forEach((v,j)=>{
         const t = norm(v);
-        if(t==='DATACRIACAOOPORTUNIDADE' || t==='GERACAO') c.data = j;
+        if(t==='DATACRIACAOOPORTUNIDADE' || t==='DATAASSINATURACONTRATOSALESFORCE' || t==='GERACAO') c.data = j;
         else if(t==='NOMEIMOVEL' || t==='DESCRICAO_PRODUTO') c.desc = j;
         else if(t==='NOMEEMPREENDIMENTO' || t==='EMPREENDIMENTO') c.emp = j;
         else if(t==='NOMEGERENTE' || t==='GERENTE') c.ger = j;
@@ -1471,6 +1471,23 @@ async function loadHistorico(){
   }catch(e){ historicoFechamentos = {}; }
 }
 
+// Meses fechados que trazem "registros" (detalhe das vendas) viram fonte do histórico
+// pros meses que o historico_gerados.xlsx ainda não cobre — assim cada fechamento
+// acumula e o mês aparece em "Ver mês" e na projeção sem precisar atualizar a planilha.
+function mergeFechamentosIntoHistorico(){
+  if(HISTORICO_REGISTROS.length === 0 && Object.keys(HISTORICO_GERADOS).length > 0) return; // histórico no formato agregado
+  const mesDe = h => { const p = String(h.GERACAO||'').split('/'); return p.length === 3 ? `${p[2]}-${p[1]}` : ''; };
+  const jaTem = new Set(HISTORICO_REGISTROS.map(mesDe));
+  let novos = [];
+  Object.keys(historicoFechamentos).forEach(k=>{
+    const reg = historicoFechamentos[k] && historicoFechamentos[k].registros;
+    if(Array.isArray(reg) && reg.length > 0 && !jaTem.has(k)) novos = novos.concat(reg);
+  });
+  if(novos.length === 0) return;
+  HISTORICO_REGISTROS = HISTORICO_REGISTROS.concat(novos);
+  HISTORICO_GERADOS = buildHistoricoGeradosFromRecords(HISTORICO_REGISTROS);
+}
+
 function fecharMesAtual(){
   if(modoHistoricoMes){
     alert('Você está vendo um mês do histórico. Volte pra "Ver mês: Atual (XML carregado)" antes de fechar o mês, senão o fechamento seria gravado com dados incompletos do histórico.');
@@ -1487,6 +1504,12 @@ function fecharMesAtual(){
   const porSpi = {}; const metasOut = {};
   SPI_KEYS.forEach(k=>{ porSpi[k] = perSpiTotal[k]||0; metasOut[k] = Number(metasDoMes[k])||0; });
 
+  // Proteção: se o fechamentos.json do GitHub não foi lido (ou está vazio), o arquivo
+  // baixado teria só este mês e, ao subir, apagaria os fechamentos anteriores.
+  if(Object.keys(historicoFechamentos).length === 0){
+    if(!confirm('Não consegui ler o historico/fechamentos.json do GitHub (ou ele está vazio).\n\nO arquivo baixado vai conter SOMENTE ' + mKey + ' — se você subir ele no lugar do antigo, os meses anteriores serão apagados.\n\nContinuar mesmo assim?')) return;
+  }
+
   if(historicoFechamentos[mKey]){
     const jaTinha = historicoFechamentos[mKey];
     const confirmMsg = `Já existe um fechamento salvo para ${mKey} `+
@@ -1495,14 +1518,40 @@ function fecharMesAtual(){
     if(!confirm(confirmMsg)) return;
   }
 
+  // registros = uma linha por venda do mês, tirada do XML carregado (mesma regra de
+  // data do painel: venda de mês anterior entra como dia 1, de mês posterior como último dia).
+  // Isso faz o fechamentos.json acumular o detalhe de cada mês — é o que permite abrir o mês
+  // depois em "Ver mês" (Gerentes, Empreendimentos, preço, EmCash) mesmo sem o XML antigo.
+  const fmtBR = d => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  const registros = [];
+  currentRecords.forEach(r=>{
+    const d = getEffectiveGeracaoDate(parseDateBR(r.geracao), year, month);
+    if(!d || d.getFullYear()!==year || d.getMonth()!==month) return;
+    registros.push({
+      DESCRICAO_PRODUTO: r.descricaoProduto || '',
+      EMPREENDIMENTO: r.empreendimento || '',
+      TIPO_CANAL: r.canal || '',
+      GERACAO: fmtBR(d),
+      GERENTE: r.superior || '',
+      CORRETOR: r.corretor || '',
+      LOJA: r.loja || '',
+      CIDADE: r.cidade || '',
+      STATUS: r.status || '',
+      VALOR_DA_PROPOSTA: r.valorProposta || 0,
+      VALOR_TOTAL_PARCELA_DESCONTO: r.valorDesconto || 0,
+      EMCASH: !!r.isEmCash
+    });
+  });
+
   historicoFechamentos[mKey] = {
     fechadoEm: new Date().toISOString().slice(0,10),
     totalGerados,
     porSpi,
-    metas: metasOut
+    metas: metasOut,
+    registros
   };
 
-  const blob = new Blob([JSON.stringify(historicoFechamentos, null, 2)], {type:'application/json;charset=utf-8'});
+  const blob = new Blob([JSON.stringify(historicoFechamentos, null, 1)], {type:'application/json;charset=utf-8'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -1511,7 +1560,7 @@ function fecharMesAtual(){
   URL.revokeObjectURL(url);
 
   renderHistorico();
-  alert(`Mês ${mKey} fechado com ${totalGerados} gerados. Arquivo fechamentos.json baixado — suba ele em historico/ no GitHub, SUBSTITUINDO o antigo (mesmo nome de arquivo), pra não duplicar o mês.`);
+  alert(`Mês ${mKey} fechado com ${totalGerados} gerados (${registros.length} vendas detalhadas). Arquivo fechamentos.json baixado — suba ele em historico/ no GitHub, SUBSTITUINDO o antigo (mesmo nome de arquivo), pra não duplicar o mês.`);
 }
 
 function renderHistorico(){
@@ -1967,18 +2016,70 @@ async function hashText(text){
   }
 }
 
-async function updateFileStatusFromRemote(xmlText){
-  const hash = await hashText(xmlText);
-  const storedHash = localStorage.getItem('spi-xml-hash');
-  let storedTime = localStorage.getItem('spi-xml-updated-at');
+// ---- "Atualizado em": última vez que o XML foi anexado (commitado) no GitHub ----
+// Antes mostrava a hora em que o painel foi aberto neste navegador. Agora vem do
+// GitHub: 1) data do último commit que alterou o arquivo do XML (API pública do GitHub);
+// 2) se a API falhar, o cabeçalho Last-Modified da resposta do XML; 3) o último valor
+// conhecido guardado no navegador. Se o painel NÃO estiver hospedado em *.github.io
+// (domínio próprio), preencha GITHUB_REPO_OVERRIDE com 'usuario/repositorio'.
+const XML_REMOTE_NAME = '{DEDBD38E-D54E-DF11-AD89-001B78B9D994}';
+const GITHUB_REPO_OVERRIDE = '';
 
-  if(hash !== storedHash || !storedTime){
-    storedTime = new Date().toISOString();
-    localStorage.setItem('spi-xml-hash', hash);
-    localStorage.setItem('spi-xml-updated-at', storedTime);
+function detectGithubRepoInfo(){
+  const segs = (location.pathname || '/').split('/').filter(Boolean);
+  const host = location.hostname || '';
+  const temExt = t => /\.[a-z0-9]+$/i.test(t);
+  let repo = GITHUB_REPO_OVERRIDE || null;
+  let dirSegs = [];
+  if(!repo){
+    if(!host.endsWith('.github.io')) return null;
+    const owner = host.split('.')[0];
+    if(segs.length > 0 && !temExt(segs[0])){
+      repo = `${owner}/${segs[0]}`;
+      dirSegs = segs.slice(1);
+    } else {
+      repo = `${owner}/${owner}.github.io`;
+      dirSegs = segs;
+    }
+  } else {
+    dirSegs = segs;
   }
+  if(dirSegs.length && temExt(dirSegs[dirSegs.length-1])) dirSegs = dirSegs.slice(0, -1); // tira o index.html
+  return { repo, dir: dirSegs.length ? dirSegs.join('/') + '/' : '' };
+}
 
-  lastUploadMeta = { uploadedAt: storedTime };
+async function fetchXmlGithubCommitDate(){
+  let info = null;
+  try{ info = detectGithubRepoInfo(); }catch(e){ return null; }
+  if(!info) return null;
+  for(const nome of [XML_REMOTE_NAME, XML_REMOTE_NAME + '.xml']){
+    try{
+      const url = `https://api.github.com/repos/${info.repo}/commits?path=${encodeURIComponent(info.dir + nome)}&per_page=1`;
+      const r = await fetch(url, { headers: { 'Accept': 'application/vnd.github+json' } });
+      if(!r.ok) continue;
+      const arr = await r.json();
+      if(Array.isArray(arr) && arr.length && arr[0].commit){
+        const c = arr[0].commit;
+        return (c.committer && c.committer.date) || (c.author && c.author.date) || null;
+      }
+    }catch(e){ /* tenta o próximo nome / cai no Last-Modified */ }
+  }
+  return null;
+}
+
+async function updateFileStatusFromRemote(xmlText, response){
+  let iso = await fetchXmlGithubCommitDate();
+  if(!iso && response && response.headers && response.headers.get){
+    const lm = response.headers.get('Last-Modified');
+    const d = lm ? new Date(lm) : null;
+    if(d && !isNaN(d)) iso = d.toISOString();
+  }
+  if(iso){
+    try{ localStorage.setItem('spi-xml-updated-at', iso); }catch(e){}
+  } else {
+    iso = localStorage.getItem('spi-xml-updated-at'); // último valor conhecido
+  }
+  lastUploadMeta = iso ? { uploadedAt: iso } : null;
   updateFileStatus();
 }
 
@@ -2093,20 +2194,20 @@ function buildSyntheticRecordsFromHistorico(mesKey){
       const emp = h.EMPREENDIMENTO || '(sem empreendimento)';
       records.push({
         empreendimento: emp,
-        loja: '',
+        loja: (h.LOJA || '').trim(),
         geracao: dataStr,
-        status: 'Ativo', // o histórico não guarda status; assume venda já consolidada
+        status: h.STATUS || 'Ativo', // planilha de histórico não guarda status; fechamento novo guarda
         canal: (h.TIPO_CANAL || '').toUpperCase(),
         corretor: (h.CORRETOR || '').trim(),
         superior: (h.GERENTE || '').trim(),
         regional: '',
-        cidade: cidadePorEmp[emp] || '',
+        cidade: h.CIDADE || cidadePorEmp[emp] || '',
         descricaoProduto: h.DESCRICAO_PRODUTO || '',
-        valorProposta: 0,
-        valorDesconto: 0,
-        isEmCash: false,
-        historico: true,
-        semPreco: true
+        valorProposta: Number(h.VALOR_DA_PROPOSTA) || 0,
+        valorDesconto: Number(h.VALOR_TOTAL_PARCELA_DESCONTO) || 0,
+        isEmCash: !!h.EMCASH,
+        historico: !h.LOJA,                       // com loja, segue o mesmo caminho do XML
+        semPreco: h.VALOR_DA_PROPOSTA === undefined || h.VALOR_DA_PROPOSTA === null
       });
     });
     return records;
@@ -2149,7 +2250,10 @@ function updateVerMesBanner(){
     const [y,m] = modoHistoricoMes.split('-').map(Number);
     banner.style.display = 'inline-block';
     const temMeta = Object.values(metas || {}).some(v=>Number(v)>0);
-    banner.textContent = `Exibindo ${HIST_GER_MES_NOMES[m-1]}/${y} do histórico — sem status, loja, preço e EmCash (o histórico não traz essas colunas).` +
+    const completo = currentRecords.length > 0 && currentRecords.every(r=>!r.semPreco);
+    banner.textContent = (completo
+      ? `Exibindo ${HIST_GER_MES_NOMES[m-1]}/${y} (mês fechado, com o detalhe completo das vendas).`
+      : `Exibindo ${HIST_GER_MES_NOMES[m-1]}/${y} do histórico — sem status, loja, preço e EmCash (o histórico não traz essas colunas).`) +
       (temMeta ? '' : (METAS_STATUS === 'não carregado'
         ? ' ⚠ Meta zerada: o arquivo metas_gerados.xlsx não foi encontrado no GitHub (suba na raiz do repositório).'
         : ' ⚠ Meta zerada: não há meta cadastrada pra esse mês no metas_gerados.xlsx.'));
@@ -2951,14 +3055,15 @@ document.getElementById('fileInput').addEventListener('change', e=>{
   await loadMapping();
   await loadRelacaoGerentes();
   await loadHistoricoGerados();
-  populateVerMesSelect();
   await loadHistorico();
+  mergeFechamentosIntoHistorico();
+  populateVerMesSelect();
 
   try {
-    const response = await fetch('{DEDBD38E-D54E-DF11-AD89-001B78B9D994}?t=' + new Date().getTime());
+    const response = await fetch(XML_REMOTE_NAME + '?t=' + new Date().getTime());
     if (response.ok) {
       currentXmlText = await response.text();
-      await updateFileStatusFromRemote(currentXmlText);
+      await updateFileStatusFromRemote(currentXmlText, response);
     }
   } catch(e) {}
 
