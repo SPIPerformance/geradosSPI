@@ -1460,15 +1460,31 @@ function renderHistoricoGerados(){
   });
 }
 
+let FECHAMENTOS_STATUS = 'não carregado';
+
+// Lê o fechamentos.json. Procura em historico/fechamentos.json (local combinado) e,
+// se não achar, em fechamentos.json na raiz. Guarda em FECHAMENTOS_STATUS o motivo
+// da falha (arquivo não encontrado, JSON inválido...) pra aparecer no aviso de fechamento.
 async function loadHistorico(){
-  try{
-    const response = await fetch('historico/fechamentos.json?t=' + new Date().getTime());
-    if(response.ok){
+  const tentativas = ['historico/fechamentos.json', 'fechamentos.json'];
+  const diag = [];
+  for(const caminho of tentativas){
+    try{
+      const response = await fetch(caminho + '?t=' + new Date().getTime());
+      if(!response.ok){ diag.push(`${caminho}: HTTP ${response.status}`); continue; }
       const data = await response.json();
+      if(!data || typeof data !== 'object' || Array.isArray(data)){ diag.push(`${caminho}: formato inesperado`); continue; }
       delete data._comentario;
       historicoFechamentos = data;
+      FECHAMENTOS_STATUS = `${caminho}: ${Object.keys(data).length} mês(es) lido(s)`;
+      return;
+    }catch(e){
+      diag.push(`${caminho}: ${e && e.message ? e.message : e}`);
     }
-  }catch(e){ historicoFechamentos = {}; }
+  }
+  historicoFechamentos = {};
+  FECHAMENTOS_STATUS = 'FALHOU — ' + diag.join(' | ');
+  console.warn(FECHAMENTOS_STATUS);
 }
 
 // Meses fechados que trazem "registros" (detalhe das vendas) viram fonte do histórico
@@ -1507,7 +1523,7 @@ function fecharMesAtual(){
   // Proteção: se o fechamentos.json do GitHub não foi lido (ou está vazio), o arquivo
   // baixado teria só este mês e, ao subir, apagaria os fechamentos anteriores.
   if(Object.keys(historicoFechamentos).length === 0){
-    if(!confirm('Não consegui ler o historico/fechamentos.json do GitHub (ou ele está vazio).\n\nO arquivo baixado vai conter SOMENTE ' + mKey + ' — se você subir ele no lugar do antigo, os meses anteriores serão apagados.\n\nContinuar mesmo assim?')) return;
+    if(!confirm('Não consegui ler o historico/fechamentos.json do GitHub (ou ele está vazio).\n\nMotivo: ' + FECHAMENTOS_STATUS + '\n\nO arquivo baixado vai conter SOMENTE ' + mKey + ' — se você subir ele no lugar do antigo, os meses anteriores serão apagados.\n\nContinuar mesmo assim?')) return;
   }
 
   if(historicoFechamentos[mKey]){
