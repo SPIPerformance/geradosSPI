@@ -1567,7 +1567,7 @@ function fecharMesAtual(){
     registros
   };
 
-  const blob = new Blob([JSON.stringify(historicoFechamentos, null, 1)], {type:'application/json;charset=utf-8'});
+  const blob = new Blob([JSON.stringify(historicoFechamentos)], {type:'application/json;charset=utf-8'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
